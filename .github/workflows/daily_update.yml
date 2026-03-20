@@ -3,7 +3,7 @@ name: Daily Retain Update
 on:
   schedule:
   # 매일 한국시간 오전 9시 (UTC 0시)
-    - cron: '5 13 * * *'
+    - cron: '30 13 * * *'
   workflow_dispatch:
 
 jobs:
