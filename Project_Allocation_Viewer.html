@@ -1,0 +1,1812 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Global Retain Viewer</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html{overflow-y:scroll}
+body{font-family:'IBM Plex Sans KR',-apple-system,sans-serif;background:#f0f2f5;color:#1e293b;min-height:100vh}
+::-webkit-scrollbar{height:12px;width:12px}
+::-webkit-scrollbar-track{background:#e2e8f0;border-radius:6px}
+::-webkit-scrollbar-thumb{background:#94a3b8;border-radius:6px}
+::-webkit-scrollbar-thumb:hover{background:#64748b}
+.header{padding:16px 32px;border-bottom:1px solid #e2e8f0;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:#fff;z-index:200;box-shadow:0 1px 3px rgba(0,0,0,0.04)}
+.header-left{display:flex;align-items:center;gap:12px}
+.logo{width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,#3b82f6,#7c3aed);display:flex;align-items:center;justify-content:center;font-size:14px}
+.header-title{font-size:22px;font-weight:600;cursor:pointer}
+.header-title:hover{color:#3b82f6}
+.header-sub{font-size:13px;color:#94a3b8;margin-top:8px}
+.header-right{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.content{padding:24px 32px}
+.upload-zone{border:2px dashed #cbd5e1;border-radius:12px;padding:48px;text-align:center;cursor:pointer;background:#fff;transition:all 0.2s}
+.upload-zone:hover,.upload-zone.dragging{border-color:#60a5fa;background:#f0f7ff}
+.file-input{display:none}
+.action-btn{padding:7px 16px;border-radius:7px;background:#fff;border:1px solid #e2e8f0;font-size:12px;color:#64748b;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+.action-btn:hover{border-color:#93c5fd;color:#3b82f6;background:#f0f7ff}
+.action-btn.save{border-color:#86efac;color:#16a34a}
+.action-btn.save:hover{background:#f0fdf4}
+.tab-bar{display:flex;gap:4px;margin-bottom:20px;background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:4px;width:fit-content;position:sticky;top:68px;z-index:165;box-shadow:0 1px 3px rgba(0,0,0,0.04)}
+.tab-btn{padding:10px 24px;border-radius:7px;border:none;background:transparent;color:#64748b;font-size:17px;font-weight:500;cursor:pointer;font-family:inherit;transition:all 0.15s}
+.tab-btn.active{background:#3b82f6;color:#fff;box-shadow:0 1px 4px rgba(37,99,235,0.3)}
+.tab-btn:hover:not(.active){background:#f1f5f9;color:#334155}
+.toolbar{display:flex;align-items:center;gap:12px;margin-bottom:20px;flex-wrap:wrap;position:sticky;top:118px;background:#f0f2f5;z-index:150;padding:8px 0}
+.search-wrap{position:relative}
+.search-icon{position:absolute;left:12px;top:10px;font-size:14px;color:#94a3b8;pointer-events:none}
+.search-input{background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:10px 14px 10px 38px;color:#1e293b;font-size:15px;width:300px;outline:none;font-family:inherit}
+.search-input:focus{border-color:#60a5fa;box-shadow:0 0 0 3px rgba(96,165,250,0.12)}
+.search-input::placeholder{color:#cbd5e1}
+.clear-btn{position:absolute;right:10px;top:8px;background:#e2e8f0;border:none;color:#64748b;width:22px;height:22px;border-radius:50%;cursor:pointer;font-size:12px;display:flex;align-items:center;justify-content:center}
+.clear-btn:hover{background:#cbd5e1;color:#334155}
+.year-filters{display:flex;gap:6px;align-items:center}
+.year-label{font-size:12px;color:#94a3b8;margin-right:4px}
+.year-btn{padding:5px 14px;border-radius:6px;border:1px solid #e2e8f0;background:#fff;color:#64748b;font-size:12px;cursor:pointer;font-family:inherit}
+.year-btn.active{background:#3b82f6;border-color:#3b82f6;color:#fff}
+.year-btn:hover:not(.active){border-color:#93c5fd;color:#3b82f6}
+.result-count{font-size:12px;color:#94a3b8;padding:4px 12px;background:#fff;border-radius:6px;border:1px solid #e2e8f0}
+.person-section{margin-bottom:12px;background:#fff;border:1px solid #e2e8f0;border-radius:10px;overflow:visible;box-shadow:0 1px 3px rgba(0,0,0,0.03)}
+.person-header{padding:12px 20px;display:flex;align-items:flex-start;gap:14px;background:#fff;cursor:pointer;user-select:none;transition:background 0.15s;flex-wrap:wrap}
+.person-header:hover{background:#f8fafc}
+.person-header.open{border-bottom:1px solid #e2e8f0}
+.person-avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#3b82f6,#7c3aed);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:600;color:#fff;flex-shrink:0}
+.person-name{font-size:14px;font-weight:600}
+.person-info{flex:1;min-width:0}
+.person-stats{display:flex;gap:6px;flex-wrap:wrap;align-items:center;flex:1;min-width:0}
+.stat-chip{display:inline-flex;align-items:center;gap:5px;padding:3px 8px;border-radius:5px;font-size:10px;background:#f1f5f9;border:1px solid #e2e8f0}
+.stat-dot{width:6px;height:6px;border-radius:2px;flex-shrink:0}
+.stat-name{color:#64748b;max-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.stat-hours{color:#3b82f6;font-family:'JetBrains Mono',monospace;font-weight:500}
+.toggle-arrow{color:#94a3b8;font-size:11px;margin-left:8px;transition:transform 0.2s;flex-shrink:0}
+.toggle-arrow.open{transform:rotate(90deg)}
+.gantt-body{animation:fadeIn 0.2s ease;overflow:visible}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.gantt-scroll{overflow-x:auto}
+.gantt-table{border-collapse:collapse;width:max-content}
+.gantt-table th,.gantt-table td{min-width:130px;max-width:130px}
+.month-header-cell{text-align:center;padding:10px 0;border-right:1px solid #e2e8f0;border-bottom:1px solid #e2e8f0;font-size:10px;font-weight:600;color:#64748b;background:#f8fafc;position:sticky;top:0;z-index:2}
+.week-header-cell{text-align:center;padding:8px 0;font-size:10px;color:#94a3b8;border-bottom:1px solid #e2e8f0;border-right:1px solid #cbd5e1;font-family:'JetBrains Mono',monospace;background:#f8fafc;position:sticky;top:31px;z-index:2}
+.week-header-cell.today{background:#e8f1fe;color:#3b82f6;font-weight:600}
+.gantt-cell{vertical-align:top;border-right:1px solid #cbd5e1;border-bottom:1px solid #f1f5f9;padding:0}
+.gantt-cell.today-col{background:#eff6ff !important}
+.gantt-row-even .gantt-cell{background:#fff}
+.gantt-row-odd .gantt-cell{background:#f8fafc}
+.project-block{display:flex;align-items:center;gap:4px;padding:3px 6px;border-radius:4px;font-size:10px;white-space:nowrap;overflow:hidden;margin:2px 3px;height:32px;cursor:default}
+.project-block:hover{opacity:0.85}
+/* Clickable link hover effects */
+.project-block[data-proj]:hover{opacity:1 !important;filter:brightness(0.95);box-shadow:0 1px 4px rgba(37,99,235,0.2);transform:translateY(-1px);transition:all 0.15s}
+[data-person]:hover,[data-avail-person]:hover,[data-detail-proj]:hover,[data-compare-goto]:hover{text-decoration:underline;text-underline-offset:2px}
+.stat-chip[data-proj]:hover{background:#e8f1fe !important;border-color:#93c5fd !important;transform:translateY(-1px);transition:all 0.15s}
+/* Custom fast tooltip */
+.custom-tip{position:fixed;z-index:9999;background:#1e293b;color:#fff;font-size:12px;line-height:1.5;padding:8px 12px;border-radius:6px;pointer-events:none;white-space:pre-line;max-width:360px;box-shadow:0 4px 12px rgba(0,0,0,0.2);opacity:0;transition:opacity 0.05s;font-family:'IBM Plex Sans KR',sans-serif}
+.custom-tip.show{opacity:1}
+/* Custom instant tooltip */
+.custom-tip{position:fixed;z-index:9999;background:#1e293b;color:#fff;font-size:11px;line-height:1.5;padding:8px 12px;border-radius:6px;pointer-events:none;opacity:0;transition:opacity 0.1s;white-space:pre-line;max-width:320px;box-shadow:0 4px 12px rgba(0,0,0,0.2)}
+.project-block-name{flex:1;overflow:hidden;text-overflow:ellipsis;color:#334155;font-size:10px}
+.project-block-hours{font-family:'JetBrains Mono',monospace;font-size:9.5px;font-weight:600;flex-shrink:0}
+.avail-toolbar{display:flex;align-items:center;gap:12px;margin-bottom:20px;flex-wrap:wrap;position:sticky;top:118px;background:#f0f2f5;z-index:150;padding:8px 0}
+.date-input{background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:10px 14px;color:#1e293b;font-size:14px;outline:none;font-family:inherit}
+.date-input:focus{border-color:#60a5fa;box-shadow:0 0 0 3px rgba(96,165,250,0.12)}
+.check-btn{padding:10px 20px;border-radius:8px;border:none;background:#3b82f6;color:#fff;font-size:15px;font-weight:600;cursor:pointer;font-family:inherit}
+.check-btn:hover{background:#2563eb}
+.avail-count{font-size:13px;color:#64748b;margin-bottom:16px}
+.avail-count strong{color:#3b82f6}
+.rank-group{margin-bottom:12px;background:#fff;border:1px solid #e2e8f0;border-radius:10px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,0.03)}
+.rank-group-header{padding:14px 20px;background:#fff;display:flex;align-items:center;justify-content:space-between;cursor:pointer;user-select:none;transition:background 0.15s}
+.rank-group-header:hover{background:#f8fafc}
+.rank-group-header.open{border-bottom:1px solid #e2e8f0;background:#f8fafc}
+.rank-group-left{display:flex;align-items:center;gap:10px}
+.rank-group-title{font-size:14px;font-weight:600;color:#334155}
+.rank-group-count{font-size:11px;color:#1e293b;background:#e2e8f0;padding:2px 10px;border-radius:10px;font-weight:600}
+.rank-toggle{color:#94a3b8;font-size:11px;transition:transform 0.2s}
+.rank-toggle.open{transform:rotate(90deg)}
+.rank-group-body{animation:fadeIn 0.2s ease}
+.avail-table{width:100%;border-collapse:collapse}
+.avail-table thead th{padding:10px 16px;text-align:left;font-size:12px;font-weight:600;color:#64748b;background:#f8fafc;border-bottom:1px solid #e2e8f0}
+.avail-table tbody td{padding:10px 16px;font-size:13px;border-bottom:1px solid #f1f5f9;color:#334155}
+.avail-table tbody tr:last-child td{border-bottom:none}
+.avail-table tbody tr:hover{background:#f8fafc}
+.avail-range{font-size:12px;color:#3b82f6;font-weight:500}
+.avail-days{display:inline-block;margin-left:8px;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600}
+.avail-days.short{background:#dcfce7;color:#16a34a}
+.avail-days.medium{background:#fef3c7;color:#d97706}
+.avail-days.long{background:#e8f1fe;color:#3b82f6}
+.empty-state{text-align:center;padding:64px;color:#94a3b8;font-size:14px}
+.empty-icon{font-size:36px;margin-bottom:12px}
+.loading-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(240,242,245,0.85);z-index:999;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.loading-spinner{width:40px;height:40px;border:3px solid #e2e8f0;border-top-color:#3b82f6;border-radius:50%;animation:spin 0.8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-text{margin-top:16px;font-size:14px;color:#64748b}
+/* Detail tab */
+.detail-section{background:#fff;border:1px solid #e2e8f0;border-radius:10px;overflow:hidden;margin-bottom:12px;box-shadow:0 1px 3px rgba(0,0,0,0.03)}
+.detail-year-header{padding:14px 20px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;user-select:none;background:#fff;transition:background 0.15s}
+.detail-year-header:hover{background:#f8fafc}
+.detail-year-header.open{border-bottom:1px solid #e2e8f0;background:#f8fafc}
+.detail-year-title{font-size:14px;font-weight:600;color:#334155;display:flex;align-items:center;gap:10px}
+.detail-year-hours{font-size:12px;color:#3b82f6;font-weight:600}
+.detail-table{width:100%;border-collapse:collapse}
+.detail-table thead th{padding:10px 16px;text-align:left;font-size:12px;font-weight:600;color:#64748b;background:#f8fafc;border-bottom:1px solid #e2e8f0}
+.detail-table tbody td{padding:10px 16px;font-size:13px;border-bottom:1px solid #f1f5f9;color:#334155}
+.detail-table tbody tr:last-child td{border-bottom:none}
+.detail-table tbody tr:hover{background:#f8fafc}
+.detail-period{font-size:12px;color:#64748b}
+/* Tooltip */
+
+/* Tooltip removed - using native title */
+/* Compare mode */
+.compare-bar{position:fixed;bottom:0;left:0;right:0;background:#1e293b;color:#fff;padding:12px 32px;display:flex;align-items:center;justify-content:space-between;z-index:300;box-shadow:0 -4px 20px rgba(0,0,0,0.15);transform:translateY(100%);transition:transform 0.3s ease}
+.compare-bar.visible{transform:translateY(0)}
+.compare-bar-left{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.compare-chip{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:6px;font-size:12px;font-weight:500;background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.2)}
+.compare-chip .remove-chip{cursor:pointer;opacity:0.6;font-size:10px}
+.compare-chip .remove-chip:hover{opacity:1}
+.compare-bar-right{display:flex;gap:8px}
+.compare-go-btn{padding:8px 20px;border-radius:7px;border:none;background:#3b82f6;color:#fff;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit}
+.compare-go-btn:hover{background:#3b82f6}
+.compare-go-btn:disabled{opacity:0.4;cursor:not-allowed}
+.compare-clear-btn{padding:8px 16px;border-radius:7px;border:1px solid rgba(255,255,255,0.3);background:transparent;color:#fff;font-size:12px;cursor:pointer;font-family:inherit}
+.compare-clear-btn:hover{background:rgba(255,255,255,0.1)}
+.compare-check{width:18px;height:18px;border-radius:4px;border:2px solid #cbd5e1;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0;transition:all 0.15s;background:#fff}
+.compare-check:hover{border-color:#3b82f6}
+.compare-check.checked{background:#3b82f6;border-color:#3b82f6;color:#fff}
+.compare-view{background:#fff;border:1px solid #e2e8f0;border-radius:10px;overflow:hidden;margin-bottom:12px;box-shadow:0 1px 3px rgba(0,0,0,0.03)}
+.compare-person-header{padding:12px 16px;background:#f8fafc;border-bottom:1px solid #e2e8f0;display:flex;align-items:center;gap:10px}
+.compare-person-header .person-avatar{width:28px;height:28px;font-size:12px}
+/* Project summary cards */
+.proj-summary{display:flex;gap:12px;padding:16px;flex-wrap:wrap;border-bottom:1px solid #e2e8f0;background:#fafbfc}
+.proj-summary-card{flex:1;min-width:120px;max-width:200px;padding:12px 16px;border-radius:8px;background:#fff;border:1px solid #e2e8f0}
+.proj-summary-card .label{font-size:10px;color:#94a3b8;font-weight:500;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px}
+.proj-summary-card .value{font-size:18px;font-weight:700;color:#1e293b;font-family:'JetBrains Mono',monospace}
+.proj-summary-card .sub{font-size:10px;color:#64748b;margin-top:2px}
+.rank-dist{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+.rank-dist-chip{padding:2px 8px;border-radius:4px;font-size:10px;background:#f1f5f9;border:1px solid #e2e8f0;color:#475569}
+.rank-dist-chip strong{color:#3b82f6;font-family:'JetBrains Mono',monospace}
+/* Avail range inputs */
+.avail-range-wrap{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.avail-range-sep{font-size:13px;color:#94a3b8;font-weight:500}
+.min-days-wrap{display:flex;align-items:center;gap:6px}
+.min-days-input{width:60px;background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:10px 10px;color:#1e293b;font-size:14px;outline:none;font-family:inherit;text-align:center}
+.min-days-input:focus{border-color:#60a5fa;box-shadow:0 0 0 3px rgba(96,165,250,0.12)}
+.min-days-label{font-size:14px;color:#64748b}
+</style>
+</head>
+<body>
+<div id="appWrap">
+  <div class="header">
+    <div class="header-left" id="headerReset" style="cursor:pointer"><div><div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap"><div class="header-title" style="cursor:pointer" id="headerTitleReset">Global Retain Viewer<div style="font-size:14px;color:#64748b;font-weight:500;margin-top:2px">(Global IPO, CMAAS, IOA + NGH 전체 인원)</div></div></div><div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap"><div class="header-sub" id="headerSub">Copyright © 2026 JS KIM. All rights reserved.</div></div><div id="fileRunDateInfo" style="display:none;margin-top:6px"></div></div></div>
+    <div class="header-right">
+      <div id="headerNotice" style="display:none;max-width:560px;padding:12px 16px;border:1px solid #e2e8f0;border-radius:8px;background:#fafbfc;font-size:13px;color:#475569;line-height:1.6">
+        <div style="margin-bottom:4px">1. 해당 어싸인 표는 TalentLink와 달리 <span style="color:#dc2626;font-weight:700">실시간으로 업데이트되지 않으며</span>, 매일 오전 9시 기준 데이터로 하루 1회만 업데이트됩니다.</div>
+        <div>2. 현재 TalentLink에서는 어싸인 자료 추출이 2026년 6월까지로 제한되어 있어, 해당 어싸인 표에서는 2026년 6월까지의 어싸인 내역만 조회됩니다. 5월 중 2027년 자료까지 추출이 가능해질 예정이며, 해당 시점에 2026년 6월 이후 어싸인 내역도 반영될 예정입니다.</div>
+        <div style="margin-top:8px;padding-top:8px;border-top:1px solid #e2e8f0;display:flex;align-items:center;gap:8px;flex-wrap:nowrap"><span style="font-size:12px;color:#64748b;font-weight:600;white-space:nowrap">참고사이트</span><a href="https://pwc-talentlink-east.pwcinternal.com/Authenticator/Files/static/html/webportal.html" target="_blank" rel="noopener" title="TalentLink Web Portal 사이트로 이동" style="display:inline-flex;align-items:center;gap:5px;padding:3px 8px;border:1px solid #e2e8f0;border-radius:6px;background:#fff;font-size:11px;color:#64748b;text-decoration:none;font-family:inherit;cursor:pointer;white-space:nowrap" onmouseover="this.style.borderColor='#93c5fd';this.style.color='#2563eb';this.style.background='#f0f7ff'" onmouseout="this.style.borderColor='#e2e8f0';this.style.color='#64748b';this.style.background='#fff'"><img src="data:image/png;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADb/2wBDAAUDBAQEAwUEBAQFBQUGBwwIBwcHBw8LCwkMEQ8SEhEPERETFhwXExQaFRERGCEYGh0dHx8fExciJCIeJBweHx7/2wBDAQUFBQcGBw4ICA4eFBEUHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh7/wAARCAAaABsDASIAAhEBAxEB/8QAGgAAAgIDAAAAAAAAAAAAAAAABgcACAIDBf/EACgQAAICAAYBAwQDAAAAAAAAAAECAwQABQYREiEHEzFBFBZRYTIzgf/EABcBAQEBAQAAAAAAAAAAAAAAAAMCBAX/xAAmEQACAQMDAQkAAAAAAAAAAAABAgMABBExQVEFEhMhIkJSgZHw/9oADAMBAAIRAxEAPwC49iZIYnlkdUjRSzsx2CgdknA5kWudI54tpssz+nMtT+8sxjCD87sBuP2OsdrN6UOZZZcy6zy9G1C8EnE7HiylTt/hxXyTTujfD2qVk1Og1HWv1WNZGqoz12Vx20bHiwI9nBBBUjbvfGO6nkhKkAdncnbiuv0yyt7tHRi3eekAa8/sj50pqP5T0d94VdLwX2tWrLLGk9cLJAHb+Klwfc9DoEfnBvhX+Nsn09q7N5PIYo1AqyfT5XXjjCfTJEdg7gdeoff54jbb9NDF2zyOpZ8YOmOKHqUVvDII4gQQPNn3b/WlZOO98Knzf4st66v0szyzMK9a5Xh9B0scuDpyLDtQSCCx+MNnGs++EngSdCjjwobK9msphNCcMKEfE2jhofSKZM1oWpnmaeaRQQpdgB1v8bKMFuJiYqONY1CLoKK4ne4laWQ5YnJr/9k=" style="width:14px;height:14px;border-radius:2px"> TalentLink Web Portal</a><a href="https://pageone.pwc.kr/covicore/control/goOrgChart.do?type=A0&amp;treeKind=Group&amp;css=samil&amp;CFN_OpenWindowName=조직구성" target="_blank" rel="noopener" title="직원 검색(Pageone) 사이트로 이동" style="display:inline-flex;align-items:center;gap:5px;padding:3px 8px;border:1px solid #e2e8f0;border-radius:6px;background:#fff;font-size:11px;color:#64748b;text-decoration:none;font-family:inherit;cursor:pointer;white-space:nowrap" onmouseover="this.style.borderColor='#93c5fd';this.style.color='#2563eb';this.style.background='#f0f7ff'" onmouseout="this.style.borderColor='#e2e8f0';this.style.color='#64748b';this.style.background='#fff'"><img src="data:image/png;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADb/2wBDAAUDBAQEAwUEBAQFBQUGBwwIBwcHBw8LCwkMEQ8SEhEPERETFhwXExQaFRERGCEYGh0dHx8fExciJCIeJBweHx7/2wBDAQUFBQcGBw4ICA4eFBEUHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh7/wAARCAAUABwDASIAAhEBAxEB/8QAFgABAQEAAAAAAAAAAAAAAAAAAAYI/8QAHxAAAQMFAQEBAAAAAAAAAAAAAQACAwQFBhExIRIV/8QAFgEBAQEAAAAAAAAAAAAAAAAAAwAB/8QAIhEAAQQBAwUBAAAAAAAAAAAAAQACAxFhIVFxEiORobHB/9oADAMBAAIRAxEAPwDZaIpensWUm7GauzN1RbnPcX0UVtji2w70wSAlw1se987v1FJI5ldLSb2rTmyPVp4YmSAlzw2t71wKB15oZVQinMewbFsfuH6FotTaep+CwSGaR+ge6DnEDnVRrYjIW9wAHBv8HxZO2FrqhcSMgA+AXfURESIUREUpf//Z" style="width:14px;height:14px;border-radius:2px"> 직원 검색(Pageone)</a><a href="https://smartoffice.samil.com/usc/swc/selectSmrtCnterResveListSearch.do" target="_blank" rel="noopener" title="Smart Office System 사이트로 이동" style="display:inline-flex;align-items:center;gap:5px;padding:3px 8px;border:1px solid #e2e8f0;border-radius:6px;background:#fff;font-size:11px;color:#64748b;text-decoration:none;font-family:inherit;cursor:pointer;white-space:nowrap" onmouseover="this.style.borderColor='#93c5fd';this.style.color='#2563eb';this.style.background='#f0f7ff'" onmouseout="this.style.borderColor='#e2e8f0';this.style.color='#64748b';this.style.background='#fff'"><img src="data:image/png;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADb/2wBDAAUDBAQEAwUEBAQFBQUGBwwIBwcHBw8LCwkMEQ8SEhEPERETFhwXExQaFRERGCEYGh0dHx8fExciJCIeJBweHx7/2wBDAQUFBQcGBw4ICA4eFBEUHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh7/wAARCAAUABwDASIAAhEBAxEB/8QAFgABAQEAAAAAAAAAAAAAAAAAAAYI/8QAHxAAAQMFAQEBAAAAAAAAAAAAAQACAwQFBhExIRIV/8QAFgEBAQEAAAAAAAAAAAAAAAAAAwAB/8QAIhEAAQQBAwUBAAAAAAAAAAAAAQACAxFhIVFxEiORobHB/9oADAMBAAIRAxEAPwDZaIpensWUm7GauzN1RbnPcX0UVtji2w70wSAlw1se987v1FJI5ldLSb2rTmyPVp4YmSAlzw2t71wKB15oZVQinMewbFsfuH6FotTaep+CwSGaR+ge6DnEDnVRrYjIW9wAHBv8HxZO2FrqhcSMgA+AXfURESIUREUpf//Z" style="width:14px;height:14px;border-radius:2px"> Smart Office System</a></div>
+      </div>
+      <button class="action-btn save" id="saveBtn" style="display:none">📦 공유용 파일 저장</button>
+      <div id="replaceWrap" style="display:none"><label class="action-btn">🔄 파일 교체<input type="file" accept=".xlsx,.xls" class="file-input" id="replaceInput"></label></div>
+    </div>
+  </div>
+  <div class="content">
+    <div id="uploadZone">
+      <label><div class="upload-zone" id="dropZone"><div style="font-size:40px;margin-bottom:12px">📁</div><div style="font-size:15px;font-weight:500;color:#475569">Excel 파일을 드래그하거나 클릭하여 업로드</div><div style="font-size:12px;color:#94a3b8;margin-top:6px">Data_output_Excel 파일 (.xlsx)</div></div><input type="file" accept=".xlsx,.xls" class="file-input" id="fileInput"></label>
+    </div>
+    <div id="mainUI" style="display:none">
+      <div class="tab-bar">
+          <button class="tab-btn active" data-tab="gantt">📋 어싸인 현황</button>
+          <button class="tab-btn" data-tab="detail">📄 개인별 프로젝트 내역</button>
+          <button class="tab-btn" data-tab="projSearch">🔎 프로젝트별 검색</button>
+          <button class="tab-btn" data-tab="avail">🟢 Available 조회</button>
+          <button class="tab-btn" data-tab="news">📰 업계 기사모음</button>
+      </div>
+      <div id="tabGantt">
+        <div id="ganttGuide" style="padding:8px 0 4px;font-size:14px;color:#1e293b;display:flex;align-items:center;gap:6px">💡이름을 직접 검색하거나 해당하는 직급을 클릭하여 조회할 수 있습니다. 프로젝트 바를 클릭하면 해당 프로젝트 상세로 이동합니다.</div>
+        <div class="toolbar"><div class="search-wrap"><span class="search-icon">🔍</span><input class="search-input" id="searchInput" placeholder="이름 검색..." autocomplete="off"><button class="clear-btn" id="clearBtn" style="display:none">✕</button></div><div class="year-filters" id="yearFilters" style="display:none"><span class="year-label">기간</span><div id="yearBtns" style="display:flex;gap:6px"></div></div></div>
+        <div id="ganttArea"></div>
+      </div>
+      <div id="tabDetail" style="display:none">
+        <div id="detailGuide" style="padding:8px 0 4px;font-size:14px;color:#1e293b;display:flex;align-items:center;gap:6px">💡이름을 직접 검색하거나 해당하는 직급을 클릭하여 조회할 수 있습니다. 프로젝트 바를 클릭하면 해당 프로젝트 상세로 이동합니다.</div>
+        <div class="toolbar"><div class="search-wrap"><span class="search-icon">🔍</span><input class="search-input" id="detailSearchInput" placeholder="이름 검색..." autocomplete="off"></div></div>
+        <div id="detailArea"></div>
+      </div>
+      <div id="tabProjSearch" style="display:none">
+        <div id="projGuide" style="padding:8px 0 4px;font-size:14px;color:#1e293b;display:flex;align-items:center;gap:6px">💡프로젝트명을 직접 검색하거나 해당하는 EL명을 클릭하여 조회할 수 있습니다. 인원 이름을 클릭하면 해당 인원의 어싸인 현황으로 이동합니다.</div>
+        <div class="toolbar"><div class="search-wrap"><span class="search-icon">🔍</span><input class="search-input" id="projSearchInput" placeholder="프로젝트명 검색..." autocomplete="off" style="width:400px"></div></div>
+        <div id="projSearchArea"></div>
+      </div>
+      <div id="tabAvail" style="display:none">
+        <div style="display:flex;gap:0;min-height:calc(100vh - 200px)">
+          <!-- LEFT: Available Search -->
+          <div style="flex:1;min-width:0;border-right:2px solid #e2e8f0;padding-right:20px">
+            <div id="availLeftSticky" style="position:sticky;top:68px;z-index:160;background:#f0f2f5;padding-bottom:4px">
+              <div style="font-size:16px;font-weight:600;color:#334155;margin-bottom:6px;display:flex;align-items:center;gap:6px;padding-top:8px">🟢 Available 검색</div>
+              <div id="availLeftGuide">
+                <div style="padding:4px 0 6px;font-size:14px;color:#1e293b;padding-left:20px;text-indent:-20px;line-height:1.6">💡 기간과 최소 일수를 설정한 뒤 조회하면, 해당 기간 내 어싸인이 없는 인원을 본부·직급별로 확인할 수 있습니다. 종료일을 비워두면 시작일 하루만 조회됩니다.</div>
+                <div style="padding:0 0 4px;font-size:13px;color:#dc2626;font-weight:400;margin-left:24px">(시스템 추출 로직 상 '휴직자'가 포함되어 있을 수 있습니다. 참고용으로 검색하시고, 찾은 인원의 정확한 정보는 TalentLink 상에서 한 번 더 확인 부탁드립니다.)</div>
+              </div>
+              <div style="position:static;padding:8px 14px;margin-bottom:6px;background:#fff;border:1px solid #e2e8f0;border-radius:10px;display:flex;align-items:center;gap:6px;flex-wrap:nowrap">
+                  <label style="font-size:13px;color:#1e293b;font-weight:700">기간</label>
+                  <input type="date" class="date-input" id="availDateFrom" style="padding:5px 4px;font-size:11px;width:120px">
+                  <span style="color:#94a3b8;font-size:11px">~</span>
+                  <input type="date" class="date-input" id="availDateTo" style="padding:5px 4px;font-size:11px;width:120px">
+                  <label style="font-size:11px;color:#64748b">최소</label>
+                  <input type="number" class="min-days-input" id="availMinDays" value="1" min="1" max="999" style="width:40px;padding:5px 4px;font-size:11px">
+                  <label style="font-size:11px;color:#64748b">일</label>
+                  <span style="color:#e2e8f0;font-size:14px">|</span>
+                  <label style="font-size:13px;color:#1e293b;font-weight:700">직급</label>
+                  <select id="availRankFilter" style="background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:5px 6px;color:#1e293b;font-size:11px;outline:none;font-family:inherit;cursor:pointer">
+                    <option value="">전체</option>
+                    <option value="Senior-Manager">SM</option>
+                    <option value="Manager">M</option>
+                    <option value="Senior-Associate">SA</option>
+                    <option value="Associate">A</option>
+                    <option value="Assistant-Associate">AA</option>
+                    <option value="Intern">Intern</option>
+                  </select>
+                  <label style="font-size:13px;color:#1e293b;font-weight:700">사번</label>
+                  <select id="availJobCodeFilter" style="background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:5px 6px;color:#1e293b;font-size:11px;outline:none;font-family:inherit;cursor:pointer">
+                    <option value="">전체</option>
+                  </select>
+                  <button class="check-btn" id="availBtn" style="padding:5px 14px;font-size:11px">조회</button>
+              </div>
+            </div>
+            <div id="availResult"></div>
+          </div>
+          <!-- RIGHT: Compare Mode -->
+          <div style="flex:1;min-width:0;padding-left:20px">
+            <div id="availRightSticky" style="position:sticky;top:68px;z-index:160;background:#f0f2f5;padding-bottom:4px">
+              <div style="font-size:16px;font-weight:600;color:#334155;margin-bottom:6px;display:flex;align-items:center;gap:6px;padding-top:8px">👥 비교 모드</div>
+              <div id="availRightGuide">
+                <div style="padding:4px 0 4px;font-size:14px;color:#1e293b;display:flex;align-items:center;gap:6px">💡 이름을 검색하여 선택(또는 Enter)한 뒤 비교하기를 누르면, 전체 기간의 어싸인 일정을 나란히 비교할 수 있습니다.</div>
+                <div style="padding:0 0 4px;font-size:13px;color:#94a3b8;margin-left:24px">(최대 5명까지 비교 가능)</div>
+              </div>
+              <div style="position:static;padding:8px 14px;margin-bottom:6px;background:#fff;border:1px solid #e2e8f0;border-radius:10px;display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+                <div class="search-wrap"><span class="search-icon">🔍</span><input class="search-input" id="compareSearchInput" placeholder="비교할 인원 검색 (최대 5명)..." autocomplete="off" style="width:260px;padding:6px 10px 6px 34px;font-size:12px"><button class="clear-btn" id="compareClearBtn" style="display:none">✕</button></div>
+              </div>
+              <div id="compareSelectedInfo" style="font-size:12px;color:#94a3b8;margin-bottom:4px"></div>
+            </div>
+            <div id="compareSelectArea"></div>
+            <div id="compareResultArea" style="margin-top:12px"></div>
+          </div>
+        </div>
+      </div>
+      <div id="tabNews" style="display:none">
+        <div style="padding:8px 0 12px">
+          <div style="font-size:16px;font-weight:600;color:#334155;display:flex;align-items:center;gap:6px">📰 업계 기사모음</div>
+          <div id="newsDate" style="font-size:11px;color:#94a3b8;margin-top:2px"></div>
+        </div>
+        <div id="newsContent" style="font-size:13px;color:#94a3b8;padding:20px 0">뉴스 데이터가 없습니다. news_update.py를 실행해주세요.</div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="custom-tip" id="customTip"></div>
+<div class="loading-overlay" id="loading" style="display:none"><div class="loading-spinner"></div><div class="loading-text" id="loadingText">로딩 중...</div></div>
+<script>
+var EMBEDDED_DATA = null;
+var EMBEDDED_FILE_RUN_DATE = null;
+var IS_SHARED = false;
+
+var COLORS=["#3b82f6","#dc2626","#059669","#d97706","#7c3aed","#db2777","#0891b2","#65a30d","#ea580c","#4f46e5","#be123c","#0d9488","#ca8a04","#9333ea","#e11d48","#0284c7","#16a34a","#c2410c","#6d28d9","#b91c1c"];
+var allData=[],allNames=[],yearFilter="all",expandedSet=new Set(),searchQuery="",debounceTimer=null,personCache={},fileRunDateText="";
+var nameRankMap={};
+var personInfoMap={};
+var rawParsedForSave=null;
+var AVAIL_RANKS=["Senior-Manager","Manager","Senior-Associate","Associate","Assistant-Associate","Intern"];
+var RANK_ORDER=["Director","Senior-Manager","Manager","Senior-Associate","Associate","Assistant-Associate","Intern"];
+function rankIndex(r){var i=RANK_ORDER.indexOf(r);return i>=0?i:RANK_ORDER.length;}
+// Person key system for handling duplicate names
+function personKey(name,jobCode){return name+"|"+(jobCode||"");}
+function personKeyName(key){return key.split("|")[0];}
+function personKeyJobCode(key){return key.split("|")[1]||"";}
+function personDisplayName(key){
+  var name=personKeyName(key);
+  var info=personInfoMap[key];
+  // Check if there are other people with the same name
+  var dupes=allNames.filter(function(k){return personKeyName(k)===name;});
+  if(dupes.length>1&&info){
+    // Check if dept alone differentiates
+    var sameDept=dupes.filter(function(k){var i=personInfoMap[k];return i&&i.dept===info.dept;});
+    if(sameDept.length>1){return name+" ("+info.dept+" · "+info.jobCode+")";}
+    return name+" ("+info.dept+")";
+  }
+  return name;
+}
+function buildPersonMaps(){
+  var seen={};
+  allData.forEach(function(r){
+    var pk=personKey(r.name,r.jobCode);
+    if(!seen[pk]){seen[pk]=1;personInfoMap[pk]={name:r.name,rank:r.rank,dept:r.dept,jobCode:r.jobCode};}
+    if(!nameRankMap[pk])nameRankMap[pk]=r.rank;
+  });
+  allNames=Object.keys(seen).sort(function(a,b){return personKeyName(a).localeCompare(personKeyName(b));});
+}
+
+function getMonday(d){var dt=new Date(d);var y=dt.getFullYear(),m=dt.getMonth(),day=dt.getDate();var dow=new Date(y,m,day).getDay();var diff=dow===0?-6:1-dow;return new Date(y,m,day+diff);}
+function fmtWeek(d){return(d.getMonth()+1)+"/"+d.getDate();}
+function fmtWeekFull(d){return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");}
+function fmtDate(d){return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");}
+function fmtDateKR(d){return d.getFullYear()+"."+(d.getMonth()+1)+"."+d.getDate();}
+function daysBetween(a,b){return Math.round((b-a)/864e5);}
+function roundHalf(v){var n=parseFloat(v)||0;return Math.round(n*2)/2;}
+function fmtHours(v){var n=roundHalf(v);return (n%1===0?String(n.toFixed(0)):String(n.toFixed(1)))+"h";}
+function escapeHtml(s){return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;");}
+
+function infoText(rank,dept,jobCode){var parts=[];if(rank)parts.push(rank);if(dept)parts.push(dept);if(jobCode)parts.push(String(jobCode));return parts.join(" · ");}
+function weekCellBackground(bg){
+  var base=bg||"#fff";
+  return base+';background-image:linear-gradient(to right, rgba(100,116,139,0.34) 0, rgba(100,116,139,0.34) 1px, transparent 1px, transparent calc(20% - 0.5px), rgba(148,163,184,0.18) calc(20% - 0.5px), rgba(148,163,184,0.18) calc(20% + 0.5px), transparent calc(20% + 0.5px), transparent calc(40% - 0.5px), rgba(148,163,184,0.18) calc(40% - 0.5px), rgba(148,163,184,0.18) calc(40% + 0.5px), transparent calc(40% + 0.5px), transparent calc(60% - 0.5px), rgba(148,163,184,0.18) calc(60% - 0.5px), rgba(148,163,184,0.18) calc(60% + 0.5px), transparent calc(60% + 0.5px), transparent calc(80% - 0.5px), rgba(148,163,184,0.18) calc(80% - 0.5px), rgba(148,163,184,0.18) calc(80% + 0.5px), transparent calc(80% + 0.5px), transparent calc(100% - 1px), rgba(100,116,139,0.34) calc(100% - 1px), rgba(100,116,139,0.34) 100%);background-repeat:no-repeat';
+}
+function getWeeksBetween(s,e){var w=[];var c=getMonday(s);var em=getMonday(e);var cy=c.getFullYear(),cm=c.getMonth(),cd=c.getDate();while(new Date(cy,cm,cd)<=em){w.push(new Date(cy,cm,cd));cd+=7;}return w;}
+function toLastBusinessDay(d){var dt=new Date(d);var y=dt.getFullYear(),m=dt.getMonth(),day=dt.getDate();var dow=new Date(y,m,day).getDay();if(dow===6)return new Date(y,m,day-1);if(dow===0)return new Date(y,m,day-2);return new Date(y,m,day);}
+function countBusinessDays(from,to){var count=0;var fy=from.getFullYear(),fm=from.getMonth(),fd=from.getDate();var end=new Date(to.getFullYear(),to.getMonth(),to.getDate());for(var i=0;;i++){var cur=new Date(fy,fm,fd+i);if(cur>end)break;var dow=cur.getDay();if(dow!==0&&dow!==6)count++;}return count;}
+function escapeAttr(str){return String(str||"").replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+
+// Close sibling accordions at same level
+function closeSiblings(headerEl){
+  var parent=headerEl.parentElement.parentElement; // container of groups
+  if(!parent)return;
+  var siblings=parent.children;
+  for(var i=0;i<siblings.length;i++){
+    var sib=siblings[i];
+    if(sib===headerEl.parentElement)continue;
+    var sh=sib.querySelector(".rank-group-header,.detail-year-header,.person-header");
+    if(sh&&sh.classList.contains("open")){
+      sh.classList.remove("open");
+      var arrow=sh.querySelector(".rank-toggle,.toggle-arrow");
+      if(arrow)arrow.classList.remove("open");
+      // Find and hide body
+      var bodies=sib.querySelectorAll(":scope > div:not(.rank-group-header):not(.detail-year-header):not(.person-header)");
+      for(var j=0;j<bodies.length;j++){
+        if(bodies[j].className!=="rank-group-header"&&bodies[j].className!=="detail-year-header"&&bodies[j].className!=="person-header"){
+          if(bodies[j].style)bodies[j].style.display="none";
+        }
+      }
+      // For person-section gantt-body removal
+      var gb=sib.querySelector(".gantt-body");
+      if(gb)gb.remove();
+      // Update expandedSet if person
+      var pname=sib.dataset?sib.dataset.name:null;
+      if(pname&&typeof expandedSet!=="undefined")expandedSet.delete(pname);
+    }
+  }
+}
+function isWeekday(d){var day=d.getDay();return day!==0&&day!==6;}
+function uniqueNonEmpty(arr){return Array.from(new Set((arr||[]).filter(function(v){return !!v;})));}
+function isValidDateObj(d){return d instanceof Date&&!isNaN(d.getTime());}
+function cleanDateDisplayValue(v){
+  if(v===undefined||v===null)return "";
+  var s=String(v).trim();
+  if(!s)return "";
+  s=s.replace(/_/g,"").replace(/\s+/g,"");
+  if(/^\d{8}$/.test(s))return s.slice(0,4)+"-"+s.slice(4,6)+"-"+s.slice(6,8);
+  return s;
+}
+function extractFileRunDate(rows){
+  if(!rows||!rows.length)return "";
+  var keyCandidates=["FileRunDate","File Run Date","파일실행일자","추출일자","추출 일자","TalentLink 추출 일자","TalentLinkRunDate"];
+  for(var i=0;i<rows.length;i++){
+    var row=rows[i]||{};
+    var keys=Object.keys(row);
+    for(var j=0;j<keys.length;j++){
+      var key=keys[j];
+      var normalized=String(key||"").replace(/\s+/g,"").toLowerCase();
+      var matched=keyCandidates.indexOf(key)>=0||normalized.indexOf("filerundate")>=0||normalized.indexOf("추출일자")>=0||normalized.indexOf("파일실행일자")>=0||normalized.indexOf("talentlink")>=0&&normalized.indexOf("date")>=0;
+      if(!matched)continue;
+      var v=row[key];
+      var d=serialToDate(v);
+      if(isValidDateObj(d))return fmtDate(d);
+      var cleaned=cleanDateDisplayValue(v);
+      d=serialToDate(cleaned);
+      if(isValidDateObj(d))return fmtDate(d);
+      if(cleaned&&cleaned!=="NaN-NaN-NaN")return cleaned;
+    }
+  }
+  return "";
+}
+function updateFileRunDateInfo(v){
+  var cleaned=cleanDateDisplayValue(v);
+  var d=serialToDate(cleaned);
+  fileRunDateText=isValidDateObj(d)?fmtDate(d):(cleaned&&cleaned!=="NaN-NaN-NaN"?cleaned:"");
+  var el=document.getElementById("fileRunDateInfo");
+  if(!el)return;
+  el.style.display=fileRunDateText?"block":"none";
+  el.innerHTML='🔄 <span style="font-size:17px;font-weight:700;color:#1e293b;background:linear-gradient(transparent 60%,#bfdbfe 60%);padding:0 2px">'+(fileRunDateText||"-")+' 오전 9시 기준</span><span style="font-size:17px;color:#475569;margin-left:6px">TalentLink 데이터 반영</span>';
+}
+function getWeekdaySegments(startDate,endDate,weekStart){var weekEnd=new Date(weekStart.getFullYear(),weekStart.getMonth(),weekStart.getDate()+6);var s=startDate>weekStart?new Date(startDate):new Date(weekStart);var e=endDate<weekEnd?new Date(endDate):new Date(weekEnd);if(s>e)return [];var segs=[];var open=null;for(var i=0;i<5;i++){var day=new Date(weekStart.getFullYear(),weekStart.getMonth(),weekStart.getDate()+i);var active=day>=s&&day<=e&&isWeekday(day);if(active){if(open===null)open=i;}else if(open!==null){segs.push({start:open,end:i-1});open=null;}}if(open!==null)segs.push({start:open,end:4});return segs;}
+function mergeSegments(segs){if(!segs||!segs.length)return [];var sorted=segs.slice().sort(function(a,b){return a.start-b.start||a.end-b.end;});var merged=[{start:sorted[0].start,end:sorted[0].end}];for(var i=1;i<sorted.length;i++){var cur=sorted[i],last=merged[merged.length-1];if(cur.start<=last.end+1){if(cur.end>last.end)last.end=cur.end;}else merged.push({start:cur.start,end:cur.end});}return merged;}
+function hexToRgba(hex,alpha){var h=String(hex||"").replace("#","");if(h.length===3)h=h.split("").map(function(x){return x+x;}).join("");if(h.length!==6)return hex;var r=parseInt(h.substring(0,2),16),g=parseInt(h.substring(2,4),16),b=parseInt(h.substring(4,6),16);return 'rgba('+r+','+g+','+b+','+alpha+')';}
+function buildSegmentBarsHtml(segments,color,opts){
+  if(!segments||!segments.length)return "";
+  opts=opts||{};
+  var width=opts.width||120;
+  var height=opts.height||26;
+  var barHeight=opts.barHeight||20;
+  var top=opts.top!==undefined?opts.top:3;
+  var radius=opts.radius||4;
+  var fill=opts.fill||hexToRgba(color,0.3);
+  var border=opts.border||color;
+  var lineColor=opts.lineColor||"transparent";
+  var lineTop=opts.lineTop!==undefined?opts.lineTop:0;
+  var lineBottom=opts.lineBottom!==undefined?opts.lineBottom:0;
+  var innerW=width;
+  var dayW=innerW/5;
+  var padX=opts.padX!==undefined?opts.padX:4;
+  var parts=['<div style="position:relative;'+(padX>0?'width:calc(100% + '+(padX*2)+'px);margin-left:-'+padX+'px;':'width:100%;')+'height:'+height+'px">'];
+  for(var i=1;i<5;i++){
+    var lPct=i*20;
+    parts.push('<div style="position:absolute;left:'+lPct+'%;top:'+lineTop+'px;bottom:'+lineBottom+'px;width:1px;background:'+lineColor+';pointer-events:none"></div>');
+  }
+  segments.forEach(function(seg){
+    var leftPct=seg.start*20;
+    var widthPct=(seg.end-seg.start+1)*20;
+    parts.push('<div style="position:absolute;left:'+leftPct+'%;top:'+top+'px;width:'+widthPct+'%;height:'+barHeight+'px;border-radius:'+radius+'px;background:'+fill+';border:1px solid '+border+';box-sizing:border-box"></div>');
+  });
+  parts.push('</div>');
+  return parts.join("");
+}
+
+function serialToDate(v){
+  if(v===undefined||v===null||v==="")return null;
+  if(v instanceof Date)return isValidDateObj(v)?new Date(v.getFullYear(),v.getMonth(),v.getDate()):null;
+  if(typeof v==="number"){
+    var days=Math.round(v);
+    var d=new Date(1899,11,30+days);
+    return isValidDateObj(d)?new Date(d.getFullYear(),d.getMonth(),d.getDate()):null;
+  }
+  if(typeof v==="string"){
+    var s=v.trim();
+    if(!s)return null;
+    s=s.replace(/_/g,"");
+    if(/^\d+(\.\d+)?$/.test(s))return serialToDate(parseFloat(s));
+    if(/^\d{8}$/.test(s)){var ymd=s.match(/^(\d{4})(\d{2})(\d{2})$/);if(ymd)return new Date(parseInt(ymd[1],10),parseInt(ymd[2],10)-1,parseInt(ymd[3],10));}
+    var m=s.match(/^(\d{4})[-\/.](\d{1,2})[-\/.](\d{1,2})/);
+    if(m){
+      var y=parseInt(m[1],10),mo=parseInt(m[2],10),da=parseInt(m[3],10);
+      if(!isNaN(y)&&!isNaN(mo)&&!isNaN(da))return new Date(y,mo-1,da);
+    }
+    var parsed=new Date(s);
+    if(isValidDateObj(parsed))return new Date(parsed.getFullYear(),parsed.getMonth(),parsed.getDate());
+    return null;
+  }
+  return null;
+}
+function getRowValue(row,keys){
+  for(var i=0;i<keys.length;i++){
+    var k=keys[i];
+    if(row[k]!==undefined&&row[k]!==null&&String(row[k]).trim()!=="")return row[k];
+  }
+  return "";
+}
+function normalizeEmpNo(v){
+  if(v===undefined||v===null)return "";
+  var s=String(v).trim();
+  if(!s)return "";
+  if(/^\d+(\.0+)?$/.test(s))return String(Math.round(parseFloat(s)));
+  var digits=s.replace(/\D/g,"");
+  if(digits&&digits.length>=5&&digits.length<=8)return digits;
+  return "";
+}
+function pickEmployeeNumber(r){
+  var direct=getRowValue(r,["사번","Employee Number","Employee No","Employee No.","Employee ID","EmployeeID","EMPLID","Emp ID","EmpID","Personnel Number","인번","사원번호"]);
+  var norm=normalizeEmpNo(direct);
+  if(norm)return norm;
+  var explicit=getRowValue(r,["jobCode","Job Code","JobCode"]);
+  var explicitNorm=normalizeEmpNo(explicit);
+  if(explicitNorm)return explicitNorm;
+  return "";
+}
+function parseRows(rows){return rows.map(function(r){
+  var sd=serialToDate(r.startDate||r["Start Date"]);
+  var ed=serialToDate(r.endDate||r["End Date"]);
+  return{name:r.name||r["이름"]||"",rank:r.rank||r["직급"]||"",dept:r.dept||r["소속"]||r["본부"]||"",project:r.project||r["Project Name"]||"",startDate:sd,endDate:ed,hours:parseFloat(r.hours||r["Time (Hours)"])||0,pm:r.pm||r["PM"]||"",el:r.el||r["EL"]||"",jobCode:pickEmployeeNumber(r)};
+});}
+function showLoading(t){document.getElementById("loadingText").textContent=t||"로딩 중...";document.getElementById("loading").style.display="flex";}
+function hideLoading(){document.getElementById("loading").style.display="none";}
+
+function initApp(){
+  if(IS_SHARED){
+    document.getElementById("uploadZone").style.display="none";
+    document.getElementById("replaceWrap").style.display="none";
+    document.getElementById("saveBtn").style.display="none";
+  }
+  if(EMBEDDED_DATA){loadEmbeddedData();}
+}
+
+function loadEmbeddedData(){
+  showLoading("데이터 로딩 중...");setTimeout(function(){
+    allData=parseRows(EMBEDDED_DATA);
+    updateFileRunDateInfo(EMBEDDED_FILE_RUN_DATE);
+    allNames=allData.map(function(r){return r.name;}).filter(function(v,i,a){return a.indexOf(v)===i;}).sort();nameRankMap={};personInfoMap={};buildPersonMaps();
+    yearFilter="all";searchQuery="";expandedSet=new Set();personCache={};
+    document.getElementById("uploadZone").style.display="none";document.getElementById("mainUI").style.display="block";
+    if(!IS_SHARED){document.getElementById("replaceWrap").style.display="block";document.getElementById("saveBtn").style.display="inline-flex";}
+    document.getElementById("headerNotice").style.display="block";
+    
+    document.getElementById("availDateFrom").value=fmtDate(getKoreaToday());
+    document.getElementById("availDateTo").value="";document.getElementById("availDateTo").min=document.getElementById("availDateFrom").value;
+    buildYearFilter();hideLoading();showLoading("차트 렌더링 중...");setTimeout(function(){renderAll();setTimeout(scrollGanttsToToday,150);hideLoading();},50);
+  },50);
+}
+
+function processFile(file){
+  if(!file)return;showLoading("파일 읽는 중...");
+  var reader=new FileReader();reader.onload=function(e){showLoading("데이터 파싱 중...");setTimeout(function(){
+    var wb=XLSX.read(e.target.result,{type:"array"});var ws=wb.Sheets[wb.SheetNames[0]];var rows=XLSX.utils.sheet_to_json(ws,{defval:""});
+    allData=parseRows(rows);
+    updateFileRunDateInfo(extractFileRunDate(rows));
+    rawParsedForSave=allData.map(function(r){return{name:r.name,rank:r.rank,dept:r.dept,project:r.project,startDate:r.startDate?fmtDate(r.startDate):"",endDate:r.endDate?fmtDate(r.endDate):"",hours:r.hours,pm:r.pm,el:r.el,jobCode:r.jobCode};});
+    allNames=allData.map(function(r){return r.name;}).filter(function(v,i,a){return a.indexOf(v)===i;}).sort();nameRankMap={};personInfoMap={};buildPersonMaps();
+    yearFilter="all";searchQuery="";expandedSet=new Set();personCache={};
+    document.getElementById("uploadZone").style.display="none";document.getElementById("mainUI").style.display="block";
+    document.getElementById("replaceWrap").style.display="block";document.getElementById("saveBtn").style.display="inline-flex";
+    document.getElementById("headerNotice").style.display="block";
+    document.getElementById("searchInput").value="";document.getElementById("clearBtn").style.display="none";
+    document.getElementById("availDateFrom").value=fmtDate(getKoreaToday());
+    document.getElementById("availDateTo").value="";document.getElementById("availDateTo").min=document.getElementById("availDateFrom").value;
+    buildYearFilter();hideLoading();showLoading("차트 렌더링 중...");setTimeout(function(){renderAll();setTimeout(scrollGanttsToToday,150);hideLoading();},50);
+  },50);};reader.readAsArrayBuffer(file);
+}
+document.getElementById("fileInput").addEventListener("change",function(e){processFile(e.target.files[0]);});
+document.getElementById("replaceInput").addEventListener("change",function(e){processFile(e.target.files[0]);});
+var dz=document.getElementById("dropZone");
+dz.addEventListener("dragover",function(e){e.preventDefault();dz.classList.add("dragging");});
+dz.addEventListener("dragleave",function(){dz.classList.remove("dragging");});
+dz.addEventListener("drop",function(e){e.preventDefault();dz.classList.remove("dragging");processFile(e.dataTransfer.files[0]);});
+
+// SAVE: shared version has IS_SHARED=true and no upload
+document.getElementById("saveBtn").addEventListener("click",function(){
+  if(!rawParsedForSave&&!EMBEDDED_DATA){alert("저장할 데이터가 없습니다.");return;}
+  // Hide loading before capturing HTML to prevent it showing on GitHub
+  hideLoading();
+  // Stamp download time (Korea KST)
+  var now=new Date();var utc=now.getTime()+(now.getTimezoneOffset()*60000);var kr=new Date(utc+(9*3600000));
+  var ts=kr.getFullYear()+"."+String(kr.getMonth()+1).padStart(2,"0")+"."+String(kr.getDate()).padStart(2,"0")+" "+String(kr.getHours()).padStart(2,"0")+":"+String(kr.getMinutes()).padStart(2,"0")+":"+String(kr.getSeconds()).padStart(2,"0");
+  document.getElementById("saveTimestamp").textContent=ts;
+  setTimeout(function(){
+    var dataToEmbed=rawParsedForSave||EMBEDDED_DATA;var jsonStr=JSON.stringify(dataToEmbed);
+    var html=document.documentElement.outerHTML;
+    html=html.replace(/var EMBEDDED_DATA\s*=\s*null\s*;/,"var EMBEDDED_DATA = "+jsonStr+";");
+    html=html.replace(/var EMBEDDED_DATA\s*=\s*\[[\s\S]*?\];/,"var EMBEDDED_DATA = "+jsonStr+";");
+    html=html.replace(/var EMBEDDED_FILE_RUN_DATE\s*=\s*null\s*;/,"var EMBEDDED_FILE_RUN_DATE = "+JSON.stringify(fileRunDateText||"")+";");
+    html=html.replace(/var EMBEDDED_FILE_RUN_DATE\s*=\s*[\s\S]*?;/,"var EMBEDDED_FILE_RUN_DATE = "+JSON.stringify(fileRunDateText||"")+";");
+    html=html.replace(/var IS_SHARED\s*=\s*false\s*;/,"var IS_SHARED = true;");
+    // Ensure loading overlay is hidden in saved file
+    html=html.replace(/id="loading" style="display:\s*flex\s*"/g,'id="loading" style="display:none"');
+    var blob=new Blob(["<!DOCTYPE html>\n<html"+html.substring(html.indexOf("<html")+5)],{type:"text/html;charset=utf-8"});
+    var url=URL.createObjectURL(blob);var a=document.createElement("a");a.href=url;
+    a.download="index.html";
+    document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);
+  },50);
+});
+
+// TABS
+document.querySelectorAll(".tab-btn").forEach(function(btn){btn.addEventListener("click",function(){
+  document.querySelectorAll(".tab-btn").forEach(function(b){b.classList.remove("active");});
+  btn.classList.add("active");
+  var t=btn.dataset.tab;
+  document.getElementById("tabGantt").style.display=t==="gantt"?"block":"none";
+  document.getElementById("tabDetail").style.display=t==="detail"?"block":"none";
+  document.getElementById("tabProjSearch").style.display=t==="projSearch"?"block":"none";
+  document.getElementById("tabAvail").style.display=t==="avail"?"block":"none";
+  document.getElementById("tabNews").style.display=t==="news"?"block":"none";
+  // Reset each tab
+  if(t==="gantt"){searchQuery="";expandedSet=new Set();personCache={};document.getElementById("searchInput").value="";document.getElementById("clearBtn").style.display="none";yearFilter="all";buildYearFilter();renderAll();setTimeout(scrollGanttsToToday,150);}
+  if(t==="detail"){document.getElementById("detailSearchInput").value="";renderDetail("");}
+  if(t==="projSearch"){document.getElementById("projSearchInput").value="";renderProjSearch("");}
+  if(t==="avail"){document.getElementById("availDateFrom").value=fmtDate(getKoreaToday());document.getElementById("availDateTo").value="";document.getElementById("availDateTo").min=document.getElementById("availDateFrom").value;document.getElementById("availMinDays").value="1";document.getElementById("availRankFilter").value="";document.getElementById("availJobCodeFilter").value="";document.getElementById("availResult").innerHTML="";initCompareTab();setTimeout(syncAvailHeaders,50);}
+  if(t==="news"){renderNews();}
+});});
+function syncAvailHeaders(){
+  var l=document.getElementById("availLeftGuide"),r=document.getElementById("availRightGuide");
+  if(!l||!r)return;
+  l.style.minHeight="";r.style.minHeight="";
+  var h=Math.max(l.offsetHeight,r.offsetHeight);
+  l.style.minHeight=h+"px";r.style.minHeight=h+"px";
+}
+window.addEventListener("resize",function(){if(document.getElementById("tabAvail").style.display!=="none")syncAvailHeaders();});
+window.addEventListener("load",function(){if(document.getElementById("tabAvail").style.display!=="none")setTimeout(syncAvailHeaders,100);});
+
+// SEARCH
+var searchInput=document.getElementById("searchInput"),clearBtn=document.getElementById("clearBtn");
+searchInput.addEventListener("input",function(){clearTimeout(debounceTimer);debounceTimer=setTimeout(function(){searchQuery=searchInput.value.trim();clearBtn.style.display=searchQuery?"flex":"none";expandedSet=new Set();var m=getFilteredNames();if(m.length<=3)m.forEach(function(n){expandedSet.add(n);});renderAll();setTimeout(scrollGanttsToToday,150);},300);});
+searchInput.addEventListener("keydown",function(e){if(e.key==="Enter"){clearTimeout(debounceTimer);searchQuery=searchInput.value.trim();clearBtn.style.display=searchQuery?"flex":"none";expandedSet=new Set();var m=getFilteredNames();if(m.length<=3)m.forEach(function(n){expandedSet.add(n);});renderAll();setTimeout(scrollGanttsToToday,150);}});
+clearBtn.addEventListener("click",function(){searchInput.value="";searchQuery="";clearBtn.style.display="none";expandedSet=new Set();renderAll();setTimeout(scrollGanttsToToday,150);searchInput.focus();});
+function getFilteredNames(){
+  var list=searchQuery?allNames.filter(function(k){return personKeyName(k).indexOf(searchQuery)>=0;}):allNames;
+  return list.filter(function(k){return nameRankMap[k]!=="Partner"&&nameRankMap[k]!=="Managing Director";});
+}
+
+function buildYearFilter(){
+  // Build jobCode prefix filter options
+  var prefixes={};
+  allData.forEach(function(r){if(r.jobCode&&r.jobCode.length>=2){var p=r.jobCode.substring(0,2);prefixes[p]=1;}});
+  var sel=document.getElementById("availJobCodeFilter");
+  if(sel){
+    var cur=sel.value;
+    sel.innerHTML='<option value="">전체</option>';
+    Object.keys(prefixes).filter(function(p){var n=parseInt(p);return n>=20&&n<=60;}).sort(function(a,b){return parseInt(b)-parseInt(a);}).forEach(function(p){sel.innerHTML+='<option value="'+p+'">'+p+'사번</option>';});
+    sel.value=cur||"";
+  }
+  var years=Array.from(new Set(allData.filter(function(r){return r.startDate;}).map(function(r){return r.startDate.getFullYear();}))).sort();
+  var yf=document.getElementById("yearFilters"),yb=document.getElementById("yearBtns");
+  if(years.length>0){yf.style.display="flex";
+    yb.innerHTML='<button class="year-btn '+(yearFilter==="all"?"active":"")+'" data-y="all">전체</button>'+years.map(function(y){return '<button class="year-btn '+(yearFilter===String(y)?"active":"")+'" data-y="'+y+'">'+y+'</button>';}).join("");
+    yb.querySelectorAll(".year-btn").forEach(function(btn){btn.addEventListener("click",function(){yearFilter=btn.dataset.y;yb.querySelectorAll(".year-btn").forEach(function(b){b.classList.remove("active");});btn.classList.add("active");personCache={};renderAll();setTimeout(scrollGanttsToToday,150);});});
+  }
+}
+
+function getPersonData(pk){
+  var cacheKey=pk+"_"+yearFilter;
+  if(personCache[cacheKey])return personCache[cacheKey];
+  var pkName=personKeyName(pk),pkJob=personKeyJobCode(pk);
+  var all=allData.filter(function(r){return r.name===pkName&&(pkJob?r.jobCode===pkJob:true)&&r.startDate&&r.endDate;});
+  if(!all.length)return null;
+  var info={name:all[0].name,rank:all[0].rank,dept:all[0].dept,jobCode:all[0].jobCode};
+  var filtered=all;
+  if(yearFilter!=="all"){var yy=parseInt(yearFilter);filtered=all.filter(function(r){return r.startDate.getFullYear()===yy||r.endDate.getFullYear()===yy;});}
+  var minD=all[0].startDate,maxD=all[0].endDate;all.forEach(function(r){if(r.startDate<minD)minD=r.startDate;if(r.endDate>maxD)maxD=r.endDate;});
+  var displayMax=new Date(2028,11,31);if(maxD<displayMax)maxD=displayMax;
+  var weeks=getWeeksBetween(minD,maxD),weekMap={},ps=new Set();
+  all.forEach(function(r){
+    var weekStart=getMonday(r.startDate);
+    var k=fmtWeekFull(weekStart);
+    if(!weekMap[k])weekMap[k]={};
+    if(!weekMap[k][r.project])weekMap[k][r.project]={hours:0,el:r.el,pm:r.pm,ranges:[],segments:[]};
+    weekMap[k][r.project].hours+=r.hours;
+    if(r.el)weekMap[k][r.project].el=r.el;
+    if(r.pm)weekMap[k][r.project].pm=r.pm;
+    weekMap[k][r.project].ranges.push({sd:r.startDate,ed:r.endDate});
+    weekMap[k][r.project].segments=weekMap[k][r.project].segments.concat(getWeekdaySegments(r.startDate,r.endDate,weekStart));
+    ps.add(r.project);
+  });
+  Object.keys(weekMap).forEach(function(wk){Object.keys(weekMap[wk]).forEach(function(p){weekMap[wk][p].segments=mergeSegments(weekMap[wk][p].segments);});});
+  var colorMap={};var ci=0;Array.from(ps).sort().forEach(function(p){colorMap[p]=COLORS[ci%COLORS.length];ci++;});
+  var totals={};filtered.forEach(function(r){if(!totals[r.project])totals[r.project]=0;totals[r.project]+=r.hours;});
+  var totalHours=filtered.reduce(function(a,r){return a+r.hours;},0);
+  var result={info:info,weeks:weeks,weekMap:weekMap,colorMap:colorMap,totals:totals,totalHours:totalHours};
+  personCache[cacheKey]=result;return result;
+}
+
+function getKoreaToday(){
+  var now=new Date();
+  var utc=now.getTime()+(now.getTimezoneOffset()*60000);
+  var kr=new Date(utc+(9*3600000));
+  return new Date(kr.getFullYear(),kr.getMonth(),kr.getDate());
+}
+function getTodayWeekKey(){return fmtWeekFull(getMonday(getKoreaToday()));}
+
+function formatRanges(ranges){
+  if(!ranges||!ranges.length)return "";
+  var sorted=ranges.slice().sort(function(a,b){return a.sd-b.sd;});
+  var merged=[];
+  sorted.forEach(function(r){
+    if(!merged.length||r.sd>new Date(merged[merged.length-1].ed.getTime()+864e5)){
+      merged.push({sd:new Date(r.sd),ed:new Date(r.ed)});
+    } else {
+      if(r.ed>merged[merged.length-1].ed)merged[merged.length-1].ed=new Date(r.ed);
+    }
+  });
+  return merged.map(function(r){
+    if(r.sd.getTime()===r.ed.getTime())return fmtDateKR(r.sd);
+    return fmtDateKR(r.sd)+" ~ "+fmtDateKR(r.ed);
+  }).join(", ");
+}
+
+function buildGanttHTML(data,yf){
+  var fw=data.weeks;if(yf!=="all"){var y=parseInt(yf);fw=data.weeks.filter(function(w){return w.getFullYear()===y;});}
+  if(!fw.length)return '<div style="padding:20px;text-align:center;color:#94a3b8;font-size:12px;">해당 기간 데이터 없음</div>';
+  var mg=[];var cM=-1,cY=-1,sp=0;var todayKey=getTodayWeekKey();var todayColIdx=-1;
+  fw.forEach(function(w,i){if(fmtWeekFull(w)===todayKey)todayColIdx=i;var m=w.getMonth(),y=w.getFullYear();if(m!==cM||y!==cY){if(sp>0)mg.push({l:cY+"."+String(cM+1).padStart(2,"0"),s:sp});cM=m;cY=y;sp=1;}else sp++;if(i===fw.length-1)mg.push({l:y+"."+String(m+1).padStart(2,"0"),s:sp});});
+  var scrollId="gs_"+Math.random().toString(36).substr(2,6);
+  var scrollAttr=todayColIdx>=0?' data-scroll-to="'+todayColIdx+'"':'';
+  var h='<div class="gantt-scroll" id="'+scrollId+'"'+scrollAttr+'><table class="gantt-table"><thead>';
+  h+='<tr>'+mg.map(function(m){return '<td class="month-header-cell" colspan="'+m.s+'">'+m.l+'</td>';}).join("")+'</tr>';
+  h+='<tr>'+fw.map(function(w,i){return '<td class="week-header-cell'+(i===todayColIdx?' today':'')+'">'+fmtWeek(w)+'</td>';}).join("")+'</tr></thead><tbody>';
+  h+='<tr>';fw.forEach(function(w,ci){
+    var k=fmtWeekFull(w),en=data.weekMap[k]||{},pr=Object.entries(en).sort(function(a,b){return b[1].hours-a[1].hours;});
+    var isTodayC=ci===todayColIdx;
+    h+='<td class="gantt-cell" style="vertical-align:top;border-bottom:1px solid #f1f5f9;padding:0;min-width:130px;max-width:130px;background:'+weekCellBackground(isTodayC?'#eff6ff':'#fff')+'">';
+    pr.forEach(function(it){
+      var c=data.colorMap[it[0]]||"#666",nm=it[0].length>13?it[0].slice(0,13)+"…":it[0];
+      var dateRange=formatRanges(it[1].ranges);
+      var tipText=it[0]+"\n기간: "+dateRange+"\nEL: "+(it[1].el||"-")+"\nPM: "+(it[1].pm||"-")+"\n\n🔗 클릭 → 프로젝트별 검색으로 이동";
+      h+='<div class="project-block" style="cursor:pointer;height:auto;display:block;padding:3px 4px" title="'+escapeAttr(tipText)+'" data-proj="'+escapeAttr(it[0])+'"><div style="display:flex;align-items:center;justify-content:space-between;gap:4px;margin-bottom:2px"><span class="project-block-name">'+nm+'</span><span class="project-block-hours" style="color:'+c+'">'+fmtHours(it[1].hours)+'</span></div>'+buildSegmentBarsHtml(it[1].segments,c)+'</div>';
+    });
+    h+='</td>';
+  });h+='</tr>';
+  h+='</tbody></table></div>';
+  return h;
+}
+
+function scrollGanttsToToday(){
+  document.querySelectorAll(".gantt-scroll[data-scroll-to]").forEach(function(el){
+    var col=parseInt(el.getAttribute("data-scroll-to"));
+    if(!isNaN(col))el.scrollLeft=Math.max(0,(col-4)*130);
+  });
+}
+
+function renderAll(){
+  var ganttGuide=document.getElementById("ganttGuide");
+  if(ganttGuide)ganttGuide.style.display=searchQuery?"none":"flex";
+  var names=getFilteredNames();
+
+  if(!names.length){document.getElementById("ganttArea").innerHTML='<div class="empty-state"><div class="empty-icon">🔍</div>"'+searchQuery+'" 검색 결과가 없습니다.</div>';return;}
+  var area=document.getElementById("ganttArea");area.innerHTML="";
+
+  // If searching (few results), show flat list directly
+  if(searchQuery && names.length<=10){
+    names.forEach(function(name){renderPersonSection(area,name,names);});
+    return;
+  }
+
+  // Group by rank
+  var byRank={};
+  var GANTT_RANKS=["Director","Senior-Manager","Manager","Senior-Associate","Associate","Assistant-Associate","Intern"];
+  names.forEach(function(name){
+    var rk=nameRankMap[name]||"기타";
+    if(!byRank[rk])byRank[rk]=[];
+    byRank[rk].push(name);
+  });
+  // Sort within each rank alphabetically
+  Object.keys(byRank).forEach(function(rk){byRank[rk].sort();});
+  // Display in rank order
+  var rankOrder=GANTT_RANKS.concat(Object.keys(byRank).filter(function(r){return GANTT_RANKS.indexOf(r)<0;}));
+  rankOrder.forEach(function(rk){
+    if(!byRank[rk]||!byRank[rk].length)return;
+    var people=byRank[rk];
+    var gid="gantt_rk_"+rk.replace(/[^a-zA-Z]/g,"");
+    var grp=document.createElement("div");grp.className="rank-group";
+    var ghdr=document.createElement("div");ghdr.className="rank-group-header";
+    ghdr.innerHTML='<div class="rank-group-left"><span class="rank-toggle" id="garrow_'+gid+'">▶</span><div class="rank-group-title">'+rk+'</div></div><div class="rank-group-count">'+people.length+'명</div>';
+    grp.appendChild(ghdr);
+    var gbody=document.createElement("div");gbody.id="gbody_"+gid;gbody.style.display="none";
+    grp.appendChild(gbody);
+    ghdr.addEventListener("click",function(){
+      var arrow=document.getElementById("garrow_"+gid);
+      if(gbody.style.display==="none"){
+        closeSiblings(ghdr);
+        gbody.style.display="block";arrow.classList.add("open");ghdr.classList.add("open");
+        // Lazy render people if not yet rendered
+        if(!gbody.dataset.rendered){
+          people.forEach(function(name){renderPersonSection(gbody,name,names);});
+          gbody.dataset.rendered="1";
+        }
+      } else {
+        gbody.style.display="none";arrow.classList.remove("open");ghdr.classList.remove("open");
+      }
+    });
+    area.appendChild(grp);
+  });
+}
+
+function renderPersonSection(container,name,names){
+    var data=getPersonData(name);if(!data)return;
+    var dispName=personDisplayName(name);
+    var realName=personKeyName(name);
+    var isOpen=expandedSet.has(name);
+    var showAll=names.length<=3;
+    var topP=Object.entries(data.totals).sort(function(a,b){return b[1]-a[1];});
+    var displayP=showAll?topP:topP.slice(0,5);
+    var extra=showAll?0:Object.keys(data.totals).length-5;
+    var section=document.createElement("div");section.className="person-section";section.dataset.name=name;
+    var header=document.createElement("div");header.className="person-header"+(isOpen?" open":"");
+    header.innerHTML='<div class="person-avatar">'+realName[0]+'</div><div class="person-info"><div class="person-name">'+escapeHtml(dispName)+'<span style="font-size:11px;color:#94a3b8;font-weight:400;margin-left:4px">'+escapeHtml(infoText(data.info.rank,data.info.dept,data.info.jobCode))+'</span><span style="font-size:11px;color:#3b82f6;margin-left:8px">'+fmtHours(data.totalHours)+'</span></div></div><div class="person-stats">'+displayP.map(function(x){var c=data.colorMap[x[0]]||"#666",pn=x[0].length>15?x[0].slice(0,15)+"…":x[0];return '<div class="stat-chip" style="cursor:pointer" data-proj="'+x[0].replace(/"/g,"&quot;")+'" title="🔗 클릭 → 프로젝트별 검색으로 이동"><div class="stat-dot" style="background:'+c+'"></div><span class="stat-name">'+pn+'</span><span class="stat-hours">'+fmtHours(x[1])+'</span></div>';}).join("")+(extra>0?'<div class="stat-chip" style="color:#94a3b8">+'+extra+'</div>':"")+'</div><span class="toggle-arrow'+(isOpen?' open':'')+'">▶</span>';
+    section.appendChild(header);
+    if(isOpen){var body=document.createElement("div");body.className="gantt-body";body.innerHTML=buildGanttHTML(data,yearFilter);section.appendChild(body);}
+    header.addEventListener("click",function(ev){
+      if(ev.target.closest("[data-proj]"))return;
+      var arrow=header.querySelector(".toggle-arrow");
+      if(expandedSet.has(name)){expandedSet.delete(name);header.classList.remove("open");arrow.classList.remove("open");var b=section.querySelector(".gantt-body");if(b)b.remove();}
+      else{closeSiblings(header);expandedSet.add(name);header.classList.add("open");arrow.classList.add("open");var b=document.createElement("div");b.className="gantt-body";b.innerHTML=buildGanttHTML(data,yearFilter);section.appendChild(b);setTimeout(scrollGanttsToToday,200);}
+    });
+    container.appendChild(section);
+}
+
+// ===== DETAIL TAB =====
+var detailSearch=document.getElementById("detailSearchInput");
+var detailTimer=null;
+detailSearch.addEventListener("input",function(){clearTimeout(detailTimer);detailTimer=setTimeout(function(){renderDetail(detailSearch.value.trim());},300);});
+detailSearch.addEventListener("keydown",function(e){if(e.key==="Enter"){clearTimeout(detailTimer);renderDetail(detailSearch.value.trim());}});
+
+function renderDetail(q){
+  var area=document.getElementById("detailArea");
+  var guide=document.getElementById("detailGuide");
+  if(guide)guide.style.display=q?"none":"flex";
+  var matched;
+  if(!q){
+    matched=allNames.slice().sort();
+  } else {
+    matched=allNames.filter(function(k){return personKeyName(k).indexOf(q)>=0;});
+  }
+  // Exclude Partner and Managing Director
+  matched=matched.filter(function(k){return nameRankMap[k]!=="Partner"&&nameRankMap[k]!=="Managing Director";});
+  if(!matched.length){
+    var html='<div class="empty-state"><div class="empty-icon">🔍</div>"'+escapeHtml(q)+'" 검색 결과가 없습니다.';
+    // Check if query matches any project name
+    var matchedProjs=allData.filter(function(r){return r.project&&r.project.toLowerCase().indexOf(q.toLowerCase())>=0;});
+    var uniqueProjs={};matchedProjs.forEach(function(r){uniqueProjs[r.project]=1;});
+    var projCount=Object.keys(uniqueProjs).length;
+    if(projCount>0){
+      html+='<div style="margin-top:16px"><span style="font-size:13px;color:#64748b">프로젝트명에 "'+escapeHtml(q)+'" 포함 결과 <strong style="color:#3b82f6">'+projCount+'건</strong> 발견</span><br><button class="check-btn" style="margin-top:8px;padding:8px 20px;font-size:13px" id="detailToProjBtn">🔎 프로젝트별 검색으로 이동</button></div>';
+    }
+    html+='</div>';
+    area.innerHTML=html;
+    var btn=document.getElementById("detailToProjBtn");
+    if(btn)btn.addEventListener("click",function(){goToProjSearch(q);});
+    return;
+  }
+  area.innerHTML="";
+
+  // If searching with few results, show flat
+  if(q && matched.length<=10){
+    matched.forEach(function(name){renderDetailPerson(area,name);});
+    return;
+  }
+
+  // Group by rank
+  var byRank={};
+  var DETAIL_RANKS=["Director","Senior-Manager","Manager","Senior-Associate","Associate","Assistant-Associate","Intern"];
+  matched.forEach(function(name){
+    var rk=nameRankMap[name]||"기타";
+    if(!byRank[rk])byRank[rk]=[];
+    byRank[rk].push(name);
+  });
+  Object.keys(byRank).forEach(function(rk){byRank[rk].sort();});
+  var rankOrder=DETAIL_RANKS.concat(Object.keys(byRank).filter(function(r){return DETAIL_RANKS.indexOf(r)<0;}));
+  rankOrder.forEach(function(rk){
+    if(!byRank[rk]||!byRank[rk].length)return;
+    var people=byRank[rk];
+    var gid="detail_rk_"+rk.replace(/[^a-zA-Z]/g,"");
+    var grp=document.createElement("div");grp.className="rank-group";
+    var ghdr=document.createElement("div");ghdr.className="rank-group-header";
+    ghdr.innerHTML='<div class="rank-group-left"><span class="rank-toggle" id="darrow_'+gid+'">▶</span><div class="rank-group-title">'+rk+'</div></div><div class="rank-group-count">'+people.length+'명</div>';
+    grp.appendChild(ghdr);
+    var gbody=document.createElement("div");gbody.id="dbody_"+gid;gbody.style.display="none";
+    grp.appendChild(gbody);
+    ghdr.addEventListener("click",function(){
+      var arrow=document.getElementById("darrow_"+gid);
+      if(gbody.style.display==="none"){
+        closeSiblings(ghdr);
+        gbody.style.display="block";arrow.classList.add("open");ghdr.classList.add("open");
+        if(!gbody.dataset.rendered){
+          people.forEach(function(name){renderDetailPerson(gbody,name);});
+          gbody.dataset.rendered="1";
+        }
+      } else {
+        gbody.style.display="none";arrow.classList.remove("open");ghdr.classList.remove("open");
+      }
+    });
+    area.appendChild(grp);
+  });
+}
+
+function renderDetailPerson(container,pk){
+    var pkName=personKeyName(pk),pkJob=personKeyJobCode(pk);
+    var records=allData.filter(function(r){return r.name===pkName&&(pkJob?r.jobCode===pkJob:true)&&r.startDate&&r.endDate;});
+    if(!records.length)return;
+    var info={rank:records[0].rank,dept:records[0].dept,jobCode:records[0].jobCode};
+    var dispName=personDisplayName(pk);
+    // Group by year
+    var byYear={};
+    records.forEach(function(r){
+      var y=r.startDate.getFullYear();
+      if(!byYear[y])byYear[y]=[];
+      byYear[y].push(r);
+    });
+    // Group by project within year
+    var years=Object.keys(byYear).sort(function(a,b){return parseInt(b)-parseInt(a);});
+    var wrapper=document.createElement("div");
+    wrapper.innerHTML='<div style="padding:16px 0 8px;display:flex;align-items:center;gap:10px"><div class="person-avatar">'+pkName[0]+'</div><div><span style="font-size:15px;font-weight:600">'+escapeHtml(dispName)+'</span><span style="font-size:12px;color:#94a3b8;margin-left:8px">'+escapeHtml(infoText(info.rank,info.dept,info.jobCode))+'</span></div></div>';
+    container.appendChild(wrapper);
+
+    years.forEach(function(yr){
+      var recs=byYear[yr];
+      var yearHours=recs.reduce(function(a,r){return a+r.hours;},0);
+      // Unique projects
+      var projMap={};
+      recs.forEach(function(r){
+        if(!projMap[r.project])projMap[r.project]={hours:0,el:r.el,pm:r.pm,periods:[]};
+        projMap[r.project].hours+=r.hours;
+        if(r.el)projMap[r.project].el=r.el;
+        if(r.pm)projMap[r.project].pm=r.pm;
+        projMap[r.project].periods.push({start:r.startDate,end:r.endDate,hours:r.hours});
+      });
+      var projects=Object.entries(projMap).sort(function(a,b){return b[1].hours-a[1].hours;});
+
+      var sec=document.createElement("div");sec.className="detail-section";
+      var hdr=document.createElement("div");hdr.className="detail-year-header";
+      hdr.innerHTML='<div class="detail-year-title"><span class="rank-toggle">▶</span>'+yr+'년 <span class="detail-year-hours">'+fmtHours(yearHours)+'</span></div><div class="rank-group-count">'+projects.length+' projects</div>';
+      sec.appendChild(hdr);
+
+      var body=document.createElement("div");body.style.display="none";
+      var tbl='<table class="detail-table"><thead><tr><th>Project Name</th><th>EL</th><th>PM</th><th>시간</th><th>기간</th></tr></thead><tbody>';
+      projects.forEach(function(x){
+        var p=x[0],d=x[1];
+        var starts=d.periods.map(function(pp){return pp.start;}).sort(function(a,b){return a-b;});
+        var ends=d.periods.map(function(pp){return pp.end;}).sort(function(a,b){return a-b;});
+        var periodStr=fmtDateKR(starts[0])+" ~ "+fmtDateKR(ends[ends.length-1]);
+        var assignDays=Math.round(d.hours/8);
+        tbl+='<tr><td style="font-weight:500;max-width:250px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"><span style="cursor:pointer;color:#3b82f6" data-detail-proj="'+p.replace(/"/g,"&quot;")+'" title="🔗 클릭 → 프로젝트별 검색으로 이동">'+p+'</span></td><td style="font-size:12px;color:#64748b">'+(d.el||"-")+'</td><td style="font-size:12px;color:#64748b">'+(d.pm||"-")+'</td><td><span style="font-size:12px;color:#3b82f6;font-weight:600">'+fmtHours(d.hours)+'</span></td><td class="detail-period">'+periodStr+' <span style="color:#94a3b8;font-size:11px">(총 '+assignDays+'일 어싸인)</span></td></tr>';
+      });
+      tbl+='</tbody></table>';
+      body.innerHTML=tbl;sec.appendChild(body);
+
+      hdr.addEventListener("click",function(){
+        var arrow=hdr.querySelector(".rank-toggle");
+        if(body.style.display==="none"){closeSiblings(hdr);body.style.display="block";arrow.classList.add("open");hdr.classList.add("open");}
+        else{body.style.display="none";arrow.classList.remove("open");hdr.classList.remove("open");}
+      });
+      container.appendChild(sec);
+    });
+}
+
+// ===== PROJECT SEARCH =====
+var projSearchInput=document.getElementById("projSearchInput");
+var projSearchTimer=null;
+projSearchInput.addEventListener("input",function(){clearTimeout(projSearchTimer);projSearchTimer=setTimeout(function(){renderProjSearch(projSearchInput.value.trim());},300);});
+projSearchInput.addEventListener("keydown",function(e){if(e.key==="Enter"){clearTimeout(projSearchTimer);renderProjSearch(projSearchInput.value.trim());}});
+
+function renderProjSearch(q,autoExpand){
+  var area=document.getElementById("projSearchArea");
+  var projGuide=document.getElementById("projGuide");
+  if(projGuide)projGuide.style.display=q?"none":"flex";
+  var projMap={};
+  allData.forEach(function(r){
+    if(!r.project||!r.startDate||!r.endDate)return;
+    if(q && r.project.toLowerCase().indexOf(q.toLowerCase())<0)return;
+    if(!projMap[r.project])projMap[r.project]={records:[],minDate:r.startDate,maxDate:r.endDate};
+    var pm=projMap[r.project];
+    if(r.startDate<pm.minDate)pm.minDate=r.startDate;
+    if(r.endDate>pm.maxDate)pm.maxDate=r.endDate;
+    pm.records.push(r);
+  });
+  var projects=Object.keys(projMap).sort();
+  if(!projects.length){
+    var emptyHtml='<div class="empty-state"><div class="empty-icon">🔍</div>'+(q?'"'+escapeHtml(q)+'" 관련 프로젝트가 없습니다.':'프로젝트가 없습니다.');
+    if(q){
+      var matchedNames=allNames.filter(function(k){return personKeyName(k).indexOf(q)>=0&&nameRankMap[k]!=="Partner"&&nameRankMap[k]!=="Managing Director";});
+      if(matchedNames.length>0){
+        emptyHtml+='<div style="margin-top:16px"><span style="font-size:13px;color:#64748b">이름에 "'+escapeHtml(q)+'" 포함 결과 <strong style="color:#3b82f6">'+matchedNames.length+'명</strong> 발견</span><br><button class="check-btn" style="margin-top:8px;padding:8px 20px;font-size:13px" id="projToDetailBtn">📄 개인별 프로젝트 내역으로 이동</button></div>';
+      }
+    }
+    emptyHtml+='</div>';
+    area.innerHTML=emptyHtml;
+    var btn2=document.getElementById("projToDetailBtn");
+    if(btn2)btn2.addEventListener("click",function(){goToDetailSearch(q);});
+    return;
+  }
+
+  // If searching, show flat list
+  if(q){
+    area.innerHTML='<div class="avail-count">검색 결과: <strong>'+projects.length+'개</strong> 프로젝트</div>';
+    projects.forEach(function(projName){renderProjItem(area,projName,projMap[projName],autoExpand);});
+    return;
+  }
+
+  // No query: group by EL -> PM -> Projects
+  var byEL={};
+  projects.forEach(function(projName){
+    var pData=projMap[projName];
+    var els=uniqueNonEmpty(pData.records.map(function(r){return r.el;}));
+    var pms=uniqueNonEmpty(pData.records.map(function(r){return r.pm;}));
+    var elName=els.length?els[0]:"Non-Project";
+    var pmName=pms.length?pms[0]:"Non-Project";
+    if(!byEL[elName])byEL[elName]={};
+    if(!byEL[elName][pmName])byEL[elName][pmName]=[];
+    byEL[elName][pmName].push(projName);
+  });
+  var elNames=Object.keys(byEL).sort(function(a,b){if(a==="Non-Project")return 1;if(b==="Non-Project")return -1;return a.localeCompare(b);});
+  var totalELs=elNames.length;
+  area.innerHTML='<div class="avail-count">전체: <strong>'+projects.length+'개</strong> 프로젝트 · <strong>'+totalELs+'</strong> EL</div>';
+
+  elNames.forEach(function(elName){
+    var pmMap=byEL[elName];
+    var elProjCount=Object.values(pmMap).reduce(function(a,arr){return a+arr.length;},0);
+    var elGid="el_"+elName.replace(/[^a-zA-Z0-9가-힣]/g,"_");
+    var elGrp=document.createElement("div");elGrp.className="rank-group";
+    var elHdr=document.createElement("div");elHdr.className="rank-group-header";
+    elHdr.innerHTML='<div class="rank-group-left"><span class="rank-toggle" id="earrow_'+elGid+'">▶</span><div class="rank-group-title">'+escapeHtml(elName)+'</div></div><div style="font-size:11px;font-weight:600;color:#000">'+elProjCount+'개 프로젝트</div>';
+    elGrp.appendChild(elHdr);
+    var elBody=document.createElement("div");elBody.id="ebody_"+elGid;elBody.style.display="none";
+    elGrp.appendChild(elBody);
+
+    elHdr.addEventListener("click",function(){
+      var arrow=document.getElementById("earrow_"+elGid);
+      if(elBody.style.display==="none"){
+        closeSiblings(elHdr);
+        elBody.style.display="block";arrow.classList.add("open");elHdr.classList.add("open");
+        if(!elBody.dataset.rendered){
+          elBody.dataset.rendered="1";
+          var pmNames=Object.keys(pmMap).sort(function(a,b){if(a==="Non-Project")return 1;if(b==="Non-Project")return -1;return a.localeCompare(b);});
+          pmNames.forEach(function(pmName){
+            var pmProjects=pmMap[pmName];
+            var pmGid=elGid+"_pm_"+pmName.replace(/[^a-zA-Z0-9가-힣]/g,"_");
+            var pmGrp=document.createElement("div");pmGrp.style.cssText="margin:4px 0 4px 20px;background:#fff;border:1px solid #e2e8f0;border-radius:8px;overflow:hidden";
+            var pmHdr=document.createElement("div");pmHdr.className="rank-group-header";pmHdr.style.cssText="padding:10px 16px";
+            pmHdr.innerHTML='<div class="rank-group-left"><span class="rank-toggle" id="parrow_'+pmGid+'">▶</span><div style="font-size:13px;font-weight:500;color:#475569">PM: '+escapeHtml(pmName)+'</div></div><div style="font-size:11px;font-weight:600;color:#000">'+pmProjects.length+'개</div>';
+            pmGrp.appendChild(pmHdr);
+            var pmBody=document.createElement("div");pmBody.id="pbody_"+pmGid;pmBody.style.display="none";
+            pmGrp.appendChild(pmBody);
+            pmHdr.addEventListener("click",function(){
+              var parrow=document.getElementById("parrow_"+pmGid);
+              if(pmBody.style.display==="none"){
+                closeSiblings(pmHdr);
+                pmBody.style.display="block";parrow.classList.add("open");pmHdr.classList.add("open");
+                if(!pmBody.dataset.rendered){
+                  pmBody.dataset.rendered="1";
+                  pmProjects.sort().forEach(function(projName){renderProjItem(pmBody,projName,projMap[projName],false);});
+                }
+              } else {
+                pmBody.style.display="none";parrow.classList.remove("open");pmHdr.classList.remove("open");
+              }
+            });
+            elBody.appendChild(pmGrp);
+          });
+        }
+      } else {
+        elBody.style.display="none";arrow.classList.remove("open");elHdr.classList.remove("open");
+      }
+    });
+    area.appendChild(elGrp);
+  });
+}
+
+function renderProjItem(container,projName,pData,autoExpand){
+    var totalHours=pData.records.reduce(function(a,r){return a+r.hours;},0);
+    var projEls=uniqueNonEmpty(pData.records.map(function(r){return r.el;}));
+    var projPms=uniqueNonEmpty(pData.records.map(function(r){return r.pm;}));
+    var elText=projEls.length?projEls.join(", "):"-";
+    var pmText=projPms.length?projPms.join(", "):"-";
+    var peopleNames=Object.keys(pData.records.reduce(function(m,r){m[personKey(r.name,r.jobCode)]=1;return m;},{}));
+    var peopleCount=peopleNames.length;
+
+    var sec=document.createElement("div");sec.className="detail-section";
+    var hdr=document.createElement("div");hdr.className="detail-year-header";
+    hdr.innerHTML='<div class="detail-year-title"><span class="rank-toggle'+(autoExpand?' open':'')+'">▶</span><span style="max-width:500px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:inline-block" title="'+escapeAttr(projName)+'">'+projName+'</span><span style="font-size:11px;color:#64748b;font-weight:400;margin-left:10px">EL: '+escapeAttr(elText)+' · PM: '+escapeAttr(pmText)+'</span></div><div style="display:flex;gap:12px;align-items:center"><span class="detail-year-hours">'+fmtHours(totalHours)+'</span><span style="font-size:11px;font-weight:600;color:#000">'+peopleCount+'명</span><span style="font-size:11px;color:#94a3b8">'+fmtDateKR(pData.minDate)+' ~ '+fmtDateKR(pData.maxDate)+'</span></div>';
+    if(autoExpand)hdr.classList.add("open");
+    sec.appendChild(hdr);
+
+    var body=document.createElement("div");body.style.display=autoExpand?"block":"none";
+    sec.appendChild(body);
+
+    function buildProjBody(){
+      if(body.dataset.rendered)return;
+      body.dataset.rendered="1";
+      
+      // === Project Summary Panel ===
+      var summaryPeopleMap={};
+      var summaryByRank={};
+      var summaryTotalHours=0;
+      pData.records.forEach(function(r){
+        summaryTotalHours+=r.hours;
+        var pk=personKey(r.name,r.jobCode);
+        if(!summaryPeopleMap[pk])summaryPeopleMap[pk]={rank:r.rank};
+        var rk=r.rank||"기타";
+        if(!summaryByRank[rk])summaryByRank[rk]={count:new Set(),hours:0};
+        summaryByRank[rk].count.add(pk);
+        summaryByRank[rk].hours+=r.hours;
+      });
+      var summaryPeopleCount=Object.keys(summaryPeopleMap).length;
+      var summaryDays=Math.round(summaryTotalHours/8);
+      var periodDays=countBusinessDays(pData.minDate,pData.maxDate);
+      
+      var rankDistHtml='';
+      var rankArr=Object.entries(summaryByRank).sort(function(a,b){return rankIndex(a[0])-rankIndex(b[0]);});
+      rankArr.forEach(function(x){
+        rankDistHtml+='<span class="rank-dist-chip">'+x[0]+' <strong>'+x[1].count.size+'명</strong> ('+fmtHours(x[1].hours)+')</span>';
+      });
+      
+      var summaryHtml='<div class="proj-summary">';
+      summaryHtml+='<div class="proj-summary-card"><div class="label">총 투입시간</div><div class="value">'+fmtHours(summaryTotalHours)+'</div><div class="sub">≒ '+summaryDays+'일 (man-day)</div></div>';
+      summaryHtml+='<div class="proj-summary-card"><div class="label">투입 인원</div><div class="value">'+summaryPeopleCount+'<span style="font-size:12px;font-weight:400;color:#64748b;font-family:IBM Plex Sans KR,sans-serif">명</span></div></div>';
+      summaryHtml+='<div class="proj-summary-card"><div class="label">프로젝트 기간</div><div class="value">'+periodDays+'<span style="font-size:12px;font-weight:400;color:#64748b;font-family:IBM Plex Sans KR,sans-serif">일(주말 제외)</span></div><div class="sub">'+fmtDateKR(pData.minDate)+' ~ '+fmtDateKR(pData.maxDate)+'</div></div>';
+      summaryHtml+='<div class="proj-summary-card" style="max-width:none;flex:2"><div class="label">직급별 투입 현황</div><div class="rank-dist">'+rankDistHtml+'</div></div>';
+      summaryHtml+='</div>';
+      
+      // === Gantt Chart ===
+      var peopleMap={};
+      pData.records.forEach(function(r){
+        var pk=personKey(r.name,r.jobCode);
+        if(!peopleMap[pk])peopleMap[pk]={name:r.name,rank:r.rank,dept:r.dept,jobCode:r.jobCode,weekMap:{}};
+        var weekStart=getMonday(r.startDate);
+        var wk=fmtWeekFull(weekStart);
+        if(!peopleMap[pk].weekMap[wk])peopleMap[pk].weekMap[wk]={hours:0,ranges:[],segments:[]};
+        peopleMap[pk].weekMap[wk].hours+=r.hours;
+        peopleMap[pk].weekMap[wk].ranges.push({sd:r.startDate,ed:r.endDate});
+        peopleMap[pk].weekMap[wk].segments=peopleMap[pk].weekMap[wk].segments.concat(getWeekdaySegments(r.startDate,r.endDate,weekStart));
+      });
+      Object.keys(peopleMap).forEach(function(pk){Object.keys(peopleMap[pk].weekMap).forEach(function(wk){peopleMap[pk].weekMap[wk].segments=mergeSegments(peopleMap[pk].weekMap[wk].segments);});});
+      var peopleArr=Object.entries(peopleMap).sort(function(a,b){var ri=rankIndex(a[1].rank)-rankIndex(b[1].rank);if(ri!==0)return ri;var ja=String(a[1].jobCode||"");var jb=String(b[1].jobCode||"");if(ja&&jb)return ja.localeCompare(jb);if(ja)return -1;if(jb)return 1;return a[0].localeCompare(b[0]);});
+      var weeks=getWeeksBetween(pData.minDate,pData.maxDate);
+      var mg=[];var cM=-1,cY=-1,sp=0;
+      weeks.forEach(function(w,i){var m=w.getMonth(),y=w.getFullYear();if(m!==cM||y!==cY){if(sp>0)mg.push({l:cY+"."+String(cM+1).padStart(2,"0"),s:sp});cM=m;cY=y;sp=1;}else sp++;if(i===weeks.length-1)mg.push({l:y+"."+String(m+1).padStart(2,"0"),s:sp});});
+      var pColors=["#3b82f6","#dc2626","#059669","#d97706","#7c3aed","#db2777","#0891b2","#65a30d","#ea580c","#4f46e5"];
+      var colW=100;
+      var tbl='<div style="overflow-x:auto"><table style="border-collapse:collapse;width:max-content"><thead>';
+      tbl+='<tr><td style="min-width:160px;max-width:160px;background:#f8fafc;border-right:2px solid #e2e8f0;border-bottom:1px solid #e2e8f0;padding:8px 12px;font-size:11px;font-weight:600;color:#64748b;position:sticky;left:0;z-index:3">인원</td>';
+      mg.forEach(function(m){tbl+='<td colspan="'+m.s+'" style="text-align:center;padding:8px 0;font-size:10px;font-weight:600;color:#64748b;background:#f8fafc;border-bottom:1px solid #e2e8f0;border-right:1px solid #e2e8f0;min-width:'+colW+'px">'+m.l+'</td>';});
+      tbl+='</tr><tr><td style="min-width:160px;max-width:160px;background:#f8fafc;border-right:2px solid #e2e8f0;border-bottom:1px solid #e2e8f0;position:sticky;left:0;z-index:3"></td>';
+      weeks.forEach(function(w){tbl+='<td style="text-align:center;padding:6px 0;font-size:10px;color:#94a3b8;border-bottom:1px solid #e2e8f0;border-right:1px solid #cbd5e1;min-width:'+colW+'px;max-width:'+colW+'px;background:#f8fafc">'+fmtWeek(w)+'</td>';});
+      tbl+='</tr></thead><tbody>';
+      peopleArr.forEach(function(x,pi){
+        var pk=x[0],pInfo=x[1];
+        var pDispName=personDisplayName(pk);
+        var color=pColors[pi%pColors.length];
+        var isEven=pi%2===0;
+        tbl+='<tr><td style="min-width:160px;max-width:160px;padding:8px 12px;background:'+(isEven?'#fff':'#f8fafc')+';border-right:2px solid #e2e8f0;border-bottom:1px solid #f1f5f9;position:sticky;left:0;z-index:1"><div style="font-weight:600;font-size:12px;cursor:pointer;color:#000" data-person="'+escapeAttr(pk)+'" title="🔗 클릭 → 어싸인 현황으로 이동">'+escapeHtml(pDispName)+'</div><div style="font-size:10px;color:#94a3b8">'+escapeHtml(infoText(pInfo.rank,pInfo.dept,pInfo.jobCode))+'</div></td>';
+        weeks.forEach(function(w){
+          var wk=fmtWeekFull(w);
+          var hd=pInfo.weekMap[wk];
+          tbl+='<td style="min-width:'+colW+'px;max-width:'+colW+'px;height:44px;border-right:1px solid #cbd5e1;border-bottom:1px solid #f1f5f9;padding:0;background:'+weekCellBackground(isEven?'#fff':'#f8fafc')+';vertical-align:top;position:relative">';
+          if(hd){
+            var dr=formatRanges(hd.ranges);
+            var tipT=pDispName+' · '+projName+'\n기간: '+dr+'\n시간: '+fmtHours(hd.hours);
+            tbl+='<div style="margin:3px 4px;position:relative;cursor:default" title="'+tipT.replace(/"/g,"&quot;")+'"><div style="position:absolute;right:0;top:-1px;font-weight:700;font-size:10px;color:'+color+';background:rgba(255,255,255,0.92);padding:0 2px;border-radius:3px;line-height:1.2;z-index:2">'+fmtHours(hd.hours)+'</div>'+buildSegmentBarsHtml(hd.segments,color,{height:36,barHeight:18,top:14,fill:hexToRgba(color,0.36),border:color,padX:4})+'</div>';
+          }
+          tbl+='</td>';
+        });
+        tbl+='</tr>';
+      });
+      tbl+='</tbody></table></div>';
+      body.innerHTML=summaryHtml+tbl;
+    }
+
+    if(autoExpand)buildProjBody();
+
+    hdr.addEventListener("click",function(){
+      var arrow=hdr.querySelector(".rank-toggle");
+      if(body.style.display==="none"){
+        closeSiblings(hdr);
+        body.style.display="block";arrow.classList.add("open");hdr.classList.add("open");
+        buildProjBody();
+      } else {
+        body.style.display="none";arrow.classList.remove("open");hdr.classList.remove("open");
+      }
+    });
+    container.appendChild(sec);
+}
+
+// ===== AVAILABILITY (Range Search) =====
+document.getElementById("availBtn").addEventListener("click",checkAvailability);
+document.getElementById("availDateFrom").addEventListener("keydown",function(e){if(e.key==="Enter")checkAvailability();});
+document.getElementById("availDateTo").addEventListener("keydown",function(e){if(e.key==="Enter")checkAvailability();});
+document.getElementById("availDateFrom").addEventListener("change",function(){
+  var fromVal=this.value;
+  var toEl=document.getElementById("availDateTo");
+  if(fromVal){
+    toEl.min=fromVal;
+    if(toEl.value&&toEl.value<fromVal)toEl.value="";
+  } else {
+    toEl.min="";
+  }
+});
+
+function checkAvailability(){
+  var fromStr=document.getElementById("availDateFrom").value;
+  var toStr=document.getElementById("availDateTo").value;
+  var minDays=parseInt(document.getElementById("availMinDays").value)||1;
+  if(!fromStr){document.getElementById("availResult").innerHTML='<div class="empty-state">시작 날짜를 선택하세요.</div>';return;}
+  
+  var targetFrom=new Date(fromStr+"T00:00:00");
+  var targetTo=toStr?new Date(toStr+"T00:00:00"):null;
+  var isSingleDay=!targetTo||targetFrom.getTime()===targetTo.getTime();
+  
+  var resultDiv=document.getElementById("availResult");
+  var personIntervals={},personInfoLocal={};
+  allData.forEach(function(r){
+    if(!r.name||!r.startDate||!r.endDate)return;
+    var pk=personKey(r.name,r.jobCode);
+    if(!personIntervals[pk])personIntervals[pk]=[];
+    personIntervals[pk].push({start:r.startDate,end:r.endDate});
+    if(!personInfoLocal[pk])personInfoLocal[pk]={rank:r.rank,dept:r.dept,jobCode:r.jobCode,name:r.name};
+    else if(!personInfoLocal[pk].jobCode&&r.jobCode)personInfoLocal[pk].jobCode=r.jobCode;
+  });
+  
+  var available=[];
+  allNames.forEach(function(pk){
+    var info=personInfoLocal[pk];if(!info)return;
+    if(AVAIL_RANKS.indexOf(info.rank)<0)return;
+    var intervals=personIntervals[pk];if(!intervals||!intervals.length)return;
+    
+    // Sort intervals by start date
+    var sorted=intervals.slice().sort(function(a,b){return a.start-b.start;});
+    
+    if(isSingleDay){
+      // Original single-day logic
+      var isAssigned=sorted.some(function(iv){return targetFrom>=iv.start&&targetFrom<=iv.end;});
+      if(!isAssigned){
+        var earliestStartAfter=null;
+        sorted.forEach(function(iv){if(iv.start>targetFrom){if(!earliestStartAfter||iv.start<earliestStartAfter)earliestStartAfter=new Date(iv.start.getFullYear(),iv.start.getMonth(),iv.start.getDate());}});
+        var availTo=null,bizDays=null;
+        if(earliestStartAfter){var rawEnd=new Date(earliestStartAfter.getFullYear(),earliestStartAfter.getMonth(),earliestStartAfter.getDate()-1);availTo=toLastBusinessDay(rawEnd);if(availTo<targetFrom)return;bizDays=countBusinessDays(targetFrom,availTo);}
+        if(minDays>1&&bizDays!==null&&bizDays<minDays)return;
+        if(minDays>1&&bizDays===null){}// no upper bound, always passes
+        available.push({name:personKeyName(pk),pk:pk,rank:info.rank,dept:info.dept,jobCode:personKeyJobCode(pk),from:new Date(targetFrom),to:availTo,days:bizDays});
+      }
+    } else {
+      // Range logic: find available gaps within [targetFrom, targetTo]
+      var searchEnd=targetTo;
+      // Build list of "busy" periods within search range
+      var busyInRange=[];
+      sorted.forEach(function(iv){
+        var s=iv.start>targetFrom?iv.start:targetFrom;
+        var e=iv.end<searchEnd?iv.end:searchEnd;
+        if(s<=e)busyInRange.push({start:s,end:e});
+      });
+      // Merge overlapping busy periods
+      busyInRange.sort(function(a,b){return a.start-b.start;});
+      var merged=[];
+      busyInRange.forEach(function(b){
+        if(!merged.length||b.start>new Date(merged[merged.length-1].end.getTime()+864e5)){
+          merged.push({start:new Date(b.start),end:new Date(b.end)});
+        } else {
+          if(b.end>merged[merged.length-1].end)merged[merged.length-1].end=new Date(b.end);
+        }
+      });
+      // Find gaps
+      var gaps=[];
+      var cursor=new Date(targetFrom);
+      merged.forEach(function(b){
+        if(cursor<b.start){
+          var gapEnd=new Date(b.start.getTime()-864e5);
+          gapEnd=toLastBusinessDay(gapEnd);
+          if(gapEnd>=cursor){
+            var bd=countBusinessDays(cursor,gapEnd);
+            if(bd>=minDays)gaps.push({from:new Date(cursor),to:gapEnd,days:bd});
+          }
+        }
+        var nextDay=new Date(b.end.getTime()+864e5);
+        if(nextDay>cursor)cursor=nextDay;
+      });
+      // Gap after last busy period
+      if(merged.length&&cursor<=searchEnd){
+        var lastTo=toLastBusinessDay(searchEnd);
+        if(lastTo>=cursor){
+          var bd=countBusinessDays(cursor,lastTo);
+          if(bd>=minDays)gaps.push({from:new Date(cursor),to:lastTo,days:bd});
+        }
+      }
+      // If no busy periods at all
+      if(!merged.length){
+        var lastTo=toLastBusinessDay(searchEnd);
+        if(lastTo>=targetFrom){
+          var bd=countBusinessDays(targetFrom,lastTo);
+          if(bd>=minDays)gaps.push({from:new Date(targetFrom),to:lastTo,days:bd});
+        }
+      }
+      
+      if(gaps.length>0){
+        // Use the longest gap
+        var bestGap=gaps.reduce(function(best,g){return g.days>best.days?g:best;},gaps[0]);
+        available.push({name:personKeyName(pk),pk:pk,rank:info.rank,dept:info.dept,jobCode:personKeyJobCode(pk),from:bestGap.from,to:bestGap.to,days:bestGap.days,allGaps:gaps});
+      }
+    }
+  });
+  
+  if(!available.length){
+    var dateLabel=isSingleDay?fmtDateKR(targetFrom):fmtDateKR(targetFrom)+" ~ "+fmtDateKR(targetTo);
+    resultDiv.innerHTML='<div class="empty-state"><div class="empty-icon">📋</div>'+dateLabel+' 기준'+(minDays>1?' (최소 '+minDays+'일(주말 제외))':'')+'<br>해당 직급에 Available 인원이 없습니다.</div>';return;
+  }
+  
+  // Sort by available days desc
+  available.sort(function(a,b){
+    if(a.days===null&&b.days===null)return 0;
+    if(a.days===null)return -1;
+    if(b.days===null)return 1;
+    return b.days-a.days;
+  });
+  
+  var totalAvail=available.length;
+  
+  // Apply rank filter
+  var rankFilterVal=document.getElementById("availRankFilter").value;
+  if(rankFilterVal){
+    available=available.filter(function(p){return p.rank===rankFilterVal;});
+  }
+  var jobCodeFilterVal=document.getElementById("availJobCodeFilter").value;
+  if(jobCodeFilterVal){
+    available=available.filter(function(p){
+      var jc=personKeyJobCode(p.pk);
+      return jc&&jc.substring(0,2)===jobCodeFilterVal;
+    });
+  }
+  var filteredCount=available.length;
+  
+  // Group by Rank → Dept, sort by jobCode
+  var byRank={};
+  available.forEach(function(p){
+    var rk=p.rank||"기타";
+    if(!byRank[rk])byRank[rk]={};
+    var dept=p.dept||"기타";
+    if(!byRank[rk][dept])byRank[rk][dept]=[];
+    byRank[rk][dept].push(p);
+  });
+  Object.keys(byRank).forEach(function(rk){
+    Object.keys(byRank[rk]).forEach(function(dept){
+      byRank[rk][dept].sort(function(a,b){
+        var ja=String(a.jobCode||"");var jb=String(b.jobCode||"");
+        return ja.localeCompare(jb);
+      });
+    });
+  });
+  var DEPT_ORDER=["Global IPO","Global CMAAS","IOA","Assurance NGH"];
+  var AVAIL_RANK_ORDER=["Senior-Manager","Manager","Senior-Associate","Associate","Assistant-Associate","Intern"];
+  var sortedRanks=AVAIL_RANK_ORDER.filter(function(r){return byRank[r];}).concat(Object.keys(byRank).filter(function(r){return AVAIL_RANK_ORDER.indexOf(r)<0;}));
+  
+  var dateLabel=isSingleDay?fmtDateKR(targetFrom):fmtDateKR(targetFrom)+" ~ "+fmtDateKR(targetTo);
+  var filterLabel='';
+  if(rankFilterVal)filterLabel+=' · '+rankFilterVal;
+  if(jobCodeFilterVal)filterLabel+=' · '+jobCodeFilterVal+'사번';
+  var hasFilter=rankFilterVal||jobCodeFilterVal;
+  var html='<div class="avail-count">'+dateLabel+' 기준'+(minDays>1?' (최소 '+minDays+'일(주말 제외))':'')+filterLabel+'  Available 인원: <strong>'+filteredCount+'명</strong>'+(hasFilter?' <span style="color:#94a3b8;font-size:11px">(전체 '+totalAvail+'명 중)</span>':'')+'</div>';
+
+  sortedRanks.forEach(function(rk){
+    var deptMap=byRank[rk];
+    var rkCount=Object.values(deptMap).reduce(function(a,arr){return a+arr.length;},0);
+    var rGid="avrk_"+rk.replace(/[^a-zA-Z]/g,"");
+    html+='<div class="rank-group"><div class="rank-group-header" data-grp="'+rGid+'"><div class="rank-group-left"><span class="rank-toggle" id="arrow_'+rGid+'">▶</span><div class="rank-group-title">'+escapeHtml(rk)+'</div></div><div class="rank-group-count">'+rkCount+'명</div></div>';
+    html+='<div id="body_'+rGid+'" style="display:none">';
+
+    var deptNames=Object.keys(deptMap).sort(function(a,b){var ai=DEPT_ORDER.indexOf(a),bi=DEPT_ORDER.indexOf(b);if(ai<0)ai=999;if(bi<0)bi=999;if(ai!==bi)return ai-bi;return a.localeCompare(b);});
+    deptNames.forEach(function(dept){
+      var people=deptMap[dept];
+      var dGid=rGid+"_dept_"+dept.replace(/[^a-zA-Z0-9가-힣]/g,"_");
+      html+='<div style="margin:4px 0 4px 20px;background:#fff;border:1px solid #e2e8f0;border-radius:8px;overflow:hidden"><div class="rank-group-header" style="padding:10px 16px" data-grp="'+dGid+'"><div class="rank-group-left"><span class="rank-toggle" id="arrow_'+dGid+'">▶</span><div style="font-size:13px;font-weight:500;color:#475569">'+escapeHtml(dept)+'</div></div><div class="rank-group-count">'+people.length+'명</div></div>';
+      html+='<div id="body_'+dGid+'" style="display:none"><table class="avail-table"><thead><tr><th style="width:40px">#</th><th style="width:80px">이름</th><th style="width:220px">직급 / 소속 / 사번</th><th>Available 기간</th></tr></thead><tbody>';
+      people.forEach(function(p,i){
+        var rangeStr="",daysLabel="";
+        if(p.to){
+          rangeStr='<span class="avail-range">'+fmtDateKR(p.from)+' ~ '+fmtDateKR(p.to)+'</span>';
+          var cls=p.days<=10?"short":p.days<=20?"medium":"long";
+          daysLabel='<span class="avail-days '+cls+'">'+p.days+'일(주말 제외)</span>';
+        } else {
+          rangeStr='<span class="avail-range">'+fmtDateKR(p.from)+' ~</span> <span style="color:#16a34a;font-size:12px;font-weight:500">이후 어싸인 없음</span>';
+        }
+        html+='<tr><td style="color:#94a3b8;font-size:12px">'+(i+1)+'</td><td style="font-weight:600"><span style="cursor:pointer;color:#1e293b" data-avail-person="'+escapeAttr(p.pk)+'" title="🔗 클릭 → 어싸인 현황으로 이동">'+escapeHtml(personDisplayName(p.pk))+'</span></td><td style="color:#64748b;font-size:12px">'+escapeHtml(infoText(p.rank,p.dept,p.jobCode))+'</td><td>'+rangeStr+daysLabel+'</td></tr>';
+      });
+      html+='</tbody></table></div></div>';
+    });
+    html+='</div></div>';
+  });
+  resultDiv.innerHTML=html;
+  resultDiv.querySelectorAll(".rank-group-header").forEach(function(hdr){
+    hdr.addEventListener("click",function(){var gid=hdr.dataset.grp;var body=document.getElementById("body_"+gid);var arrow=document.getElementById("arrow_"+gid);
+      if(body.style.display==="none"){closeSiblings(hdr);body.style.display="block";arrow.classList.add("open");hdr.classList.add("open");}
+      else{body.style.display="none";arrow.classList.remove("open");hdr.classList.remove("open");}
+    });
+  });
+}
+
+initApp();
+
+// Header click to reset
+// Helper: navigate to gantt with person name
+function goToGanttPerson(personNameOrKey){
+  document.querySelectorAll(".tab-btn").forEach(function(b){b.classList.remove("active");});
+  document.querySelector('[data-tab="gantt"]').classList.add("active");
+  document.getElementById("tabGantt").style.display="block";
+  document.getElementById("tabDetail").style.display="none";
+  document.getElementById("tabProjSearch").style.display="none";
+  document.getElementById("tabAvail").style.display="none";document.getElementById("tabNews").style.display="none";
+  var realName=personNameOrKey.indexOf("|")>=0?personKeyName(personNameOrKey):personNameOrKey;
+  searchQuery=realName;
+  document.getElementById("searchInput").value=realName;
+  document.getElementById("clearBtn").style.display="flex";
+  expandedSet=new Set();
+  // If it's a pk, expand that specific person; otherwise expand all matches
+  if(personNameOrKey.indexOf("|")>=0){
+    expandedSet.add(personNameOrKey);
+  } else {
+    allNames.forEach(function(k){if(personKeyName(k)===realName)expandedSet.add(k);});
+  }
+  yearFilter="all";personCache={};
+  buildYearFilter();renderAll();setTimeout(scrollGanttsToToday,150);
+}
+
+// Helper: navigate to project search with project name
+function goToProjSearch(projName){
+  document.querySelectorAll(".tab-btn").forEach(function(b){b.classList.remove("active");});
+  document.querySelector('[data-tab="projSearch"]').classList.add("active");
+  document.getElementById("tabGantt").style.display="none";
+  document.getElementById("tabDetail").style.display="none";
+  document.getElementById("tabProjSearch").style.display="block";
+  document.getElementById("tabAvail").style.display="none";document.getElementById("tabNews").style.display="none";
+  document.getElementById("projSearchInput").value=projName;
+  // Clear old heavy content first, then render in next frame
+  var area=document.getElementById("projSearchArea");
+  area.innerHTML='<div style="padding:20px;text-align:center;color:#94a3b8">로딩 중...</div>';
+  requestAnimationFrame(function(){
+    renderProjSearch(projName,true);
+  });
+}
+
+function goToDetailSearch(nameQuery){
+  document.querySelectorAll(".tab-btn").forEach(function(b){b.classList.remove("active");});
+  document.querySelector('[data-tab="detail"]').classList.add("active");
+  document.getElementById("tabGantt").style.display="none";
+  document.getElementById("tabDetail").style.display="block";
+  document.getElementById("tabProjSearch").style.display="none";
+  document.getElementById("tabAvail").style.display="none";document.getElementById("tabNews").style.display="none";
+  document.getElementById("detailSearchInput").value=nameQuery;
+  renderDetail(nameQuery);
+}
+
+// Click person name in project search -> go to gantt with that person
+document.getElementById("projSearchArea").addEventListener("click",function(e){
+  var el=e.target.closest("[data-person]");
+  if(!el)return;
+  goToGanttPerson(el.getAttribute("data-person"));
+});
+
+// Click person name in availability -> go to gantt with that person
+document.getElementById("availResult").addEventListener("click",function(e){
+  var el=e.target.closest("[data-avail-person]");
+  if(!el)return;
+  goToGanttPerson(el.getAttribute("data-avail-person"));
+});
+
+// Click project name in detail tab -> go to project search
+document.getElementById("detailArea").addEventListener("click",function(e){
+  var el=e.target.closest("[data-detail-proj]");
+  if(!el)return;
+  goToProjSearch(el.getAttribute("data-detail-proj"));
+});
+
+// Click project block or stat-chip -> go to project search
+document.getElementById("ganttArea").addEventListener("click",function(e){
+  var block=e.target.closest("[data-proj]");
+  if(!block)return;
+  var proj=block.getAttribute("data-proj");
+  if(!proj)return;
+  e.stopPropagation();
+  goToProjSearch(proj);
+});
+
+function resetToHome(){
+  searchQuery="";expandedSet=new Set();yearFilter="all";personCache={};
+  document.getElementById("searchInput").value="";document.getElementById("clearBtn").style.display="none";
+  // Switch to gantt tab
+  document.querySelectorAll(".tab-btn").forEach(function(b){b.classList.remove("active");});
+  document.querySelector('[data-tab="gantt"]').classList.add("active");
+  document.getElementById("tabGantt").style.display="block";
+  document.getElementById("tabDetail").style.display="none";
+  document.getElementById("tabProjSearch").style.display="none";
+  document.getElementById("tabAvail").style.display="none";document.getElementById("tabNews").style.display="none";
+  buildYearFilter();renderAll();setTimeout(scrollGanttsToToday,150);
+}
+document.getElementById("headerReset").addEventListener("click",resetToHome);
+document.getElementById("headerTitleReset").addEventListener("click",function(){resetToHome();window.scrollTo({top:0,behavior:"smooth"});});
+
+// ===== COMPARE MODE =====
+var compareSelected=[];
+var compareSearchTimer2=null;
+var compareSearchInput=document.getElementById("compareSearchInput");
+var compareClearBtn=document.getElementById("compareClearBtn");
+
+function initCompareTab(){
+  compareSelected=[];
+  compareSearchInput.value="";
+  compareClearBtn.style.display="none";
+  document.getElementById("compareSelectArea").innerHTML="";
+  if(compareSelected.length>=2){renderCompareResult();}else{document.getElementById("compareResultArea").innerHTML="";}
+  updateCompareInfo();
+  renderCompareList("");
+}
+
+compareSearchInput.addEventListener("input",function(){
+  clearTimeout(compareSearchTimer2);
+  compareSearchTimer2=setTimeout(function(){
+    var q=compareSearchInput.value.trim();
+    compareClearBtn.style.display=q?"flex":"none";
+    renderCompareList(q);
+  },300);
+});
+compareClearBtn.addEventListener("click",function(){compareSearchInput.value="";compareClearBtn.style.display="none";renderCompareList("");compareSearchInput.focus();});
+compareSearchInput.addEventListener("keydown",function(e){
+  if(e.key!=="Enter")return;
+  var q=compareSearchInput.value.trim();if(!q)return;
+  var matched=allNames.filter(function(k){return personKeyName(k).indexOf(q)>=0&&nameRankMap[k]!=="Partner"&&nameRankMap[k]!=="Managing Director"&&compareSelected.indexOf(k)<0;});
+  if(!matched.length)return;
+  if(compareSelected.length>=5){alert("최대 5명까지 선택 가능합니다.");return;}
+  compareSelected.push(matched[0]);
+  compareSearchInput.value="";compareClearBtn.style.display="none";
+  updateCompareInfo();renderCompareList("");
+});
+
+function updateCompareInfo(){
+  var info=document.getElementById("compareSelectedInfo");
+  if(compareSelected.length===0){info.innerHTML='<span style="color:#94a3b8">비교할 인원을 선택하세요 (최대 5명)</span>';return;}
+  var chips=compareSelected.map(function(k){var dn=personDisplayName(k);return '<span style="display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:5px;background:#e8f1fe;color:#1e40af;font-size:11px;font-weight:500">'+escapeHtml(dn)+' <span style="cursor:pointer;font-size:9px;opacity:0.6" data-compare-remove="'+escapeAttr(k)+'">✕</span></span>';}).join(" ");
+  info.innerHTML=chips+' <button class="check-btn" style="padding:6px 16px;font-size:12px;margin-left:8px" id="compareGoBtn">비교하기</button>';
+  var goBtn=document.getElementById("compareGoBtn");
+  if(goBtn){
+    goBtn.disabled=compareSelected.length<2;
+    goBtn.addEventListener("click",function(){renderCompareResult();});
+  }
+  info.querySelectorAll("[data-compare-remove]").forEach(function(el){
+    el.addEventListener("click",function(e){
+      e.stopPropagation();
+      var name=el.getAttribute("data-compare-remove");
+      compareSelected=compareSelected.filter(function(n){return n!==name;});
+      updateCompareInfo();
+      renderCompareList(compareSearchInput.value.trim());
+      if(compareSelected.length>=2){renderCompareResult();}else{document.getElementById("compareResultArea").innerHTML="";}
+    });
+  });
+}
+
+function renderCompareList(q){
+  var area=document.getElementById("compareSelectArea");
+  var matched=q?allNames.filter(function(k){return personKeyName(k).indexOf(q)>=0;}):allNames.slice();
+  matched=matched.filter(function(k){return nameRankMap[k]!=="Partner"&&nameRankMap[k]!=="Managing Director";});
+  
+  if(!q&&matched.length>100){
+    area.innerHTML='<div class="empty-state"><div class="empty-icon">🔍</div>이름을 검색하여 비교할 인원을 선택하세요</div>';
+    return;
+  }
+  if(!matched.length){
+    area.innerHTML='<div class="empty-state"><div class="empty-icon">🔍</div>"'+q+'" 검색 결과가 없습니다.</div>';
+    return;
+  }
+  
+  // Group by rank
+  var byRank={};
+  var CMP_RANKS=["Director","Senior-Manager","Manager","Senior-Associate","Associate","Assistant-Associate","Intern"];
+  matched.forEach(function(k){
+    var rk=nameRankMap[k]||"기타";
+    if(!byRank[rk])byRank[rk]=[];
+    byRank[rk].push(k);
+  });
+  Object.keys(byRank).forEach(function(rk){byRank[rk].sort();});
+  
+  var html='<div style="margin-bottom:8px;font-size:12px;color:#94a3b8">검색 결과: '+matched.length+'명 (클릭하여 선택/해제)</div>';
+  var rankOrder=CMP_RANKS.concat(Object.keys(byRank).filter(function(r){return CMP_RANKS.indexOf(r)<0;}));
+  rankOrder.forEach(function(rk){
+    if(!byRank[rk]||!byRank[rk].length)return;
+    var people=byRank[rk];
+    html+='<div style="margin-bottom:8px"><div style="font-size:11px;color:#64748b;font-weight:600;margin-bottom:4px;padding:2px 0">'+rk+' ('+people.length+'명)</div><div style="display:flex;gap:6px;flex-wrap:wrap">';
+    people.forEach(function(k){
+      var isSelected=compareSelected.indexOf(k)>=0;
+      var info=personInfoMap[k];
+      var dept=info?info.dept:"";
+      html+='<div class="action-btn" data-compare-name="'+escapeAttr(k)+'" style="'+(isSelected?'background:#e8f1fe;border-color:#93c5fd;color:#1e40af;':'')+'cursor:pointer;padding:5px 12px"><span style="font-size:12px;font-weight:500">'+escapeHtml(personDisplayName(k))+'</span><span style="font-size:10px;color:#94a3b8;margin-left:4px">'+escapeHtml(dept)+'</span></div>';
+    });
+    html+='</div></div>';
+  });
+  area.innerHTML=html;
+  
+  area.querySelectorAll("[data-compare-name]").forEach(function(el){
+    el.addEventListener("click",function(){
+      var k=el.getAttribute("data-compare-name");
+      var idx=compareSelected.indexOf(k);
+      if(idx>=0){
+        compareSelected.splice(idx,1);
+      } else {
+        if(compareSelected.length>=5){alert("최대 5명까지 선택 가능합니다.");return;}
+        compareSelected.push(k);
+      }
+      updateCompareInfo();
+      renderCompareList(compareSearchInput.value.trim());
+      if(compareSelected.length>=2){renderCompareResult();}else{document.getElementById("compareResultArea").innerHTML="";}
+    });
+  });
+}
+
+function renderCompareResult(){
+  var area=document.getElementById("compareResultArea");
+  if(compareSelected.length<2){area.innerHTML='<div class="empty-state">2명 이상 선택해주세요.</div>';return;}
+  
+  // Find the full date range across all selected people
+  var globalMin=null,globalMax=null;
+  var personDataMap={};
+  compareSelected.forEach(function(pk){
+    var pkN=personKeyName(pk),pkJ=personKeyJobCode(pk);
+    var records=allData.filter(function(r){return r.name===pkN&&(pkJ?r.jobCode===pkJ:true)&&r.startDate&&r.endDate;});
+    if(!records.length)return;
+    var info={rank:records[0].rank,dept:records[0].dept,jobCode:records[0].jobCode};
+    var minD=records[0].startDate,maxD=records[0].endDate;
+    records.forEach(function(r){if(r.startDate<minD)minD=r.startDate;if(r.endDate>maxD)maxD=r.endDate;});
+    if(!globalMin||minD<globalMin)globalMin=minD;
+    if(!globalMax||maxD>globalMax)globalMax=maxD;
+    
+    var weekMap={};var projs=new Set();
+    records.forEach(function(r){
+      var weekStart=getMonday(r.startDate);
+      var k=fmtWeekFull(weekStart);
+      if(!weekMap[k])weekMap[k]={};
+      if(!weekMap[k][r.project])weekMap[k][r.project]={hours:0,el:r.el,pm:r.pm,ranges:[],segments:[]};
+      weekMap[k][r.project].hours+=r.hours;
+      if(r.el)weekMap[k][r.project].el=r.el;
+      if(r.pm)weekMap[k][r.project].pm=r.pm;
+      weekMap[k][r.project].ranges.push({sd:r.startDate,ed:r.endDate});
+      weekMap[k][r.project].segments=weekMap[k][r.project].segments.concat(getWeekdaySegments(r.startDate,r.endDate,weekStart));
+      projs.add(r.project);
+    });
+    Object.keys(weekMap).forEach(function(wk){Object.keys(weekMap[wk]).forEach(function(p){weekMap[wk][p].segments=mergeSegments(weekMap[wk][p].segments);});});
+    var colorMap={};var ci=0;Array.from(projs).sort().forEach(function(p){colorMap[p]=COLORS[ci%COLORS.length];ci++;});
+    personDataMap[pk]={info:info,weekMap:weekMap,colorMap:colorMap,records:records};
+  });
+  
+  if(!globalMin||!globalMax){area.innerHTML='<div class="empty-state">데이터가 없습니다.</div>';return;}
+  
+  var displayMax=new Date(2028,11,31);if(globalMax<displayMax)globalMax=displayMax;
+  var allWeeks=getWeeksBetween(globalMin,globalMax);
+  
+  // Collect years from actual data for filter buttons
+  var cmpYears={};
+  compareSelected.forEach(function(pk){var pd=personDataMap[pk];if(!pd)return;pd.records.forEach(function(r){if(r.startDate)cmpYears[r.startDate.getFullYear()]=1;if(r.endDate)cmpYears[r.endDate.getFullYear()]=1;});});
+  var cmpYearList=Object.keys(cmpYears).map(Number).sort();
+  var cmpYF=document.getElementById("compareYearFilter");
+  var compareYF=cmpYF?cmpYF.value:"all";
+  
+  var weeks=allWeeks;
+  if(compareYF!=="all"){var yy=parseInt(compareYF);weeks=allWeeks.filter(function(w){return w.getFullYear()===yy;});}
+  if(!weeks.length){area.innerHTML='<div class="empty-state">해당 기간 데이터 없음</div>';return;}
+  
+  var todayKey=getTodayWeekKey();
+  var todayColIdx=-1;
+  weeks.forEach(function(w,i){if(fmtWeekFull(w)===todayKey)todayColIdx=i;});
+  
+  // Build month groups
+  var mg=[];var cM=-1,cY=-1,sp=0;
+  weeks.forEach(function(w,i){var m=w.getMonth(),y=w.getFullYear();if(m!==cM||y!==cY){if(sp>0)mg.push({l:cY+"."+String(cM+1).padStart(2,"0"),s:sp});cM=m;cY=y;sp=1;}else sp++;if(i===weeks.length-1)mg.push({l:y+"."+String(m+1).padStart(2,"0"),s:sp});});
+  
+  var colW=110;
+  var scrollId="cmp_"+Math.random().toString(36).substr(2,6);
+  var scrollAttr=todayColIdx>=0?' data-scroll-to="'+todayColIdx+'"':'';
+  
+  var h='<div style="display:flex;align-items:center;gap:12px;margin-bottom:12px"><div style="font-size:14px;font-weight:600;color:#334155">📊 일정 비교 ('+compareSelected.length+'명)</div><div style="display:flex;gap:4px;align-items:center"><span style="font-size:12px;color:#94a3b8">기간</span><button class="year-btn cmp-yr-btn'+(compareYF==="all"?" active":"")+'" data-cy="all" style="padding:4px 12px;font-size:11px">전체</button>';
+  cmpYearList.forEach(function(y){h+='<button class="year-btn cmp-yr-btn'+(compareYF===String(y)?" active":"")+'" data-cy="'+y+'" style="padding:4px 12px;font-size:11px">'+y+'</button>';});
+  h+='</div><input type="hidden" id="compareYearFilter" value="'+compareYF+'"></div>';
+  h+='<div class="compare-view"><div class="gantt-scroll" id="'+scrollId+'"'+scrollAttr+'><table style="border-collapse:collapse;width:max-content"><thead>';
+  h+='<tr><td style="min-width:140px;max-width:140px;background:#f8fafc;border-right:2px solid #e2e8f0;border-bottom:1px solid #e2e8f0;position:sticky;left:0;z-index:4"></td>';
+  mg.forEach(function(m){h+='<td colspan="'+m.s+'" style="text-align:center;padding:8px 0;font-size:10px;font-weight:600;color:#64748b;background:#f8fafc;border-bottom:1px solid #e2e8f0;border-right:1px solid #e2e8f0;min-width:'+colW+'px">'+m.l+'</td>';});
+  h+='</tr><tr><td style="min-width:140px;max-width:140px;background:#f8fafc;border-right:2px solid #e2e8f0;border-bottom:1px solid #e2e8f0;position:sticky;left:0;z-index:4"></td>';
+  weeks.forEach(function(w,i){h+='<td style="text-align:center;padding:6px 0;font-size:10px;color:'+(i===todayColIdx?'#3b82f6':'#94a3b8')+';font-weight:'+(i===todayColIdx?'600':'400')+';border-bottom:1px solid #e2e8f0;border-right:1px solid #cbd5e1;min-width:'+colW+'px;max-width:'+colW+'px;background:'+(i===todayColIdx?'#e8f1fe':'#f8fafc')+'">'+fmtWeek(w)+'</td>';});
+  h+='</tr></thead><tbody>';
+  
+  var personColors=["#3b82f6","#dc2626","#059669","#d97706","#7c3aed"];
+  compareSelected.forEach(function(pk,pi){
+    var pd=personDataMap[pk];if(!pd)return;
+    var dispName=personDisplayName(pk);
+    var realName=personKeyName(pk);
+    var isEven=pi%2===0;
+    var personColor=personColors[pi%personColors.length];
+    h+='<tr><td style="min-width:140px;max-width:140px;padding:10px 12px;background:'+(isEven?'#fff':'#f8fafc')+';border-right:2px solid #e2e8f0;border-bottom:1px solid #e2e8f0;position:sticky;left:0;z-index:2"><div style="display:flex;align-items:center;gap:8px"><div style="width:28px;height:28px;border-radius:50%;background:'+personColor+';display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:#fff;flex-shrink:0">'+realName[0]+'</div><div><div style="font-weight:600;font-size:11px;cursor:pointer;color:#3b82f6" data-compare-goto="'+escapeAttr(pk)+'">'+escapeHtml(dispName)+'</div><div style="font-size:9px;color:#64748b">'+escapeHtml(infoText(pd.info.rank,pd.info.dept,""))+'</div></div></div></td>';
+    
+    weeks.forEach(function(w,ci){
+      var k=fmtWeekFull(w);
+      var en=pd.weekMap[k]||{};
+      var pr=Object.entries(en).sort(function(a,b){return b[1].hours-a[1].hours;});
+      var isTodayC=ci===todayColIdx;
+      
+      
+      h+='<td style="min-width:'+colW+'px;max-width:'+colW+'px;border-right:1px solid #cbd5e1;border-bottom:1px solid #e2e8f0;padding:0;background:'+weekCellBackground(isTodayC?'#eff6ff':(isEven?'#fff':'#f8fafc'))+';vertical-align:top">';
+      if(pr.length===0){
+        h+='<div style="height:44px;display:flex;align-items:center;justify-content:center;font-size:10px;color:#86efac;font-weight:600">Available</div>';
+      } else {
+        pr.forEach(function(it){
+          var c=pd.colorMap[it[0]]||"#666";
+          var nm=it[0].length>13?it[0].slice(0,13)+"…":it[0];
+          var dateRange=formatRanges(it[1].ranges);
+          var tipText=it[0]+"\n기간: "+dateRange+"\nEL: "+(it[1].el||"-")+"\nPM: "+(it[1].pm||"-")+"\n\n🔗 클릭 → 프로젝트별 검색으로 이동";
+          h+='<div style="cursor:pointer;padding:2px 4px;margin:1px 2px;font-size:9px;overflow:hidden;white-space:nowrap" title="'+escapeAttr(tipText)+'" data-proj="'+escapeAttr(it[0])+'"><div style="display:flex;align-items:center;gap:3px;margin-bottom:1px"><span style="width:4px;height:4px;border-radius:1px;background:'+c+';flex-shrink:0"></span><span style="flex:1;overflow:hidden;text-overflow:ellipsis;color:#475569">'+nm+'</span><span style="color:'+c+';font-family:JetBrains Mono,monospace;font-weight:600;font-size:9px">'+fmtHours(it[1].hours)+'</span></div>'+buildSegmentBarsHtml(it[1].segments,c)+'</div>';
+        });
+      }
+      h+='</td>';
+    });
+    h+='</tr>';
+  });
+  h+='</tbody></table></div></div>';
+  area.innerHTML=h;
+  
+  // Click person name to go to gantt
+  area.querySelectorAll("[data-compare-goto]").forEach(function(el){
+    el.addEventListener("click",function(){goToGanttPerson(el.getAttribute("data-compare-goto"));});
+  });
+  
+  // Click project to go to project search
+  area.querySelectorAll("[data-proj]").forEach(function(el){
+    el.addEventListener("click",function(){goToProjSearch(el.getAttribute("data-proj"));});
+  });
+  
+  // Year filter buttons
+  area.querySelectorAll(".cmp-yr-btn").forEach(function(btn){
+    btn.addEventListener("click",function(e){
+      e.stopPropagation();
+      var yf=document.getElementById("compareYearFilter");
+      if(yf)yf.value=btn.dataset.cy;
+      renderCompareResult();
+    });
+  });
+  
+  // Scroll to today
+  setTimeout(function(){
+    var sc=document.getElementById(scrollId);
+    if(sc&&todayColIdx>=0)sc.scrollLeft=Math.max(0,(todayColIdx-4)*colW);
+  },100);
+}
+
+// ===== CUSTOM INSTANT TOOLTIP =====
+(function(){
+  var tip=document.getElementById("customTip");
+  var curEl=null;var origTitle="";
+  function showTip(el,e){
+    origTitle=el.getAttribute("title");
+    if(!origTitle)return;
+    curEl=el;
+    el.removeAttribute("title");
+    tip.innerText=origTitle;
+    var x=e.clientX+12,y=e.clientY+16;
+    if(x+340>window.innerWidth)x=e.clientX-340;
+    if(y+100>window.innerHeight)y=e.clientY-80;
+    tip.style.left=x+"px";tip.style.top=y+"px";
+    tip.classList.add("show");
+  }
+  function hideTip(){
+    if(!curEl)return;
+    curEl.setAttribute("title",origTitle);
+    tip.classList.remove("show");
+    curEl=null;origTitle="";
+  }
+  document.getElementById("mainUI").addEventListener("mouseover",function(e){
+    var el=e.target.closest("[title]");
+    if(!el){return;}
+    if(el===curEl)return;
+    if(curEl)hideTip();
+    showTip(el,e);
+  });
+  document.getElementById("mainUI").addEventListener("mouseout",function(e){
+    if(!curEl)return;
+    var related=e.relatedTarget;
+    if(related&&curEl.contains(related))return;
+    if(related&&related.closest&&related.closest("[title]")===curEl)return;
+    hideTip();
+  });
+  document.addEventListener("mousemove",function(e){
+    if(!curEl)return;
+    var x=e.clientX+12,y=e.clientY+16;
+    if(x+340>window.innerWidth)x=e.clientX-340;
+    if(y+100>window.innerHeight)y=e.clientY-80;
+    tip.style.left=x+"px";tip.style.top=y+"px";
+  });
+})();
+// ============================================================
+// 업계 기사모음 렌더링
+// ============================================================
+function renderNews(){
+  var area=document.getElementById("newsContent");
+  var dateEl=document.getElementById("newsDate");
+  if(typeof NEWS_DATA==="undefined"||!NEWS_DATA||!NEWS_DATA.sections){
+    area.innerHTML='<div style="color:#94a3b8;padding:20px 0">뉴스 데이터가 없습니다. news_update.py를 실행해주세요.</div>';
+    return;
+  }
+  if(dateEl)dateEl.textContent=NEWS_DATA.updated+" 기준";
+  var h='<style>.news-link{color:#1e293b;text-decoration:none;font-weight:500;line-height:1.4;transition:color 0.15s}.news-link:hover{color:#2563eb;text-decoration:underline}</style>';
+  NEWS_DATA.sections.forEach(function(sec){
+    if(!sec.items||!sec.items.length)return;
+    h+='<div style="margin-bottom:18px">';
+    h+='<div style="font-size:15px;font-weight:700;color:#1e293b;margin-bottom:8px;padding-bottom:6px;border-bottom:2px solid #e2e8f0">'+sec.icon+' '+sec.title+'</div>';
+    h+='<table style="width:100%;border-collapse:collapse;font-size:13px;table-layout:fixed">';
+    h+='<colgroup><col style="width:30px"><col style="width:450px"><col></colgroup>';
+    h+='<thead><tr style="border-bottom:2px solid #e2e8f0"><th style="padding:6px 8px 6px 0;text-align:left;font-size:13px;color:#64748b;font-weight:600"></th><th style="padding:6px 12px 6px 0;text-align:left;font-size:13px;color:#64748b;font-weight:600">기사 제목</th><th style="padding:6px 0 6px 16px;text-align:left;font-size:13px;color:#64748b;font-weight:600">관련 기사 내용 요약 및 시사점</th></tr></thead>';
+    h+='<tbody>';
+    sec.items.forEach(function(item,idx){
+      h+='<tr style="border-bottom:1px solid #f1f5f9;vertical-align:top">';
+      h+='<td style="padding:8px 8px 8px 0;color:#64748b;font-size:13px">'+(idx+1)+'</td>';
+      h+='<td style="padding:8px 12px 8px 0;word-break:keep-all;overflow-wrap:break-word"><a href="'+item.url+'" target="_blank" class="news-link" title="클릭 시 관련 기사 내용으로 이동" style="font-size:13px">'+item.title+'</a>';
+      if(item.source)h+='<br><span style="font-size:11px;color:#94a3b8">'+item.source+'</span>';
+      h+='</td>';
+      h+='<td style="padding:8px 0 8px 16px;color:#475569;line-height:1.6;font-size:13px;word-break:keep-all;overflow-wrap:break-word;border-left:1px solid #e2e8f0">'+(item.summary||'');
+      if(item.impact)h+='<br><span style="color:#2563eb;font-size:12px">💡 '+item.impact+'</span>';
+      h+='</td>';
+      h+='</tr>';
+    });
+    h+='</tbody></table></div>';
+  });
+  area.innerHTML=h;
+}
+</script>
+<div id="saveTimestamp" style="position:fixed;bottom:8px;left:12px;font-size:9px;color:#64748b;letter-spacing:-0.3px;z-index:1"></div>
+</body>
+</html>
