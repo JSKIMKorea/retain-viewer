@@ -1,6 +1,7 @@
 name: Daily News Update
 on:
   schedule:
+  # 매일 한국시간 오전 8시 (UTC 23시)
     - cron: '0 23 * * *'
   workflow_dispatch:
 jobs:
