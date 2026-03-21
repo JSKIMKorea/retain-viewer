@@ -11,7 +11,11 @@
 
 import requests as req_lib
 import json, os, re, time, urllib3, sys
-from datetime import datetime, date, timedelta
+from datetime import datetime, date, timedelta, timezone
+
+# 한국시간 헬퍼
+def _kst_now():
+    return datetime.now(timezone(timedelta(hours=9)))
 from html import unescape
 
 # ============================================================
@@ -821,8 +825,8 @@ def main():
     print("=" * 60)
 
     result = {
-        "date": date.today().isoformat(),
-        "updated": datetime.now().strftime("%Y.%m.%d %H:%M"),
+        "date": _kst_now().strftime("%Y-%m-%d"),
+        "updated": _kst_now().strftime("%Y.%m.%d %H:%M"),
         "sections": []
     }
 
