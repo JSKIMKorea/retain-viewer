@@ -1,0 +1,49 @@
+name: Daily DART Update
+
+on:
+  schedule:
+    # 매일 한국시간 새벽 1시 (UTC 16시)
+    - cron: '0 16 * * *'
+  workflow_dispatch:
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install dependencies
+        run: |
+          curl https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add -
+          curl https://packages.microsoft.com/config/ubuntu/22.04/prod.list | sudo tee /etc/apt/sources.list.d/mssql-release.list
+          sudo apt-get update
+          sudo ACCEPT_EULA=Y apt-get install -y msodbcsql17
+          pip install pyodbc pandas requests python-dotenv
+      - name: Run dart_update.py
+        env:
+          AZURE_SQL_SERVER: ${{ secrets.AZURE_SQL_SERVER }}
+          AZURE_SQL_DATABASE: ${{ secrets.AZURE_SQL_DATABASE }}
+          AZURE_SQL_USERNAME: ${{ secrets.AZURE_SQL_USERNAME }}
+          AZURE_SQL_PASSWORD: ${{ secrets.AZURE_SQL_PASSWORD }}
+          DART_API_KEY: ${{ secrets.DART_API_KEY }}
+          GITHUB_ACTIONS: true
+        run: python dart_update.py
+      - name: Commit and push
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          git add dart_cache/
+          git diff --staged --quiet || git commit -m "DART cache update $(TZ=Asia/Seoul date '+%Y-%m-%d %H:%M')"
+          git push
+```
+
+**[Commit changes]** 클릭!
+
+---
+
+## 결과적으로 이런 자동화가 됩니다
+```
+🌙 새벽 1시  → dart_update.py 자동 실행 → dart_cache 갱신
+🌅 오전 9시  → retain_all.py 자동 실행 → 최신 캐시로 index.html 생성
