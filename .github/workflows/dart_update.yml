@@ -34,12 +34,3 @@ jobs:
           git add dart_cache/
           git diff --staged --quiet || git commit -m "DART update $(TZ=Asia/Seoul date '+%Y-%m-%d %H:%M')"
           git push
-```
-
-**[Commit changes]** 클릭!
-
----
-
-그 다음 `news_update.yml`:
-```
-https://github.com/JSKIMKorea/retain-viewer/blob/main/.github/workflows/news_update.yml
