@@ -1,11 +1,8 @@
 name: Daily News Update
-
 on:
   schedule:
-    # 매일 한국시간 오전 8시 (UTC 23시 = 전날)
     - cron: '0 23 * * *'
   workflow_dispatch:
-
 jobs:
   update:
     runs-on: ubuntu-latest
@@ -28,20 +25,5 @@ jobs:
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
           git add news_cache/
-          git diff --staged --quiet || git commit -m "News cache update $(TZ=Asia/Seoul date '+%Y-%m-%d %H:%M')"
+          git diff --staged --quiet || git commit -m "News update $(TZ=Asia/Seoul date '+%Y-%m-%d %H:%M')"
           git push
-```
-
-**[Commit changes]** 클릭!
-
-### ③ setup_github.py 더블클릭
-
-`news_update.py`를 GitHub에 올려야 하니까요.
-
----
-
-## 전체 자동화 완성!
-```
-🌙 새벽 1시  → dart_update.py   → DART 공시정보 갱신
-🌅 오전 8시  → news_update.py   → 업계 뉴스 수집+요약
-🌅 오전 9시  → retain_all.py    → 최신 캐시로 index.html 생성
