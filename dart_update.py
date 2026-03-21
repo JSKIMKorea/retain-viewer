@@ -8,7 +8,11 @@ Azure의 프로젝트 목록 기준으로 DART 기업정보를 수집하여 dart
 """
 
 import pyodbc, pandas as pd, requests as req_lib
-from datetime import date, datetime
+from datetime import date, datetime, timezone, timedelta
+
+# 한국시간 헬퍼
+def _kst_now():
+    return datetime.now(timezone(timedelta(hours=9)))
 import os, sys, json, re, zipfile, io, time
 import xml.etree.ElementTree as ET
 
@@ -671,7 +675,7 @@ def main():
         with open(cache_file, "r", encoding="utf-8") as f:
             old_cache = json.load(f)
 
-    result = {"projMap": {}, "companies": {}, "updated": datetime.now().strftime("%Y.%m.%d %H:%M:%S")}
+    result = {"projMap": {}, "companies": {}, "updated": _kst_now().strftime("%Y.%m.%d %H:%M:%S")}
     matched = 0
     new_fetched = 0
     unmatched = []
@@ -738,7 +742,7 @@ def main():
         # 리포트 파일 저장
         um_file = os.path.join(DART_CACHE_DIR, "match_report.txt")
         with open(um_file, "w", encoding="utf-8") as f:
-            f.write(f"DART 매칭 리포트 ({datetime.now().strftime('%Y-%m-%d %H:%M')})\n")
+            f.write(f"DART 매칭 리포트 ({_kst_now().strftime('%Y-%m-%d %H:%M')})\n")
             f.write(f"{'=' * 50}\n\n")
             if fuzzy_matches:
                 f.write(f"[퍼지 매칭 결과] ({len(fuzzy_matches)}건)\n")
