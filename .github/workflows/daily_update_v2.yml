@@ -1,4 +1,4 @@
-name: Daily Retain Update
+name: Daily Retain Update_v2
 on:
   schedule:
     # 매일 한국시간 오전 8시 40분 (UTC 전날 23시 40분)
