@@ -672,8 +672,11 @@ def main():
     cache_file = os.path.join(DART_CACHE_DIR, "dart_details.json")
     old_cache = {}
     if os.path.exists(cache_file):
-        with open(cache_file, "r", encoding="utf-8") as f:
-            old_cache = json.load(f)
+        try:
+            with open(cache_file, "r", encoding="utf-8") as f:
+                old_cache = json.load(f)
+        except:
+            old_cache = {}
 
     result = {"projMap": {}, "companies": {}, "updated": _kst_now().strftime("%Y.%m.%d %H:%M:%S")}
     matched = 0
