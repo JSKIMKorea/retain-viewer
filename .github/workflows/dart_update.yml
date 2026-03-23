@@ -1,8 +1,8 @@
 name: Daily DART Update
 on:
   schedule:
-  # 매일 한국시간 오전 1시 (UTC 16시)
-    - cron: '0 16 * * *'
+    # 3일마다 한국시간 오후 7시 (UTC 10시)
+    - cron: '0 10 */3 * *'
   workflow_dispatch:
 jobs:
   update:
