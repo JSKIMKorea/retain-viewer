@@ -1,7 +1,7 @@
 name: Daily News Update
 on:
   schedule:
-  # 매일 한국시간 오전 8시 (UTC 23시)
+    # 매일 한국시간 오전 8시 (UTC 23시)
     - cron: '0 23 * * *'
   workflow_dispatch:
 jobs:
@@ -27,4 +27,5 @@ jobs:
           git config user.email "actions@github.com"
           git add news_cache/
           git diff --staged --quiet || git commit -m "News update $(TZ=Asia/Seoul date '+%Y-%m-%d %H:%M')"
+          git pull --rebase origin main
           git push
