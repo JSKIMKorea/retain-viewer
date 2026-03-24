@@ -34,4 +34,5 @@ jobs:
           git config user.email "actions@github.com"
           git add dart_cache/
           git diff --staged --quiet || git commit -m "DART update $(TZ=Asia/Seoul date '+%Y-%m-%d %H:%M')"
+          git pull --rebase origin main
           git push
