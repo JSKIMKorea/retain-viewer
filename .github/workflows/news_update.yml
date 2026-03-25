@@ -1,8 +1,8 @@
 name: Daily News Update
 on:
   schedule:
-    # 매일 한국시간 오전 8시 (UTC 23시)
-    - cron: '0 23 * * *'
+    # 매일 한국시간 오전 7시 50분 (UTC 22시 50분)
+    - cron: '50 22 * * *'
   workflow_dispatch:
 jobs:
   update:
