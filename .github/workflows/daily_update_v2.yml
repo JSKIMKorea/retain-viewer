@@ -9,6 +9,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
@@ -31,7 +33,8 @@ jobs:
         run: |
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
+          git fetch origin main
+          git reset --soft origin/main
           git add index.html
           git diff --staged --quiet || git commit -m "Auto-update $(TZ=Asia/Seoul date '+%Y-%m-%d %H:%M')"
-          git pull --rebase origin main
           git push
