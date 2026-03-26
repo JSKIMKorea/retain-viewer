@@ -1,14 +1,16 @@
 name: Daily News Update
 on:
   schedule:
-    # 매일 한국시간 오전 7시 50분 (UTC 22시 50분)
-    - cron: '50 22 * * *'
+    # 매일 한국시간 오전 8시 (UTC 23시)
+    - cron: '0 23 * * *'
   workflow_dispatch:
 jobs:
   update:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
@@ -25,7 +27,8 @@ jobs:
         run: |
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
+          git fetch origin main
+          git reset --soft origin/main
           git add news_cache/
           git diff --staged --quiet || git commit -m "News update $(TZ=Asia/Seoul date '+%Y-%m-%d %H:%M')"
-          git pull --rebase origin main
           git push
