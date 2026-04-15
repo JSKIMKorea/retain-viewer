@@ -498,7 +498,7 @@ function pickEmployeeNumber(r){
 function parseRows(rows){return rows.map(function(r){
   var sd=serialToDate(r.startDate||r["Start Date"]);
   var ed=serialToDate(r.endDate||r["End Date"]);
-  return{name:r.name||r["이름"]||"",rank:r.rank||r["직급"]||"",dept:r.dept||r["소속"]||r["본부"]||"",project:r.project||r["Project Name"]||"",startDate:sd,endDate:ed,hours:parseFloat(r.hours||r["Time (Hours)"])||0,pm:r.pm||r["PM"]||"",el:r.el||r["EL"]||"",jobCode:pickEmployeeNumber(r)};
+  return{name:r.name||r["이름"]||"",rank:r.rank||r["직급"]||"",dept:r.dept||r["소속"]||r["본부"]||"",project:r.project||r["Project Name"]||"",startDate:sd,endDate:ed,hours:parseFloat(r.hours||r["Time (Hours)"])||0,pm:r.pm||r["PM"]||"",el:r.el||r["EL"]||"",jobCode:pickEmployeeNumber(r),projCode:r.projCode||r["Job Code"]||r["PRJTCD"]||"",assignId:r.assignId||r["Assign ID"]||""};
 });}
 function showLoading(t){document.getElementById("loadingText").textContent=t||"로딩 중...";document.getElementById("loading").style.display="flex";}
 function hideLoading(){document.getElementById("loading").style.display="none";}
@@ -534,7 +534,7 @@ function processFile(file){
     var wb=XLSX.read(e.target.result,{type:"array"});var ws=wb.Sheets[wb.SheetNames[0]];var rows=XLSX.utils.sheet_to_json(ws,{defval:""});
     allData=parseRows(rows);
     updateFileRunDateInfo(extractFileRunDate(rows));
-    rawParsedForSave=allData.map(function(r){return{name:r.name,rank:r.rank,dept:r.dept,project:r.project,startDate:r.startDate?fmtDate(r.startDate):"",endDate:r.endDate?fmtDate(r.endDate):"",hours:r.hours,pm:r.pm,el:r.el,jobCode:r.jobCode};});
+    rawParsedForSave=allData.map(function(r){return{name:r.name,rank:r.rank,dept:r.dept,project:r.project,startDate:r.startDate?fmtDate(r.startDate):"",endDate:r.endDate?fmtDate(r.endDate):"",hours:r.hours,pm:r.pm,el:r.el,jobCode:r.jobCode,projCode:r.projCode||"",assignId:r.assignId||""};});
     allNames=allData.map(function(r){return r.name;}).filter(function(v,i,a){return a.indexOf(v)===i;}).sort();nameRankMap={};personInfoMap={};buildPersonMaps();
     yearFilter="all";searchQuery="";expandedSet=new Set();personCache={};
     document.getElementById("uploadZone").style.display="none";document.getElementById("mainUI").style.display="block";
@@ -651,12 +651,13 @@ function getPersonData(pk){
     var weekStart=getMonday(r.startDate);
     var k=fmtWeekFull(weekStart);
     if(!weekMap[k])weekMap[k]={};
-    if(!weekMap[k][r.project])weekMap[k][r.project]={hours:0,el:r.el,pm:r.pm,ranges:[],segments:[]};
-    weekMap[k][r.project].hours+=r.hours;
-    if(r.el)weekMap[k][r.project].el=r.el;
-    if(r.pm)weekMap[k][r.project].pm=r.pm;
-    weekMap[k][r.project].ranges.push({sd:r.startDate,ed:r.endDate});
-    weekMap[k][r.project].segments=weekMap[k][r.project].segments.concat(getWeekdaySegments(r.startDate,r.endDate,weekStart));
+    var entryKey=r.assignId?(r.project+"|"+r.assignId):r.projCode?(r.project+"|"+r.projCode):r.project;
+    if(!weekMap[k][entryKey])weekMap[k][entryKey]={hours:0,el:r.el,pm:r.pm,ranges:[],segments:[],projName:r.project};
+    weekMap[k][entryKey].hours+=r.hours;
+    if(r.el)weekMap[k][entryKey].el=r.el;
+    if(r.pm)weekMap[k][entryKey].pm=r.pm;
+    weekMap[k][entryKey].ranges.push({sd:r.startDate,ed:r.endDate});
+    weekMap[k][entryKey].segments=weekMap[k][entryKey].segments.concat(getWeekdaySegments(r.startDate,r.endDate,weekStart));
     ps.add(r.project);
   });
   Object.keys(weekMap).forEach(function(wk){Object.keys(weekMap[wk]).forEach(function(p){weekMap[wk][p].segments=mergeSegments(weekMap[wk][p].segments);});});
@@ -707,10 +708,10 @@ function buildGanttHTML(data,yf){
     var isTodayC=ci===todayColIdx;
     h+='<td class="gantt-cell" style="vertical-align:top;border-bottom:1px solid #f1f5f9;padding:0;min-width:130px;max-width:130px;background:'+weekCellBackground(isTodayC?'#eff6ff':'#fff')+'">';
     pr.forEach(function(it){
-      var c=data.colorMap[it[0]]||"#666",nm=it[0].length>13?it[0].slice(0,13)+"…":it[0];
+      var pn=it[1].projName||it[0];var c=data.colorMap[pn]||"#666",nm=pn.length>13?pn.slice(0,13)+"…":pn;
       var dateRange=formatRanges(it[1].ranges);
-      var tipText=it[0]+"\n기간: "+dateRange+"\nEL: "+(it[1].el||"-")+"\nPM: "+(it[1].pm||"-")+"\n\n🔗 클릭 → 프로젝트별 검색으로 이동";
-      h+='<div class="project-block" style="cursor:pointer;height:auto;display:block;padding:3px 4px" title="'+escapeAttr(tipText)+'" data-proj="'+escapeAttr(it[0])+'"><div style="display:flex;align-items:center;justify-content:space-between;gap:4px;margin-bottom:2px"><span class="project-block-name">'+nm+'</span><span class="project-block-hours" style="color:'+c+'">'+fmtHours(it[1].hours)+'</span></div>'+buildSegmentBarsHtml(it[1].segments,c)+'</div>';
+      var tipText=pn+"\n기간: "+dateRange+"\nEL: "+(it[1].el||"-")+"\nPM: "+(it[1].pm||"-")+"\n\n🔗 클릭 → 프로젝트별 검색으로 이동";
+      h+='<div class="project-block" style="cursor:pointer;height:auto;display:block;padding:3px 4px" title="'+escapeAttr(tipText)+'" data-proj="'+escapeAttr(pn)+'"><div style="display:flex;align-items:center;justify-content:space-between;gap:4px;margin-bottom:2px"><span class="project-block-name">'+nm+'</span><span class="project-block-hours" style="color:'+c+'">'+fmtHours(it[1].hours)+'</span></div>'+buildSegmentBarsHtml(it[1].segments,c)+'</div>';
     });
     h+='</td>';
   });h+='</tr>';
@@ -1614,12 +1615,13 @@ function renderCompareResult(){
       var weekStart=getMonday(r.startDate);
       var k=fmtWeekFull(weekStart);
       if(!weekMap[k])weekMap[k]={};
-      if(!weekMap[k][r.project])weekMap[k][r.project]={hours:0,el:r.el,pm:r.pm,ranges:[],segments:[]};
-      weekMap[k][r.project].hours+=r.hours;
-      if(r.el)weekMap[k][r.project].el=r.el;
-      if(r.pm)weekMap[k][r.project].pm=r.pm;
-      weekMap[k][r.project].ranges.push({sd:r.startDate,ed:r.endDate});
-      weekMap[k][r.project].segments=weekMap[k][r.project].segments.concat(getWeekdaySegments(r.startDate,r.endDate,weekStart));
+      var entryKey=r.assignId?(r.project+"|"+r.assignId):r.projCode?(r.project+"|"+r.projCode):r.project;
+      if(!weekMap[k][entryKey])weekMap[k][entryKey]={hours:0,el:r.el,pm:r.pm,ranges:[],segments:[],projName:r.project};
+      weekMap[k][entryKey].hours+=r.hours;
+      if(r.el)weekMap[k][entryKey].el=r.el;
+      if(r.pm)weekMap[k][entryKey].pm=r.pm;
+      weekMap[k][entryKey].ranges.push({sd:r.startDate,ed:r.endDate});
+      weekMap[k][entryKey].segments=weekMap[k][entryKey].segments.concat(getWeekdaySegments(r.startDate,r.endDate,weekStart));
       projs.add(r.project);
     });
     Object.keys(weekMap).forEach(function(wk){Object.keys(weekMap[wk]).forEach(function(p){weekMap[wk][p].segments=mergeSegments(weekMap[wk][p].segments);});});
@@ -1686,11 +1688,12 @@ function renderCompareResult(){
         h+='<div style="height:44px;display:flex;align-items:center;justify-content:center;font-size:10px;color:#86efac;font-weight:600">Available</div>';
       } else {
         pr.forEach(function(it){
-          var c=pd.colorMap[it[0]]||"#666";
-          var nm=it[0].length>13?it[0].slice(0,13)+"…":it[0];
+          var pn=it[1].projName||it[0];
+          var c=pd.colorMap[pn]||"#666";
+          var nm=pn.length>13?pn.slice(0,13)+"…":pn;
           var dateRange=formatRanges(it[1].ranges);
-          var tipText=it[0]+"\n기간: "+dateRange+"\nEL: "+(it[1].el||"-")+"\nPM: "+(it[1].pm||"-")+"\n\n🔗 클릭 → 프로젝트별 검색으로 이동";
-          h+='<div style="cursor:pointer;padding:2px 4px;margin:1px 2px;font-size:9px;overflow:hidden;white-space:nowrap" title="'+escapeAttr(tipText)+'" data-proj="'+escapeAttr(it[0])+'"><div style="display:flex;align-items:center;gap:3px;margin-bottom:1px"><span style="width:4px;height:4px;border-radius:1px;background:'+c+';flex-shrink:0"></span><span style="flex:1;overflow:hidden;text-overflow:ellipsis;color:#475569">'+nm+'</span><span style="color:'+c+';font-family:JetBrains Mono,monospace;font-weight:600;font-size:9px">'+fmtHours(it[1].hours)+'</span></div>'+buildSegmentBarsHtml(it[1].segments,c)+'</div>';
+          var tipText=pn+"\n기간: "+dateRange+"\nEL: "+(it[1].el||"-")+"\nPM: "+(it[1].pm||"-")+"\n\n🔗 클릭 → 프로젝트별 검색으로 이동";
+          h+='<div style="cursor:pointer;padding:2px 4px;margin:1px 2px;font-size:9px;overflow:hidden;white-space:nowrap" title="'+escapeAttr(tipText)+'" data-proj="'+escapeAttr(pn)+'"><div style="display:flex;align-items:center;gap:3px;margin-bottom:1px"><span style="width:4px;height:4px;border-radius:1px;background:'+c+';flex-shrink:0"></span><span style="flex:1;overflow:hidden;text-overflow:ellipsis;color:#475569">'+nm+'</span><span style="color:'+c+';font-family:JetBrains Mono,monospace;font-weight:600;font-size:9px">'+fmtHours(it[1].hours)+'</span></div>'+buildSegmentBarsHtml(it[1].segments,c)+'</div>';
         });
       }
       h+='</td>';
