@@ -84,14 +84,23 @@ def get_conn():
         f"PWD={DB_CONFIG['password']};Encrypt=yes;TrustServerCertificate=no;")
 
 SQL = """
-SELECT r.YMD, r.PRJTCD, r.EMPNO, r.RETAIN, r.PRJTNM,
+WITH src AS (
+  SELECT *, ROW_NUMBER() OVER (
+    PARTITION BY YMD, PRJTCD, EMPNO, RETAIN, startdate, enddate, PRJTNM
+    ORDER BY (SELECT NULL)
+  ) AS DUP_SEQ
+  FROM BI_STAFFREPORT_RETAIN_V
+)
+SELECT src.YMD, src.PRJTCD, src.EMPNO, src.RETAIN, src.PRJTNM,
+  src.startdate AS ASSIGN_START, src.enddate AS ASSIGN_END,
+  src.DUP_SEQ,
   e.EMPNM, e.ORG_NM AS CM_NM, g.GRADNM,
   COALESCE(ep.EMPNM,p.PTRNM,'') AS CHARGPTR,
   COALESCE(em.EMPNM,p.MGRNM,'') AS CHARGMGR
-FROM BI_STAFFREPORT_RETAIN_V r
-INNER JOIN BI_STAFFREPORT_EMP_V e ON r.EMPNO=e.EMPNO
+FROM src
+INNER JOIN BI_STAFFREPORT_EMP_V e ON src.EMPNO=e.EMPNO
 INNER JOIN BI_STAFFREPORT_GRADE_V g ON e.GRADCD=g.GRADCD
-LEFT JOIN BI_STAFFREPORT_PRJT_V p ON r.PRJTCD=p.PRJTCD
+LEFT JOIN BI_STAFFREPORT_PRJT_V p ON src.PRJTCD=p.PRJTCD
 LEFT JOIN BI_STAFFREPORT_EMP_V ep ON p.CHARGPTR=ep.EMPNO
 LEFT JOIN BI_STAFFREPORT_EMP_V em ON p.CHARGMGR=em.EMPNO
 WHERE e.ORG_NM IN ('Global CMAAS','IOA','Global IPO','Assurance NGH')"""
@@ -119,14 +128,37 @@ def process_data(df):
         "CHARGMGR":"PM","PRJTCD":"Job Code","CHARGPTR":"EL"})
     df["End Date"]=df["Start Date"]
     df["Start Date"]=pd.to_datetime(df["Start Date"]); df["End Date"]=pd.to_datetime(df["End Date"])
+    # DUP_SEQ from SQL CTE (소스 테이블 레벨 중복 번호)
+    if "DUP_SEQ" not in df.columns:
+        df["DUP_SEQ"]=1
+    df["DUP_SEQ"]=pd.to_numeric(df["DUP_SEQ"],errors="coerce").fillna(1).astype(int)
+    # Assign period → base_aid (다일 기간만, 단일일은 빈값)
+    if "ASSIGN_START" in df.columns and "ASSIGN_END" in df.columns:
+        df["ASSIGN_START"]=pd.to_datetime(df["ASSIGN_START"],errors="coerce")
+        df["ASSIGN_END"]=pd.to_datetime(df["ASSIGN_END"],errors="coerce")
+        multi=df["ASSIGN_START"]!=df["ASSIGN_END"]
+        df["_base_aid"]=""
+        df.loc[multi,"_base_aid"]=df.loc[multi,"ASSIGN_START"].dt.strftime("%Y%m%d").fillna("")+"~"+df.loc[multi,"ASSIGN_END"].dt.strftime("%Y%m%d").fillna("")
+    else:
+        df["_base_aid"]=""
+    # Assign ID = base_aid + DUP_SEQ (DUP_SEQ>1이면 접미사 추가)
+    df["Assign ID"]=df["_base_aid"]
+    dup_mask=df["DUP_SEQ"]>1
+    df.loc[dup_mask,"Assign ID"]=df.loc[dup_mask,"_base_aid"]+"_"+df.loc[dup_mask,"DUP_SEQ"].astype(str)
+    df=df.drop(columns=["_base_aid","DUP_SEQ","ASSIGN_START","ASSIGN_END"],errors="ignore")
     df["사번"]=pd.to_numeric(df["사번"],errors="coerce")
     print(f"  → 컬럼 정리: {len(df):,}건")
     df["Client Code"]=df["Job Code"].astype(str).str.split("-").str[0]
     df["Client Code"]=pd.to_numeric(df["Client Code"],errors="coerce")
-    dedup=["이름","직급","사번","소속","Project Name","Start Date","End Date","Time (Hours)","PM","Job Code","EL"]
+    # JOIN 아티팩트 제거 (DUP_SEQ 포함했으므로 소스 중복은 보존)
+    dedup=["이름","직급","사번","소속","Project Name","Start Date","End Date","Time (Hours)","PM","Job Code","EL","Assign ID"]
     df=df.drop_duplicates(subset=dedup); print(f"  → 중복제거: {len(df):,}건")
     df["Project Name"]=df["Project Name"].fillna("기타Admin(교육 등)")
-    grp=["이름","직급","사번","소속","Project Name","PM","Job Code","EL","Start Date","End Date"]
+    grp=["이름","직급","사번","소속","Project Name","PM","Job Code","EL","Start Date","End Date","Assign ID"]
+    agg=df.groupby(grp,dropna=False).agg(**{"Time (Hours)":("Time (Hours)","sum")}).reset_index()
+    agg=agg.sort_values("Start Date").reset_index(drop=True)
+    print(f"  → Summarize: {len(agg):,}건")
+    return agg
     agg=df.groupby(grp,dropna=False).agg(**{"Time (Hours)":("Time (Hours)","sum")}).reset_index()
     agg=agg.sort_values("Start Date").reset_index(drop=True)
     print(f"  → Summarize: {len(agg):,}건")
@@ -177,9 +209,9 @@ def upath(fp):
     return f"{b}({n}){e}"
 
 def save_excels(df):
-    ts=date.today().isoformat(); rd=f"_{ts}"
+    ts=datetime.now(timezone(timedelta(hours=9))).strftime("%Y-%m-%d"); rd=f"_{ts}"
     df["Start Date"]=df["Start Date"].dt.date; df["End Date"]=df["End Date"].dt.date; df["FileRunDate"]=rd
-    cols=["이름","직급","사번","소속","Project Name","Start Date","End Date","Time (Hours)","PM","Job Code","EL","FileRunDate"]
+    cols=["이름","직급","사번","소속","Project Name","Start Date","End Date","Time (Hours)","PM","Job Code","EL","Assign ID","FileRunDate"]
     df=df[cols]; os.makedirs(OUTPUT_DIR,exist_ok=True)
     p1=upath(os.path.join(OUTPUT_DIR,f"Data_output(Excel){rd}.xlsx"))
     df.to_excel(p1,sheet_name="Sheet1",index=False); print(f"\n✅ 전체: {p1} ({len(df):,}건)")
@@ -332,8 +364,10 @@ def build_html(df25, du="", dart=None, news=None):
             "dept":str(r["소속"]) if pd.notna(r["소속"]) else "","project":str(r["Project Name"]) if pd.notna(r["Project Name"]) else "",
             "startDate":str(r["Start Date"]) if pd.notna(r["Start Date"]) else "","endDate":str(r["End Date"]) if pd.notna(r["End Date"]) else "",
             "hours":float(r["Time (Hours)"]) if pd.notna(r["Time (Hours)"]) else 0,"pm":str(r["PM"]) if pd.notna(r["PM"]) else "",
-            "el":str(r["EL"]) if pd.notna(r["EL"]) else "","jobCode":str(int(r["사번"])) if pd.notna(r["사번"]) else ""})
-    frd=date.today().isoformat()
+            "el":str(r["EL"]) if pd.notna(r["EL"]) else "","jobCode":str(int(r["사번"])) if pd.notna(r["사번"]) else "",
+            "projCode":str(r["Job Code"]) if pd.notna(r["Job Code"]) else "",
+            "assignId":str(r["Assign ID"]) if "Assign ID" in r.index and pd.notna(r["Assign ID"]) else ""})
+    frd=datetime.now(timezone(timedelta(hours=9))).strftime("%Y-%m-%d")
     if not os.path.exists(HTML_TEMPLATE): print(f"  ⚠ 템플릿 없음"); return None,None
     with open(HTML_TEMPLATE,"r",encoding="utf-8") as f: html=f.read()
     js=json.dumps(recs,ensure_ascii=False)
@@ -384,7 +418,7 @@ def push_gh(ip):
     h={"Authorization":f"token {GITHUB_TOKEN}","Accept":"application/vnd.github.v3+json"}
     r=req_lib.get(api,headers=h); sha=r.json().get("sha") if r.status_code==200 else None
     with open(ip,"rb") as f: b64=base64.b64encode(f.read()).decode()
-    p={"message":f"Update ({date.today().isoformat()})","content":b64}
+    p={"message":f"Update ({datetime.now(timezone(timedelta(hours=9))).strftime('%Y-%m-%d')})","content":b64}
     if sha: p["sha"]=sha
     r=req_lib.put(api,headers=h,json=p)
     if r.status_code in(200,201): print("✅ GitHub 완료"); return True
