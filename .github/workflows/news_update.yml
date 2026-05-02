@@ -7,6 +7,8 @@ on:
 jobs:
   update:
     runs-on: ubuntu-latest
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
     steps:
       - uses: actions/checkout@v4
         with:
@@ -15,7 +17,13 @@ jobs:
         with:
           python-version: '3.11'
       - name: Install dependencies
-        run: pip install requests python-dotenv
+        run: |
+          # pip 설치: 네트워크 불안정 대비 재시도
+          for i in 1 2 3; do
+            pip install requests python-dotenv && break
+            echo "Attempt $i failed, retrying in 10s..."
+            sleep 10
+          done
       - name: Run news_update.py
         env:
           NAVER_CLIENT_ID: ${{ secrets.NAVER_CLIENT_ID }}
@@ -28,6 +36,10 @@ jobs:
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
           git fetch origin main
+          git reset --soft origin/main
+          git add news_cache/
+          git diff --staged --quiet || git commit -m "News update $(TZ=Asia/Seoul date '+%Y-%m-%d %H:%M')"
+          git push
           git reset --soft origin/main
           git add news_cache/
           git diff --staged --quiet || git commit -m "News update $(TZ=Asia/Seoul date '+%Y-%m-%d %H:%M')"
