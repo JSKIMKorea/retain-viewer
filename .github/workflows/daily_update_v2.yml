@@ -16,10 +16,17 @@ jobs:
           python-version: '3.11'
       - name: Install dependencies
         run: |
-          curl https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add -
+          # Microsoft ODBC repo 추가
+          curl https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add - 2>/dev/null || true
           curl https://packages.microsoft.com/config/ubuntu/22.04/prod.list | sudo tee /etc/apt/sources.list.d/mssql-release.list
-          sudo apt-get update
-          sudo ACCEPT_EULA=Y apt-get install -y msodbcsql17
+          # apt-get update: 미러 실패 시에도 계속 진행
+          sudo apt-get update --fix-missing || sudo apt-get update -o Acquire::Retries=3 || true
+          # msodbcsql17 설치: 네트워크 불안정 대비 재시도 + fix-missing
+          for i in 1 2 3; do
+            sudo ACCEPT_EULA=Y apt-get install -y --fix-missing msodbcsql17 && break
+            echo "Attempt $i failed, retrying in 10s..."
+            sleep 10
+          done
           pip install pyodbc pandas requests python-dotenv
       - name: Run retain_all.py
         env:
