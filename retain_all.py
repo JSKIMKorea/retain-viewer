@@ -62,6 +62,7 @@ if IS_CI:
     NEWS_CACHE    = os.path.join(_SCRIPT_DIR, "news_cache", "daily_news.json")
     HTML_TEMPLATE = os.path.join(_SCRIPT_DIR, "Project_Allocation_Viewer.html")
     INDEX_OUTPUT  = os.path.join(_SCRIPT_DIR, "index.html")
+    BCRYPT_VENDOR = os.path.join(_SCRIPT_DIR, "vendor", "bcrypt.min.js")
 else:
     # 로컬 PC: 기존 경로
     OUTPUT_DIR    = os.path.join(_SCRIPT_DIR, "Raw data")
@@ -69,6 +70,10 @@ else:
     NEWS_CACHE    = os.path.join(_SCRIPT_DIR, "news_cache", "daily_news.json")
     HTML_TEMPLATE = os.path.join(_SCRIPT_DIR, "02.html", "Project_Allocation_Viewer.html")
     INDEX_OUTPUT  = os.path.join(OUTPUT_DIR, "index.html")
+    BCRYPT_VENDOR = os.path.join(_SCRIPT_DIR, "02.html", "vendor", "bcrypt.min.js")
+
+# 사용자 관리 — 기업정보포털과 동일한 5컬럼(이메일/사번/이름/부서/활성) 구조
+USERS_FILE = os.path.join(_SCRIPT_DIR, "2.사용자관리", "users.xlsx")
 
 GITHUB_REPO   = os.getenv("GITHUB_REPO", "")
 GITHUB_TOKEN  = os.getenv("GITHUB_TOKEN", "")
@@ -221,6 +226,365 @@ def save_excels(df):
     return df, d25
 
 # ============================================================
+# 사용자 인증 — 기업정보포털과 동일한 방식
+#   1) users.xlsx (azure_auto + manual_add 시트) 읽기
+#   2) 활성=Y 사용자만 bcrypt 해시 생성 → PORTAL_USERS
+#   3) HTML에 로그인 오버레이 + 인라인 bcrypt.js + 세션 쿠키 인증 주입
+# ============================================================
+def build_users():
+    """
+    users.xlsx 두 시트(manual_add, azure_auto) 병합 → bcrypt 해시 사용자 목록.
+    이메일 중복 시 manual_add 우선. 사번 평문은 HTML에 포함되지 않음.
+    """
+    if not os.path.exists(USERS_FILE):
+        print(f"\n⚠ users.xlsx 없음: {USERS_FILE}")
+        print("  → update_users.py를 먼저 실행하세요. 로그인 불가 상태로 빌드됩니다.")
+        return []
+
+    try:
+        import bcrypt as _bcrypt
+    except ImportError:
+        print("\n⚠ bcrypt 패키지가 설치되지 않았습니다 (pip install bcrypt). 로그인 불가 상태로 빌드.")
+        return []
+
+    try:
+        sheets = pd.read_excel(USERS_FILE, sheet_name=None, dtype=str)
+    except Exception as e:
+        print(f"\n⚠ users.xlsx 읽기 실패: {e}")
+        return []
+
+    # 시트 우선순위: manual_add → azure_auto
+    sheet_order = ["manual_add", "azure_auto"] + [s for s in sheets if s not in ("manual_add", "azure_auto")]
+    seen = set()
+    users = []
+    counts = {"manual_add": 0, "azure_auto": 0, "기타": 0}
+
+    for sheet_name in sheet_order:
+        if sheet_name not in sheets:
+            continue
+        df = sheets[sheet_name].fillna("")
+        for _, row in df.iterrows():
+            if str(row.get("활성", "")).strip().upper() != "Y":
+                continue
+            email = str(row.get("이메일", "")).strip().lower()
+            sabun = str(row.get("사번", "")).strip()
+            if not email or not sabun or email in seen:
+                continue
+            seen.add(email)
+            h = _bcrypt.hashpw(sabun.encode("utf-8"),
+                               _bcrypt.gensalt(rounds=10, prefix=b"2a")).decode()
+            users.append({
+                "email": email,
+                "hash":  h,
+                "name":  str(row.get("이름", "")).strip(),
+                "dept":  str(row.get("부서", "")).strip(),
+            })
+            key = sheet_name if sheet_name in counts else "기타"
+            counts[key] += 1
+
+    summary = " / ".join(f"{k}: {v}명" for k, v in counts.items() if v)
+    print(f"  → 사용자 로드: {len(users)}명  ({summary})")
+    return users
+
+
+def _read_bcrypt_inline():
+    """templates/vendor/bcrypt.min.js 인라인. 회사망 CDN 차단 환경 대응."""
+    if not os.path.exists(BCRYPT_VENDOR):
+        print(f"⚠ bcrypt.min.js 없음: {BCRYPT_VENDOR} → CDN fallback 사용")
+        return ""
+    with open(BCRYPT_VENDOR, "r", encoding="utf-8") as f:
+        return f.read()
+
+
+# ── 로그인 오버레이 (CSS + HTML + JS). PwC Orange 톤 / Noto Sans KR ──
+LOGIN_INJECT_CSS = """
+<style id="grv-login-style">
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&display=swap');
+#grv-login-wrap{position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#FFF5ED 0%,#FFFFFF 50%,#FFCDA8 100%);font-family:'Noto Sans KR',sans-serif;padding:30px 20px;overflow-y:auto}
+#grv-login-wrap *{box-sizing:border-box;font-family:'Noto Sans KR',sans-serif}
+.grv-login-container{max-width:1080px;width:100%}
+.grv-login-hero{text-align:center;margin-bottom:36px}
+.grv-login-hero h1{font-size:54px;font-weight:700;color:#1a1a1a;margin-bottom:16px;letter-spacing:-1.5px;line-height:1.15}
+.grv-login-hero h1 .accent{color:#FD5108}
+.grv-login-hero-sub{font-size:13px;color:#1a1a1a;max-width:760px;margin:0 auto;line-height:1.7}
+.grv-login-hero-sub strong{color:#C44608;font-weight:700}
+@media(max-width:640px){.grv-login-hero h1{font-size:36px}}
+.grv-login-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:stretch}
+@media(max-width:840px){.grv-login-grid{grid-template-columns:1fr}}
+.grv-login-info{background:#fff;border-radius:12px;padding:24px 28px;box-shadow:0 12px 40px rgba(0,0,0,.08);border-top:4px solid #FD5108;display:flex;flex-direction:column}
+.grv-login-info-section{padding:14px 16px;background:#FFF5ED;border-radius:8px;margin-bottom:10px;border-left:3px solid #FD5108}
+.grv-login-info-section:last-child{margin-bottom:0}
+.grv-login-info-section h3{font-size:13px;font-weight:700;color:#1a1a1a;margin:0 0 6px;display:flex;align-items:center;gap:6px}
+.grv-login-info-section p{font-size:11px;color:#1a1a1a;line-height:1.65;margin:0}
+.grv-login-info-section strong{color:#C44608;font-weight:700}
+.grv-login-features{display:grid;grid-template-columns:1fr 1fr;gap:6px 14px;margin-top:8px}
+.grv-login-feature{display:flex;align-items:center;gap:6px;font-size:11px;color:#1a1a1a;font-weight:500}
+.grv-login-box{background:#fff;border-radius:12px;padding:32px 30px;box-shadow:0 12px 40px rgba(0,0,0,.12);border-top:4px solid #FD5108;display:flex;flex-direction:column}
+.grv-login-logo{text-align:center;margin-bottom:24px}
+.grv-login-logo h2{font-size:22px;font-weight:700;color:#1a1a1a;margin:0 0 4px;letter-spacing:-.3px}
+.grv-login-logo p{font-size:12px;color:#A1A8B3;margin:0}
+.grv-form-group{margin-bottom:14px}
+.grv-form-group label{display:block;font-size:12px;font-weight:600;color:#1a1a1a;margin-bottom:6px}
+.grv-form-group input{width:100%;padding:10px 12px;border:1px solid #DFE3E6;border-radius:8px;font-size:14px;outline:none;transition:border .15s,box-shadow .15s;background:#fff;color:#1a1a1a;font-family:'Noto Sans KR',sans-serif}
+.grv-form-group input:focus{border-color:#FD5108;box-shadow:0 0 0 3px rgba(253,81,8,.15)}
+.grv-pw-wrap{position:relative}
+.grv-pw-wrap input{padding-right:40px}
+.grv-pw-toggle{position:absolute;right:8px;top:50%;transform:translateY(-50%);background:transparent;border:none;cursor:pointer;font-size:16px;padding:4px 8px;color:#A1A8B3;opacity:.7}
+.grv-pw-toggle:hover{opacity:1}
+.grv-pw-toggle.on{opacity:1;color:#FD5108}
+#grv-login-btn{width:100%;padding:12px;background:#FD5108;color:#fff;border:none;border-radius:8px;font-size:15px;font-weight:600;cursor:pointer;margin-top:8px;transition:background .15s,transform .1s;font-family:'Noto Sans KR',sans-serif}
+#grv-login-btn:hover{background:#C44608}
+#grv-login-btn:active{transform:scale(.98)}
+#grv-login-btn:disabled{background:#FFAA72;cursor:not-allowed}
+#grv-login-err{color:#C44608;font-size:13px;text-align:center;margin-top:12px;display:none;line-height:1.5}
+.grv-login-tips{margin-top:14px;padding:12px 14px;background:#FFF5ED;border:1px solid #FFCDA8;border-radius:8px;font-size:11px;line-height:1.6;color:#1a1a1a}
+.grv-login-tips h4{font-size:12px;color:#C44608;font-weight:700;margin:0 0 5px;display:flex;align-items:center;gap:5px}
+.grv-login-tips ul{margin:6px 0 0;padding-left:16px}
+.grv-login-tips li{margin-bottom:3px}
+.grv-login-tips strong{color:#C44608;font-weight:700}
+.grv-login-footer{margin-top:auto;padding-top:14px;border-top:1px solid #DFE3E6;font-size:10px;color:#A1A8B3;text-align:center;line-height:1.5}
+/* 로그인 전 메인 앱 숨김 — 로그인 성공 시 클래스 제거 */
+body.grv-locked #appWrap,
+body.grv-locked .custom-tip,
+body.grv-locked .loading-overlay{display:none !important}
+body.grv-locked{overflow:hidden}
+</style>
+"""
+
+LOGIN_INJECT_HTML = """
+<div id="grv-login-wrap" role="dialog" aria-modal="true" aria-labelledby="grv-login-title">
+  <div class="grv-login-container">
+    <div class="grv-login-hero">
+      <h1 id="grv-login-title">Global <span class="accent">Retain</span> Viewer</h1>
+      <p class="grv-login-hero-sub">
+        <strong>Global IPO · CMAAS · IOA · Assurance NGH</strong> 인원의 어싸인 현황을 한 화면에서 조회할 수 있는 사내 전용 뷰어입니다.
+        TalentLink 데이터를 매일 1회 가공하여 제공합니다.
+      </p>
+    </div>
+    <div class="grv-login-grid">
+      <div class="grv-login-info">
+        <div class="grv-login-info-section">
+          <h3>📋 제공 기능</h3>
+          <div class="grv-login-features">
+            <div class="grv-login-feature">📅 어싸인 현황(간트)</div>
+            <div class="grv-login-feature">📄 개인별 프로젝트 내역</div>
+            <div class="grv-login-feature"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;flex-shrink:0"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>프로젝트별 검색</div>
+            <div class="grv-login-feature">🟢 Available 조회</div>
+            <div class="grv-login-feature">📰 업계 기사모음</div>
+            <div class="grv-login-feature">🏢 DART 공시정보</div>
+          </div>
+        </div>
+        <div class="grv-login-info-section" style="border-left-color:#A1A8B3;background:#F5F7F8">
+          <h3>🔐 보안 안내</h3>
+          <p>회사 PWC 이메일 + 사번 6자리로 로그인합니다. 사번은 <strong>bcrypt 해시</strong>로 변환되어 저장되며 평문이 외부에 노출되지 않습니다.
+          어싸인 자료는 사내 인원에 한해 공유 가능한 자료이므로 외부 유출에 유의해주세요.</p>
+        </div>
+      </div>
+      <div class="grv-login-box">
+        <div class="grv-login-logo">
+          <h2>로그인</h2>
+          <p>회사 계정으로 접속하세요</p>
+        </div>
+        <div class="grv-form-group">
+          <label for="grv-login-email">회사 계정 이메일 (@pwc.com)</label>
+          <input type="email" id="grv-login-email" placeholder="hong.gd@pwc.com" autocomplete="email">
+        </div>
+        <div class="grv-form-group">
+          <label for="grv-login-pw">사번 (6자리)</label>
+          <div class="grv-pw-wrap">
+            <input type="password" id="grv-login-pw" placeholder="••••••" maxlength="10" autocomplete="current-password">
+            <button type="button" class="grv-pw-toggle" id="grv-pw-toggle" tabindex="-1" aria-label="사번 보기/숨기기">👁</button>
+          </div>
+        </div>
+        <button id="grv-login-btn">로그인</button>
+        <p id="grv-login-err">이메일 또는 사번이 올바르지 않습니다.</p>
+        <div class="grv-login-tips">
+          <h4>💡 사용 안내</h4>
+          <ul>
+            <li>회사 PWC 이메일(@pwc.com) + 사번 6자리 입력</li>
+            <li>👁 아이콘 클릭 시 사번 표시/숨김 전환</li>
+            <li>등록되지 않은 사용자는 관리자에게 문의해주세요.</li>
+          </ul>
+          <p style="margin-top:8px"><strong>🔐 자동 로그아웃</strong>: 브라우저 창을 종료하면 자동으로 로그아웃됩니다. 탭만 닫고 다시 접속하실 경우 로그인 상태가 유지됩니다.</p>
+        </div>
+        <p class="grv-login-footer">© 2026 JS KIM · 오류 및 개선 의견: jeesoo.j.kim@pwc.com</p>
+      </div>
+    </div>
+  </div>
+</div>
+"""
+
+LOGIN_INJECT_JS_TEMPLATE = """
+<!-- ── bcryptjs 인라인 (CDN 차단 환경 대응) ── -->
+<script id="grv-bcrypt-inline">
+try {
+  /*__GRV_BCRYPT_JS__*/
+  if (typeof bcrypt === 'undefined' && typeof dcodeIO !== 'undefined' && dcodeIO.bcrypt) {
+    window.bcrypt = dcodeIO.bcrypt;
+  }
+} catch(e) { window.__grvBcryptErr = e.message; }
+</script>
+<script id="grv-auth">
+(function(){
+  var PORTAL_USERS = __GRV_USERS_JSON__;
+  var BUILD_TIME   = "__GRV_BUILD_TIME__";
+  var AUTH_COOKIE  = 'retain_user';
+
+  // 로그인 전 본문 숨김
+  document.body.classList.add('grv-locked');
+
+  function setAuthCookie(info){
+    document.cookie = AUTH_COOKIE + '=' + encodeURIComponent(JSON.stringify(info)) + '; path=/; SameSite=Lax';
+  }
+  function getAuthCookie(){
+    var m = document.cookie.match(new RegExp('(?:^|; )' + AUTH_COOKIE + '=([^;]*)'));
+    if (!m) return null;
+    try { return JSON.parse(decodeURIComponent(m[1])); } catch(e){ return null; }
+  }
+  function clearAuthCookie(){
+    document.cookie = AUTH_COOKIE + '=; path=/; max-age=0; SameSite=Lax';
+  }
+  window.grvLogout = function(){
+    clearAuthCookie();
+    location.reload();
+  };
+
+  function showApp(user){
+    document.body.classList.remove('grv-locked');
+    var w = document.getElementById('grv-login-wrap');
+    if (w) w.style.display = 'none';
+    // 헤더에 사용자 표시 + 로그아웃 버튼
+    try { mountUserBadge(user); } catch(e){}
+  }
+
+  function mountUserBadge(user){
+    if (document.getElementById('grv-user-badge')) return;
+    var holder = document.querySelector('.header .header-right') || document.querySelector('.header');
+    if (!holder) return;
+    var dept = user.dept ? ' · ' + user.dept : '';
+    var badge = document.createElement('div');
+    badge.id = 'grv-user-badge';
+    badge.style.cssText = 'display:inline-flex;align-items:center;gap:8px;padding:6px 12px;border:1px solid #e2e8f0;border-radius:8px;background:#fff;font-size:12px;color:#475569;white-space:nowrap;font-family:\\'Noto Sans KR\\',sans-serif';
+    badge.innerHTML = '<span style="color:#1a1a1a;font-weight:600">' + (user.name||'') + '</span><span style="color:#94a3b8">' + dept + '</span>'
+      + '<button type="button" id="grv-logout-btn" style="margin-left:4px;padding:4px 10px;border:1px solid #FFCDA8;border-radius:6px;background:#FFF5ED;color:#C44608;font-size:11px;font-weight:600;cursor:pointer;font-family:\\'Noto Sans KR\\',sans-serif">로그아웃</button>';
+    holder.appendChild(badge);
+    document.getElementById('grv-logout-btn').addEventListener('click', window.grvLogout);
+  }
+
+  // 자동 로그인 (세션 쿠키 유효 + 임베딩 사용자 목록에 존재)
+  var cached = getAuthCookie();
+  if (cached && cached.email) {
+    var stillValid = PORTAL_USERS.some(function(u){ return u.email === cached.email; });
+    if (stillValid) { showApp(cached); }
+    else { clearAuthCookie(); }
+  }
+
+  function $(id){ return document.getElementById(id); }
+
+  $('grv-login-btn').addEventListener('click', doLogin);
+  $('grv-login-pw').addEventListener('keydown', function(e){ if(e.key==='Enter') doLogin(); });
+  $('grv-login-email').addEventListener('keydown', function(e){ if(e.key==='Enter') $('grv-login-pw').focus(); });
+  $('grv-pw-toggle').addEventListener('click', function(){
+    var inp = $('grv-login-pw'); var btn = $('grv-pw-toggle');
+    if (inp.type === 'password') { inp.type='text'; btn.textContent='🙈'; btn.classList.add('on'); }
+    else { inp.type='password'; btn.textContent='👁'; btn.classList.remove('on'); }
+  });
+
+  function doLogin(){
+    var email = ($('grv-login-email').value||'').trim().toLowerCase();
+    var pw    = ($('grv-login-pw').value||'').trim();
+    var btn   = $('grv-login-btn');
+    var err   = $('grv-login-err');
+    err.style.display='none';
+    btn.disabled=true; btn.textContent='확인 중...';
+
+    var diag = [];
+    diag.push('빌드: ' + BUILD_TIME);
+    diag.push('typeof bcrypt: ' + (typeof bcrypt));
+    if (window.__grvBcryptErr) diag.push('bcrypt 로드 에러: ' + String(window.__grvBcryptErr).substring(0,200));
+
+    var user = PORTAL_USERS.find(function(u){ return u.email === email; });
+    var ok = false, failReason = '';
+
+    if (!user) {
+      failReason = '일치하는 이메일을 찾지 못했습니다';
+      diag.push('이메일 매칭: 실패 (입력: ' + email + ')');
+      finish();
+      return;
+    }
+    diag.push('이메일 매칭: 성공');
+    diag.push('해시 길이: ' + (user.hash ? user.hash.length : 'NULL'));
+    diag.push('사번 길이: ' + pw.length);
+
+    if (typeof bcrypt === 'undefined') {
+      failReason = 'bcrypt 라이브러리 미로드 (회사망 차단 가능성)';
+      finish();
+      return;
+    }
+
+    try {
+      ok = bcrypt.compareSync(pw, user.hash);
+      diag.push('compareSync 결과: ' + ok);
+    } catch(e){
+      diag.push('compareSync 에러: ' + e.message);
+    }
+
+    if (!ok) {
+      // async fallback
+      bcrypt.compare(pw, user.hash, function(e2, res){
+        if (res) { ok = true; }
+        else if (e2) diag.push('compare(async) 에러: ' + e2.message);
+        else diag.push('compare(async) 결과: false');
+        if (!ok && !failReason) failReason = '사번이 일치하지 않습니다';
+        finish();
+      });
+      return;
+    }
+    finish();
+
+    function finish(){
+      if (ok) {
+        var info = {email:user.email, name:user.name, dept:user.dept};
+        setAuthCookie(info);
+        showApp(info);
+      } else {
+        err.innerHTML = '<div>이메일 또는 사번이 올바르지 않습니다. (' + (failReason||'사번이 일치하지 않습니다') + ')</div>'
+          + '<details style="margin-top:8px;font-size:11px;color:#A1A8B3;text-align:left">'
+          + '<summary style="cursor:pointer">진단 정보 보기</summary>'
+          + '<pre style="margin-top:6px;background:#F5F7F8;padding:8px;border-radius:4px;white-space:pre-wrap;word-break:break-all">'
+          + diag.join('\\n') + '</pre></details>';
+        err.style.display = 'block';
+        btn.disabled = false; btn.textContent = '로그인';
+        console.warn('[로그인 실패]', diag.join(' | '));
+      }
+    }
+  }
+})();
+</script>
+"""
+
+
+def inject_login(html, users, build_time):
+    """로그인 오버레이 + bcrypt 인라인 + 인증 스크립트를 HTML에 주입."""
+    bcrypt_js = _read_bcrypt_inline()
+    users_json = json.dumps(users, ensure_ascii=False, separators=(",", ":"))
+    js = (LOGIN_INJECT_JS_TEMPLATE
+          .replace("/*__GRV_BCRYPT_JS__*/", bcrypt_js)
+          .replace("__GRV_USERS_JSON__", users_json)
+          .replace("__GRV_BUILD_TIME__", build_time))
+    # CSS는 </head> 직전, HTML/JS는 <body> 직후에 삽입
+    if "</head>" in html:
+        html = html.replace("</head>", LOGIN_INJECT_CSS + "</head>", 1)
+    else:
+        html = LOGIN_INJECT_CSS + html
+    if "<body>" in html:
+        html = html.replace("<body>", "<body>\n" + LOGIN_INJECT_HTML + js, 1)
+    else:
+        html = LOGIN_INJECT_HTML + js + html
+    return html
+
+
+# ============================================================
 # DART 표시용 CSS + JS
 # ============================================================
 DART_INJECT = """
@@ -356,7 +720,7 @@ document.addEventListener('click',function(e){
 # ============================================================
 # HTML 빌드
 # ============================================================
-def build_html(df25, du="", dart=None, news=None):
+def build_html(df25, du="", dart=None, news=None, users=None):
     print("\nHTML 뷰어 생성...")
     recs=[]
     for _,r in df25.iterrows():
@@ -387,6 +751,13 @@ def build_html(df25, du="", dart=None, news=None):
     else:
         nj='\n<script>var NEWS_DATA=null;</script>'
     html=html.replace('</body>',dj+nj+'\n</body>')
+    # 로그인 오버레이 주입 (사용자 목록이 있을 때만)
+    build_time=datetime.now(timezone(timedelta(hours=9))).strftime("%Y-%m-%d %H:%M")
+    if users:
+        html=inject_login(html, users, build_time)
+        print(f"  → 로그인 오버레이 주입: {len(users)}명 등록")
+    else:
+        print(f"  ⚠ 사용자 목록이 비어있어 로그인 오버레이를 주입하지 않았습니다.")
     # Viewer (로컬 전용)
     vp=None
     if not IS_CI:
@@ -435,6 +806,24 @@ if __name__=="__main__":
     if IS_CI: print("  (GitHub Actions)")
     print("="*60)
     try:
+        # ── 사용자 목록 갱신 (Azure SQL → 2.사용자관리/users.xlsx)
+        # 환경변수 SKIP_USER_SYNC=1 또는 GitHub Actions 환경에서는 동기화 스킵
+        if os.getenv("SKIP_USER_SYNC") != "1":
+            try:
+                from update_users import run as _sync_users
+                print("\n사용자 DB 동기화 중...")
+                _n_active = _sync_users()
+                if _n_active < 0:
+                    print("  ⚠ 동기화 실패 — 기존 users.xlsx로 빌드 진행")
+            except ImportError as _e:
+                print(f"\n⚠ update_users 모듈 import 실패: {_e}")
+            except Exception as _e:
+                print(f"\n⚠ 사용자 동기화 예외 (기존 users.xlsx로 진행): {_e}")
+        else:
+            print("\n사용자 동기화 스킵 (SKIP_USER_SYNC=1)")
+
+        users=build_users()
+
         raw,du=fetch_data()
         print("\n가공 중..."); result=process_data(raw)
         if IS_CI:
@@ -450,7 +839,7 @@ if __name__=="__main__":
             df_all,df25=save_excels(result)
         dart=load_dart_cache()
         news=load_news_cache()
-        ip,vp=build_html(df25,du,dart,news)
+        ip,vp=build_html(df25,du,dart,news,users)
         if ip and not IS_CI:
             push_gh(ip)
         # GitHub Actions에서는 워크플로우가 자동 커밋하므로 push_gh 불필요
