@@ -306,20 +306,12 @@ LOGIN_INJECT_CSS = """
 .grv-login-hero{text-align:center;margin-bottom:36px}
 .grv-login-hero h1{font-size:54px;font-weight:700;color:#1a1a1a;margin-bottom:16px;letter-spacing:-1.5px;line-height:1.15}
 .grv-login-hero h1 .accent{color:#FD5108}
-.grv-login-hero-sub{font-size:13px;color:#1a1a1a;max-width:760px;margin:0 auto;line-height:1.7}
+.grv-login-hero-sub{font-size:13px;color:#1a1a1a;margin:0 auto;line-height:1.6;white-space:nowrap}
 .grv-login-hero-sub strong{color:#C44608;font-weight:700}
-@media(max-width:640px){.grv-login-hero h1{font-size:36px}}
-.grv-login-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:stretch}
-@media(max-width:840px){.grv-login-grid{grid-template-columns:1fr}}
-.grv-login-info{background:#fff;border-radius:12px;padding:24px 28px;box-shadow:0 12px 40px rgba(0,0,0,.08);border-top:4px solid #FD5108;display:flex;flex-direction:column}
-.grv-login-info-section{padding:14px 16px;background:#FFF5ED;border-radius:8px;margin-bottom:10px;border-left:3px solid #FD5108}
-.grv-login-info-section:last-child{margin-bottom:0}
-.grv-login-info-section h3{font-size:13px;font-weight:700;color:#1a1a1a;margin:0 0 6px;display:flex;align-items:center;gap:6px}
-.grv-login-info-section p{font-size:11px;color:#1a1a1a;line-height:1.65;margin:0}
-.grv-login-info-section strong{color:#C44608;font-weight:700}
-.grv-login-features{display:grid;grid-template-columns:1fr 1fr;gap:6px 14px;margin-top:8px}
-.grv-login-feature{display:flex;align-items:center;gap:6px;font-size:11px;color:#1a1a1a;font-weight:500}
-.grv-login-box{background:#fff;border-radius:12px;padding:32px 30px;box-shadow:0 12px 40px rgba(0,0,0,.12);border-top:4px solid #FD5108;display:flex;flex-direction:column}
+@media(max-width:640px){.grv-login-hero h1{font-size:36px}.grv-login-hero-sub{white-space:normal;max-width:90%}}
+/* 단일 컬럼: 로그인 박스만 가운데 배치 */
+.grv-login-grid{display:flex;justify-content:center;align-items:stretch}
+.grv-login-box{background:#fff;border-radius:12px;padding:32px 36px;box-shadow:0 12px 40px rgba(0,0,0,.12);border-top:4px solid #FD5108;display:flex;flex-direction:column;width:100%;max-width:480px}
 .grv-login-logo{text-align:center;margin-bottom:24px}
 .grv-login-logo h2{font-size:22px;font-weight:700;color:#1a1a1a;margin:0 0 4px;letter-spacing:-.3px}
 .grv-login-logo p{font-size:12px;color:#A1A8B3;margin:0}
@@ -348,6 +340,76 @@ body.grv-locked #appWrap,
 body.grv-locked .custom-tip,
 body.grv-locked .loading-overlay{display:none !important}
 body.grv-locked{overflow:hidden}
+
+/* ── 헤더 위젯 바 (날씨·사용자·로그아웃·테마 토글) ──
+   알림 박스 위에 별도 행으로 배치. width:100% + max-width:560px 로
+   알림 박스와 정확히 같은 outer 폭. padding:0 16px 가 notice 의 좌·우 padding 과
+   같아 위젯들의 컨텐츠 영역이 notice 텍스트 영역과 일치.
+   → 첫 위젯(날씨) 좌측 = "1. 해당..." 시작선
+     마지막 위젯(토글) 우측 = "Smart Office System" 끝선
+   어느 모니터에서나 비율·정렬 동일하게 유지됨.
+   4개 위젯 모두 height:32px / font-size:12px / Noto Sans KR 통일. */
+#grv-widget-bar{display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;max-width:560px;padding:0 16px;box-sizing:border-box;margin-bottom:10px;flex-wrap:wrap;font-family:'Noto Sans KR','맑은 고딕','Malgun Gothic',sans-serif;font-size:12px}
+#grv-widget-bar *,
+#grv-widget-bar *::before,
+#grv-widget-bar *::after,
+#grv-widget-bar select,
+#grv-widget-bar button,
+#grv-widget-bar input{font-family:'Noto Sans KR','맑은 고딕','Malgun Gothic',sans-serif !important;font-size:12px}
+/* 4개 모두 동일 높이 32px. box-sizing 으로 border 포함 정확 매칭 */
+.grv-w,.grv-theme{height:32px;box-sizing:border-box}
+.grv-w{display:inline-flex;align-items:center;gap:6px;padding:0 10px;border:1px solid #e2e8f0;border-radius:8px;background:#fff;color:#475569;white-space:nowrap;line-height:1.2}
+.grv-weather{cursor:default}
+.grv-weather .grv-w-icon{line-height:1;display:flex;align-items:center}
+.grv-weather .grv-w-temp{color:#1e293b;font-weight:700}
+.grv-weather .grv-w-desc{color:#64748b}
+.grv-weather select{margin-left:2px;border:none;background:transparent;color:#475569;cursor:pointer;outline:none;padding:0}
+.grv-weather select:hover{color:#3b82f6}
+.grv-user .grv-w-name{color:#1e293b;font-weight:700}
+.grv-user .grv-w-dept{color:#94a3b8}
+.grv-logout{cursor:pointer;border-color:#FFCDA8;background:#FFF5ED;color:#C44608;font-weight:600}
+.grv-logout:hover{background:#FFE8D4;border-color:#FFAA72}
+.grv-logout svg{vertical-align:-2px}
+.grv-theme{cursor:pointer;padding:0 8px;border:1px solid #e2e8f0;border-radius:24px;background:#fff;display:inline-flex;align-items:center;gap:6px}
+.grv-theme:hover{background:#f1f5f9}
+.grv-theme .grv-theme-icon{line-height:1;color:#f59e0b;display:flex;align-items:center}
+.grv-theme .grv-theme-track{position:relative;width:36px;height:18px;border-radius:9px;background:#cbd5e1;transition:background .2s}
+.grv-theme .grv-theme-knob{position:absolute;top:2px;left:2px;width:14px;height:14px;border-radius:50%;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.2);transition:left .25s,background .25s}
+
+/* ── 다크 모드 ── */
+html[data-theme="dark"]{color-scheme:dark}
+html[data-theme="dark"] body{background:#0f172a;color:#e2e8f0}
+html[data-theme="dark"] .header{background:#1e293b;color:#e2e8f0;border-bottom-color:#334155;box-shadow:0 1px 3px rgba(0,0,0,0.3)}
+html[data-theme="dark"] .header-title,html[data-theme="dark"] .person-name{color:#e2e8f0}
+html[data-theme="dark"] .header-sub,html[data-theme="dark"] .header-build,html[data-theme="dark"] .stat-name,html[data-theme="dark"] .result-count,html[data-theme="dark"] .avail-count{color:#94a3b8}
+html[data-theme="dark"] #headerNotice{background:#1e293b !important;border-color:#334155 !important;color:#cbd5e1 !important}
+html[data-theme="dark"] #headerNotice div{color:#cbd5e1 !important}
+html[data-theme="dark"] .person-section,html[data-theme="dark"] .rank-group,html[data-theme="dark"] .upload-zone,html[data-theme="dark"] .person-header,html[data-theme="dark"] .rank-group-header,html[data-theme="dark"] .tab-bar{background:#1e293b;border-color:#334155;box-shadow:0 1px 3px rgba(0,0,0,0.2)}
+html[data-theme="dark"] .person-header:hover,html[data-theme="dark"] .rank-group-header:hover{background:#273449}
+html[data-theme="dark"] .person-header.open,html[data-theme="dark"] .rank-group-header.open{border-bottom-color:#334155;background:#273449}
+html[data-theme="dark"] .stat-chip{background:#334155;border-color:#475569;color:#cbd5e1}
+html[data-theme="dark"] .toolbar,html[data-theme="dark"] .avail-toolbar{background:#0f172a}
+html[data-theme="dark"] .search-input,html[data-theme="dark"] .date-input,html[data-theme="dark"] .min-days-input,html[data-theme="dark"] .year-btn,html[data-theme="dark"] .clear-btn,html[data-theme="dark"] .action-btn{background:#1e293b;border-color:#334155;color:#e2e8f0}
+html[data-theme="dark"] .search-input::placeholder{color:#64748b}
+html[data-theme="dark"] .search-icon{color:#64748b}
+html[data-theme="dark"] .gantt-row-even .gantt-cell{background:#1e293b}
+html[data-theme="dark"] .gantt-row-odd .gantt-cell{background:#172033}
+html[data-theme="dark"] .gantt-cell{border-right-color:#334155;border-bottom-color:#1e293b}
+html[data-theme="dark"] .month-header-cell,html[data-theme="dark"] .week-header-cell{background:#1e293b;color:#94a3b8;border-color:#334155}
+html[data-theme="dark"] .week-header-cell.today{background:#1e3a8a;color:#dbeafe}
+html[data-theme="dark"] .gantt-cell.today-col{background:#172a52 !important}
+html[data-theme="dark"] .empty-state{color:#64748b}
+html[data-theme="dark"] .project-block-name{color:#cbd5e1}
+html[data-theme="dark"] .grv-w{background:#1e293b;border-color:#334155;color:#cbd5e1}
+html[data-theme="dark"] .grv-weather .grv-w-temp,html[data-theme="dark"] .grv-user .grv-w-name{color:#e2e8f0}
+html[data-theme="dark"] .grv-weather select{color:#cbd5e1}
+html[data-theme="dark"] .grv-theme{background:#1e293b;border-color:#334155}
+html[data-theme="dark"] .grv-theme:hover{background:#273449}
+html[data-theme="dark"] .grv-theme .grv-theme-track{background:#FD5108}
+html[data-theme="dark"] .grv-theme .grv-theme-knob{left:20px;background:#0f172a;color:#fcd34d}
+html[data-theme="dark"] .grv-theme .grv-theme-icon{color:#fcd34d}
+html[data-theme="dark"] .grv-logout{background:#3A2412;border-color:#7c2d12;color:#fed7aa}
+html[data-theme="dark"] .grv-logout:hover{background:#4a2e15}
 </style>
 """
 
@@ -356,30 +418,9 @@ LOGIN_INJECT_HTML = """
   <div class="grv-login-container">
     <div class="grv-login-hero">
       <h1 id="grv-login-title">Global <span class="accent">Retain</span> Viewer</h1>
-      <p class="grv-login-hero-sub">
-        <strong>Global IPO · CMAAS · IOA · Assurance NGH</strong> 인원의 어싸인 현황을 한 화면에서 조회할 수 있는 사내 전용 뷰어입니다.
-        TalentLink 데이터를 매일 1회 가공하여 제공합니다.
-      </p>
+      <p class="grv-login-hero-sub"><strong>Global Sector</strong> 인원의 어싸인 현황을 한 화면에서 조회 · 매일 1회 TalentLink 자동 갱신</p>
     </div>
     <div class="grv-login-grid">
-      <div class="grv-login-info">
-        <div class="grv-login-info-section">
-          <h3>📋 제공 기능</h3>
-          <div class="grv-login-features">
-            <div class="grv-login-feature">📅 어싸인 현황(간트)</div>
-            <div class="grv-login-feature">📄 개인별 프로젝트 내역</div>
-            <div class="grv-login-feature"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;flex-shrink:0"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>프로젝트별 검색</div>
-            <div class="grv-login-feature">🟢 Available 조회</div>
-            <div class="grv-login-feature">📰 업계 기사모음</div>
-            <div class="grv-login-feature">🏢 DART 공시정보</div>
-          </div>
-        </div>
-        <div class="grv-login-info-section" style="border-left-color:#A1A8B3;background:#F5F7F8">
-          <h3>🔐 보안 안내</h3>
-          <p>회사 PWC 이메일 + 사번 6자리로 로그인합니다. 사번은 <strong>bcrypt 해시</strong>로 변환되어 저장되며 평문이 외부에 노출되지 않습니다.
-          어싸인 자료는 사내 인원에 한해 공유 가능한 자료이므로 외부 유출에 유의해주세요.</p>
-        </div>
-      </div>
       <div class="grv-login-box">
         <div class="grv-login-logo">
           <h2>로그인</h2>
@@ -393,21 +434,21 @@ LOGIN_INJECT_HTML = """
           <label for="grv-login-pw">사번 (6자리)</label>
           <div class="grv-pw-wrap">
             <input type="password" id="grv-login-pw" placeholder="••••••" maxlength="10" autocomplete="current-password">
-            <button type="button" class="grv-pw-toggle" id="grv-pw-toggle" tabindex="-1" aria-label="사번 보기/숨기기">👁</button>
+            <button type="button" class="grv-pw-toggle" id="grv-pw-toggle" tabindex="-1" aria-label="사번 보기/숨기기"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
           </div>
         </div>
         <button id="grv-login-btn">로그인</button>
         <p id="grv-login-err">이메일 또는 사번이 올바르지 않습니다.</p>
         <div class="grv-login-tips">
-          <h4>💡 사용 안내</h4>
+          <h4><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a7 7 0 0 1 7 7c0 2.79-1.63 5.24-4 6.46V17H9v-1.54C6.63 14.24 5 11.79 5 9a7 7 0 0 1 7-7z"/></svg> 사용 안내</h4>
           <ul>
             <li>회사 PWC 이메일(@pwc.com) + 사번 6자리 입력</li>
-            <li>👁 아이콘 클릭 시 사번 표시/숨김 전환</li>
+            <li><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg> 아이콘 클릭 시 사번 표시/숨김 전환</li>
             <li>등록되지 않은 사용자는 관리자에게 문의해주세요.</li>
           </ul>
-          <p style="margin-top:8px"><strong>🔐 자동 로그아웃</strong>: 브라우저 창을 종료하면 자동으로 로그아웃됩니다. 탭만 닫고 다시 접속하실 경우 로그인 상태가 유지됩니다.</p>
+          <p style="margin-top:8px"><strong><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> 자동 로그아웃</strong>: 브라우저 창을 종료하면 자동으로 로그아웃됩니다. 탭만 닫고 다시 접속하실 경우 로그인 상태가 유지됩니다.</p>
         </div>
-        <p class="grv-login-footer">© 2026 JS KIM · 오류 및 개선 의견: jeesoo.j.kim@pwc.com</p>
+        <p class="grv-login-footer">© 2026 Copyright · 오류 및 개선 의견: <a href="mailto:jeesoo.j.kim@pwc.com?subject=%5BGlobal%20Retain%20Viewer%5D%20%EC%9D%98%EA%B2%AC" style="color:#1d4ed8;text-decoration:none;font-weight:600">jeesoo.j.kim@pwc.com</a></p>
       </div>
     </div>
   </div>
@@ -429,6 +470,34 @@ try {
   var PORTAL_USERS = __GRV_USERS_JSON__;
   var BUILD_TIME   = "__GRV_BUILD_TIME__";
   var AUTH_COOKIE  = 'retain_user';
+  var THEME_KEY    = 'retain_theme';
+  var WEATHER_KEY  = 'retain_weather_region';
+
+  // ── 다크/라이트 테마 적용 (로그인 전부터 즉시 반영) ──
+  var savedTheme = localStorage.getItem(THEME_KEY) || 'light';
+  document.documentElement.setAttribute('data-theme', savedTheme);
+
+  // ── 날씨 위젯 지역 목록 (wttr.in 식별자, 한글 라벨) ──
+  var REGIONS = [
+    {label:'서울 용산구',  q:'Yongsan-gu, Seoul'},
+    {label:'서울 동작구',  q:'Dongjak-gu, Seoul'},
+    {label:'서울 영등포구', q:'Yeongdeungpo-gu, Seoul'},
+    {label:'서울 강남구',  q:'Gangnam-gu, Seoul'},
+    {label:'서울 서초구',  q:'Seocho-gu, Seoul'},
+    {label:'서울 마포구',  q:'Mapo-gu, Seoul'},
+    {label:'서울 종로구',  q:'Jongno-gu, Seoul'},
+    {label:'서울 중구',    q:'Jung-gu, Seoul'},
+    {label:'성남 분당',    q:'Bundang-gu, Seongnam'},
+    {label:'성남 판교',    q:'Pangyo, Seongnam'},
+    {label:'고양 일산',    q:'Ilsan, Goyang'},
+    {label:'부산',         q:'Busan'},
+    {label:'대구',         q:'Daegu'},
+    {label:'인천',         q:'Incheon'},
+    {label:'광주',         q:'Gwangju'},
+    {label:'대전',         q:'Daejeon'},
+    {label:'세종',         q:'Sejong'},
+    {label:'울산',         q:'Ulsan'},
+  ];
 
   // 로그인 전 본문 숨김
   document.body.classList.add('grv-locked');
@@ -453,22 +522,147 @@ try {
     document.body.classList.remove('grv-locked');
     var w = document.getElementById('grv-login-wrap');
     if (w) w.style.display = 'none';
-    // 헤더에 사용자 표시 + 로그아웃 버튼
-    try { mountUserBadge(user); } catch(e){}
+    // 헤더 위젯 바 마운트 (날씨·사용자·로그아웃·테마 토글)
+    // headerNotice가 initApp에서 display:block 되기 전에 미리 mount해두면
+    // 로그인 직후 바로 표시되고, 안 되어 있어도 polling으로 따라잡음
+    try { mountWidgetBar(user); } catch(e){ console.error('[mountWidgetBar]', e); }
   }
 
-  function mountUserBadge(user){
-    if (document.getElementById('grv-user-badge')) return;
-    var holder = document.querySelector('.header .header-right') || document.querySelector('.header');
-    if (!holder) return;
-    var dept = user.dept ? ' · ' + user.dept : '';
-    var badge = document.createElement('div');
-    badge.id = 'grv-user-badge';
-    badge.style.cssText = 'display:inline-flex;align-items:center;gap:8px;padding:6px 12px;border:1px solid #e2e8f0;border-radius:8px;background:#fff;font-size:12px;color:#475569;white-space:nowrap;font-family:\\'Noto Sans KR\\',sans-serif';
-    badge.innerHTML = '<span style="color:#1a1a1a;font-weight:600">' + (user.name||'') + '</span><span style="color:#94a3b8">' + dept + '</span>'
-      + '<button type="button" id="grv-logout-btn" style="margin-left:4px;padding:4px 10px;border:1px solid #FFCDA8;border-radius:6px;background:#FFF5ED;color:#C44608;font-size:11px;font-weight:600;cursor:pointer;font-family:\\'Noto Sans KR\\',sans-serif">로그아웃</button>';
-    holder.appendChild(badge);
+  function mountWidgetBar(user){
+    var notice = document.getElementById('headerNotice');
+    if (!notice) {
+      // headerNotice 가 아직 없을 수도 있음 — 짧게 polling
+      var tries = 0;
+      var iv = setInterval(function(){
+        tries++;
+        if (document.getElementById('headerNotice') || tries > 40){
+          clearInterval(iv);
+          if (document.getElementById('headerNotice')) mountWidgetBar(user);
+        }
+      }, 50);
+      return;
+    }
+    if (document.getElementById('grv-widget-bar')) return; // 중복 방지
+
+    // 헤더 알림 영역을 강제로 표시 (initApp 이전에 로그인된 경우에도)
+    if (notice.style.display === 'none' || !notice.style.display) {
+      notice.style.display = 'block';
+    }
+
+    var bar = document.createElement('div');
+    bar.id = 'grv-widget-bar';
+    bar.innerHTML = buildWidgetBarHTML(user);
+    // 알림 박스 위에 형제로 배치. CSS 의 width:100% + max-width:560px + padding:0 16px
+    // 가 notice 와 outer 폭·content 영역을 정확히 일치시킴.
+    notice.parentNode.insertBefore(bar, notice);
+
+    // 이벤트 와이어
+    wireWeatherWidget();
+    wireThemeToggle();
     document.getElementById('grv-logout-btn').addEventListener('click', window.grvLogout);
+
+    // 첫 날씨 조회
+    fetchWeather(localStorage.getItem(WEATHER_KEY) || REGIONS[0].q);
+  }
+
+  function buildWidgetBarHTML(user){
+    var savedRegion = localStorage.getItem(WEATHER_KEY) || REGIONS[0].q;
+    var opts = REGIONS.map(function(r){
+      return '<option value="' + r.q + '"' + (r.q===savedRegion?' selected':'') + '>' + r.label + '</option>';
+    }).join('');
+
+    var dept = user.dept ? '<span class="grv-w-dept">(' + user.dept + ')</span>' : '';
+    var name = (user.name || '').replace(/</g,'&lt;');
+
+    var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+    var themeIcon = isDark ? '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>' : '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>';
+
+    return [
+      // 날씨
+      '<div class="grv-w grv-weather" id="grv-weather">',
+      '  <span class="grv-w-icon" id="grv-weather-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span>',
+      '  <span class="grv-w-temp"  id="grv-weather-temp">--°C</span>',
+      '  <span class="grv-w-desc"  id="grv-weather-desc">로딩</span>',
+      '  <select id="grv-weather-region" title="지역 선택">' + opts + '</select>',
+      '</div>',
+      // 사용자
+      '<div class="grv-w grv-user">',
+      '  <span class="grv-w-name">' + name + '</span> ',
+      '  ' + dept,
+      '</div>',
+      // 로그아웃
+      '<button type="button" class="grv-w grv-logout" id="grv-logout-btn" title="로그아웃">',
+      '  로그아웃 ',
+      '  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>',
+      '</button>',
+      // 테마 토글
+      '<button type="button" class="grv-theme" id="grv-theme-toggle" title="라이트·다크 전환" aria-label="테마 전환">',
+      '  <span class="grv-theme-icon" id="grv-theme-icon">' + themeIcon + '</span>',
+      '  <span class="grv-theme-track"><span class="grv-theme-knob"></span></span>',
+      '</button>',
+    ].join('');
+  }
+
+  // ── 날씨 ──
+  // wttr.in: 무료, 인증 불필요. format=j1 = JSON 전체.
+  // 한글 description 위해 lang=ko
+  function fetchWeather(region){
+    var iconEl = document.getElementById('grv-weather-icon');
+    var tempEl = document.getElementById('grv-weather-temp');
+    var descEl = document.getElementById('grv-weather-desc');
+    if (!iconEl) return;
+    iconEl.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>';
+    descEl.textContent = '로딩';
+    var url = 'https://wttr.in/' + encodeURIComponent(region) + '?format=j1&lang=ko';
+    fetch(url).then(function(r){ return r.json(); }).then(function(d){
+      var c = (d.current_condition && d.current_condition[0]) || {};
+      var temp = c.temp_C || '--';
+      var descKR = '';
+      if (c.lang_ko && c.lang_ko[0]) descKR = c.lang_ko[0].value;
+      else if (c.weatherDesc && c.weatherDesc[0]) descKR = c.weatherDesc[0].value;
+      var code = parseInt(c.weatherCode || '0', 10);
+      iconEl.innerHTML = weatherIcon(code, c.weatherDesc && c.weatherDesc[0] && c.weatherDesc[0].value);
+      tempEl.textContent = temp + '°C';
+      descEl.textContent = descKR || '-';
+    }).catch(function(e){
+      iconEl.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>';
+      tempEl.textContent = '--';
+      descEl.textContent = '조회 실패';
+      console.warn('[weather] fetch 실패', e);
+    });
+  }
+  function weatherIcon(code, descEN){
+    descEN = (descEN || '').toLowerCase();
+    if (descEN.indexOf('thunder') >= 0) return '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 16.9A5 5 0 0 0 18 7h-1.26a8 8 0 1 0-11.62 9"/><polyline points="13 11 9 17 15 17 11 23"/></svg>';
+    if (descEN.indexOf('snow') >= 0)    return '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 17.58A5 5 0 0 0 18 8h-1.26A8 8 0 1 0 4 16.25"/><line x1="8" y1="16" x2="8.01" y2="16"/><line x1="8" y1="20" x2="8.01" y2="20"/><line x1="12" y1="18" x2="12.01" y2="18"/><line x1="12" y1="22" x2="12.01" y2="22"/><line x1="16" y1="16" x2="16.01" y2="16"/><line x1="16" y1="20" x2="16.01" y2="20"/></svg>';
+    if (descEN.indexOf('rain') >= 0 || descEN.indexOf('drizzle') >= 0) return '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="16" y1="13" x2="16" y2="21"/><line x1="8" y1="13" x2="8" y2="21"/><line x1="12" y1="15" x2="12" y2="23"/><path d="M20 16.58A5 5 0 0 0 18 7h-1.26A8 8 0 1 0 4 15.25"/></svg>';
+    if (descEN.indexOf('fog') >= 0 || descEN.indexOf('mist') >= 0)    return '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.59 4.59A2 2 0 1 1 11 8H2m10.59 11.41A2 2 0 1 0 14 16H2m15.73-8.27A2.5 2.5 0 1 1 19.5 12H2"/></svg>';
+    if (descEN.indexOf('overcast') >= 0)return '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/></svg>';
+    if (descEN.indexOf('cloud') >= 0)   return '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/><circle cx="6" cy="6" r="3"/><line x1="6" y1="1" x2="6" y2="2"/><line x1="6" y1="11" x2="6" y2="10"/><line x1="1" y1="6" x2="2" y2="6"/><line x1="11" y1="6" x2="10" y2="6"/></svg>';
+    if (descEN.indexOf('clear') >= 0 || descEN.indexOf('sunny') >= 0) return '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>';
+    return '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z"/></svg>';
+  }
+  function wireWeatherWidget(){
+    var sel = document.getElementById('grv-weather-region');
+    if (!sel) return;
+    sel.addEventListener('change', function(){
+      localStorage.setItem(WEATHER_KEY, sel.value);
+      fetchWeather(sel.value);
+    });
+  }
+
+  // ── 다크/라이트 토글 ──
+  function wireThemeToggle(){
+    var btn = document.getElementById('grv-theme-toggle');
+    var ico = document.getElementById('grv-theme-icon');
+    if (!btn) return;
+    btn.addEventListener('click', function(){
+      var cur = document.documentElement.getAttribute('data-theme') || 'light';
+      var next = cur === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', next);
+      localStorage.setItem(THEME_KEY, next);
+      if (ico) ico.innerHTML = next === 'dark' ? '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>' : '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>';
+    });
   }
 
   // 자동 로그인 (세션 쿠키 유효 + 임베딩 사용자 목록에 존재)
@@ -486,8 +680,8 @@ try {
   $('grv-login-email').addEventListener('keydown', function(e){ if(e.key==='Enter') $('grv-login-pw').focus(); });
   $('grv-pw-toggle').addEventListener('click', function(){
     var inp = $('grv-login-pw'); var btn = $('grv-pw-toggle');
-    if (inp.type === 'password') { inp.type='text'; btn.textContent='🙈'; btn.classList.add('on'); }
-    else { inp.type='password'; btn.textContent='👁'; btn.classList.remove('on'); }
+    if (inp.type === 'password') { inp.type='text'; btn.innerHTML='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>'; btn.classList.add('on'); }
+    else { inp.type='password'; btn.innerHTML='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>'; btn.classList.remove('on'); }
   });
 
   function doLogin(){
