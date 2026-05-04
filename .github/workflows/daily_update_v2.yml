@@ -30,7 +30,7 @@ jobs:
             echo "Attempt $i failed, retrying in 10s..."
             sleep 10
           done
-          pip install pyodbc pandas requests python-dotenv
+          pip install pyodbc pandas requests python-dotenv bcrypt openpyxl
       - name: Run retain_all.py
         env:
           AZURE_SQL_SERVER: ${{ secrets.AZURE_SQL_SERVER }}
