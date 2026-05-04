@@ -35,7 +35,10 @@ body{font-family:'IBM Plex Sans KR',-apple-system,sans-serif;background:#f0f2f5;
 .tab-btn:hover:not(.active){background:#f1f5f9;color:#334155}
 .toolbar{display:flex;align-items:center;gap:12px;margin-bottom:20px;flex-wrap:wrap;position:sticky;top:118px;background:#f0f2f5;z-index:150;padding:8px 0}
 .search-wrap{position:relative}
-.search-icon{position:absolute;left:12px;top:10px;font-size:14px;color:#94a3b8;pointer-events:none}
+.search-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:#94a3b8;pointer-events:none;display:inline-flex;align-items:center;justify-content:center}
+.search-icon svg{width:16px;height:16px;display:block}
+.empty-icon svg{width:48px;height:48px;color:#94a3b8;display:inline-block}
+.tab-btn svg, .check-btn svg{vertical-align:-3px;margin-right:6px}
 .search-input{background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:10px 14px 10px 38px;color:#1e293b;font-size:15px;width:300px;outline:none;font-family:inherit}
 .search-input:focus{border-color:#60a5fa;box-shadow:0 0 0 3px rgba(96,165,250,0.12)}
 .search-input::placeholder{color:#cbd5e1}
@@ -194,23 +197,23 @@ body{font-family:'IBM Plex Sans KR',-apple-system,sans-serif;background:#f0f2f5;
       <div class="tab-bar">
           <button class="tab-btn active" data-tab="gantt">📋 어싸인 현황</button>
           <button class="tab-btn" data-tab="detail">📄 개인별 프로젝트 내역</button>
-          <button class="tab-btn" data-tab="projSearch">🔎 프로젝트별 검색</button>
+          <button class="tab-btn" data-tab="projSearch"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg> 프로젝트별 검색</button>
           <button class="tab-btn" data-tab="avail">🟢 Available 조회</button>
           <button class="tab-btn" data-tab="news">📰 업계 기사모음</button>
       </div>
       <div id="tabGantt">
         <div id="ganttGuide" style="padding:8px 0 4px;font-size:14px;color:#1e293b;display:flex;align-items:center;gap:6px">💡이름을 직접 검색하거나 해당하는 직급을 클릭하여 조회할 수 있습니다. 프로젝트 바를 클릭하면 해당 프로젝트 상세로 이동합니다.</div>
-        <div class="toolbar"><div class="search-wrap"><span class="search-icon">🔍</span><input class="search-input" id="searchInput" placeholder="이름 검색..." autocomplete="off"><button class="clear-btn" id="clearBtn" style="display:none">✕</button></div><div class="year-filters" id="yearFilters" style="display:none"><span class="year-label">기간</span><div id="yearBtns" style="display:flex;gap:6px"></div></div></div>
+        <div class="toolbar"><div class="search-wrap"><span class="search-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span><input class="search-input" id="searchInput" placeholder="이름 검색..." autocomplete="off"><button class="clear-btn" id="clearBtn" style="display:none">✕</button></div><div class="year-filters" id="yearFilters" style="display:none"><span class="year-label">기간</span><div id="yearBtns" style="display:flex;gap:6px"></div></div></div>
         <div id="ganttArea"></div>
       </div>
       <div id="tabDetail" style="display:none">
         <div id="detailGuide" style="padding:8px 0 4px;font-size:14px;color:#1e293b;display:flex;align-items:center;gap:6px">💡이름을 직접 검색하거나 해당하는 직급을 클릭하여 조회할 수 있습니다. 프로젝트 바를 클릭하면 해당 프로젝트 상세로 이동합니다.</div>
-        <div class="toolbar"><div class="search-wrap"><span class="search-icon">🔍</span><input class="search-input" id="detailSearchInput" placeholder="이름 검색..." autocomplete="off"></div></div>
+        <div class="toolbar"><div class="search-wrap"><span class="search-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span><input class="search-input" id="detailSearchInput" placeholder="이름 검색..." autocomplete="off"></div></div>
         <div id="detailArea"></div>
       </div>
       <div id="tabProjSearch" style="display:none">
         <div id="projGuide" style="padding:8px 0 4px;font-size:14px;color:#1e293b;display:flex;align-items:center;gap:6px">💡프로젝트명을 직접 검색하거나 해당하는 EL명을 클릭하여 조회할 수 있습니다. 인원 이름을 클릭하면 해당 인원의 어싸인 현황으로 이동합니다.</div>
-        <div class="toolbar"><div class="search-wrap"><span class="search-icon">🔍</span><input class="search-input" id="projSearchInput" placeholder="프로젝트명 검색..." autocomplete="off" style="width:400px"></div></div>
+        <div class="toolbar"><div class="search-wrap"><span class="search-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span><input class="search-input" id="projSearchInput" placeholder="프로젝트명 검색..." autocomplete="off" style="width:400px"></div></div>
         <div id="projSearchArea"></div>
       </div>
       <div id="tabAvail" style="display:none">
@@ -260,7 +263,7 @@ body{font-family:'IBM Plex Sans KR',-apple-system,sans-serif;background:#f0f2f5;
                 <div style="padding:0 0 4px;font-size:13px;color:#94a3b8;margin-left:24px">(최대 5명까지 비교 가능)</div>
               </div>
               <div style="position:static;padding:8px 14px;margin-bottom:6px;background:#fff;border:1px solid #e2e8f0;border-radius:10px;display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-                <div class="search-wrap"><span class="search-icon">🔍</span><input class="search-input" id="compareSearchInput" placeholder="비교할 인원 검색 (최대 5명)..." autocomplete="off" style="width:260px;padding:6px 10px 6px 34px;font-size:12px"><button class="clear-btn" id="compareClearBtn" style="display:none">✕</button></div>
+                <div class="search-wrap"><span class="search-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span><input class="search-input" id="compareSearchInput" placeholder="비교할 인원 검색 (최대 5명)..." autocomplete="off" style="width:260px;padding:6px 10px 6px 34px;font-size:12px"><button class="clear-btn" id="compareClearBtn" style="display:none">✕</button></div>
               </div>
               <div id="compareSelectedInfo" style="font-size:12px;color:#94a3b8;margin-bottom:4px"></div>
             </div>
@@ -701,7 +704,7 @@ function buildGanttHTML(data,yf){
   fw.forEach(function(w,i){if(fmtWeekFull(w)===todayKey)todayColIdx=i;var m=w.getMonth(),y=w.getFullYear();if(m!==cM||y!==cY){if(sp>0)mg.push({l:cY+"."+String(cM+1).padStart(2,"0"),s:sp});cM=m;cY=y;sp=1;}else sp++;if(i===fw.length-1)mg.push({l:y+"."+String(m+1).padStart(2,"0"),s:sp});});
   var scrollId="gs_"+Math.random().toString(36).substr(2,6);
   var scrollAttr=todayColIdx>=0?' data-scroll-to="'+todayColIdx+'"':'';
-  var h='<div class="gantt-scroll" id="'+scrollId+'"'+scrollAttr+'><table class="gantt-table"><thead>';
+  var h='<div class="gantt-scroll" id="'+scrollId+'"'+scrollAttr+' data-col-width="130"><table class="gantt-table"><thead>';
   h+='<tr>'+mg.map(function(m){return '<td class="month-header-cell" colspan="'+m.s+'">'+m.l+'</td>';}).join("")+'</tr>';
   h+='<tr>'+fw.map(function(w,i){return '<td class="week-header-cell'+(i===todayColIdx?' today':'')+'">'+fmtWeek(w)+'</td>';}).join("")+'</tr></thead><tbody>';
   h+='<tr>';fw.forEach(function(w,ci){
@@ -723,7 +726,8 @@ function buildGanttHTML(data,yf){
 function scrollGanttsToToday(){
   document.querySelectorAll(".gantt-scroll[data-scroll-to]").forEach(function(el){
     var col=parseInt(el.getAttribute("data-scroll-to"));
-    if(!isNaN(col))el.scrollLeft=Math.max(0,(col-4)*130);
+    var cw=parseInt(el.getAttribute("data-col-width"))||130;
+    if(!isNaN(col))el.scrollLeft=Math.max(0,col*cw);
   });
 }
 
@@ -732,7 +736,7 @@ function renderAll(){
   if(ganttGuide)ganttGuide.style.display=searchQuery?"none":"flex";
   var names=getFilteredNames();
 
-  if(!names.length){document.getElementById("ganttArea").innerHTML='<div class="empty-state"><div class="empty-icon">🔍</div>"'+searchQuery+'" 검색 결과가 없습니다.</div>';return;}
+  if(!names.length){document.getElementById("ganttArea").innerHTML='<div class="empty-state"><div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></div>"'+searchQuery+'" 검색 결과가 없습니다.</div>';return;}
   var area=document.getElementById("ganttArea");area.innerHTML="";
 
   // If searching (few results), show flat list directly
@@ -823,13 +827,13 @@ function renderDetail(q){
   // Exclude Partner and Managing Director
   matched=matched.filter(function(k){return nameRankMap[k]!=="Partner"&&nameRankMap[k]!=="Managing Director";});
   if(!matched.length){
-    var html='<div class="empty-state"><div class="empty-icon">🔍</div>"'+escapeHtml(q)+'" 검색 결과가 없습니다.';
+    var html='<div class="empty-state"><div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></div>"'+escapeHtml(q)+'" 검색 결과가 없습니다.';
     // Check if query matches any project name
     var matchedProjs=allData.filter(function(r){return r.project&&r.project.toLowerCase().indexOf(q.toLowerCase())>=0;});
     var uniqueProjs={};matchedProjs.forEach(function(r){uniqueProjs[r.project]=1;});
     var projCount=Object.keys(uniqueProjs).length;
     if(projCount>0){
-      html+='<div style="margin-top:16px"><span style="font-size:13px;color:#64748b">프로젝트명에 "'+escapeHtml(q)+'" 포함 결과 <strong style="color:#3b82f6">'+projCount+'건</strong> 발견</span><br><button class="check-btn" style="margin-top:8px;padding:8px 20px;font-size:13px" id="detailToProjBtn">🔎 프로젝트별 검색으로 이동</button></div>';
+      html+='<div style="margin-top:16px"><span style="font-size:13px;color:#64748b">프로젝트명에 "'+escapeHtml(q)+'" 포함 결과 <strong style="color:#3b82f6">'+projCount+'건</strong> 발견</span><br><button class="check-btn" style="margin-top:8px;padding:8px 20px;font-size:13px" id="detailToProjBtn"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:6px"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>프로젝트별 검색으로 이동</button></div>';
     }
     html+='</div>';
     area.innerHTML=html;
@@ -964,7 +968,7 @@ function renderProjSearch(q,autoExpand){
   });
   var projects=Object.keys(projMap).sort();
   if(!projects.length){
-    var emptyHtml='<div class="empty-state"><div class="empty-icon">🔍</div>'+(q?'"'+escapeHtml(q)+'" 관련 프로젝트가 없습니다.':'프로젝트가 없습니다.');
+    var emptyHtml='<div class="empty-state"><div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></div>'+(q?'"'+escapeHtml(q)+'" 관련 프로젝트가 없습니다.':'프로젝트가 없습니다.');
     if(q){
       var matchedNames=allNames.filter(function(k){return personKeyName(k).indexOf(q)>=0&&nameRankMap[k]!=="Partner"&&nameRankMap[k]!=="Managing Director";});
       if(matchedNames.length>0){
@@ -1120,11 +1124,14 @@ function renderProjItem(container,projName,pData,autoExpand){
       Object.keys(peopleMap).forEach(function(pk){Object.keys(peopleMap[pk].weekMap).forEach(function(wk){peopleMap[pk].weekMap[wk].segments=mergeSegments(peopleMap[pk].weekMap[wk].segments);});});
       var peopleArr=Object.entries(peopleMap).sort(function(a,b){var ri=rankIndex(a[1].rank)-rankIndex(b[1].rank);if(ri!==0)return ri;var ja=String(a[1].jobCode||"");var jb=String(b[1].jobCode||"");if(ja&&jb)return ja.localeCompare(jb);if(ja)return -1;if(jb)return 1;return a[0].localeCompare(b[0]);});
       var weeks=getWeeksBetween(pData.minDate,pData.maxDate);
+      var todayKey=getTodayWeekKey();var projTodayIdx=-1;
+      weeks.forEach(function(w,i){if(fmtWeekFull(w)===todayKey)projTodayIdx=i;});
       var mg=[];var cM=-1,cY=-1,sp=0;
       weeks.forEach(function(w,i){var m=w.getMonth(),y=w.getFullYear();if(m!==cM||y!==cY){if(sp>0)mg.push({l:cY+"."+String(cM+1).padStart(2,"0"),s:sp});cM=m;cY=y;sp=1;}else sp++;if(i===weeks.length-1)mg.push({l:y+"."+String(m+1).padStart(2,"0"),s:sp});});
       var pColors=["#3b82f6","#dc2626","#059669","#d97706","#7c3aed","#db2777","#0891b2","#65a30d","#ea580c","#4f46e5"];
       var colW=100;
-      var tbl='<div style="overflow-x:auto"><table style="border-collapse:collapse;width:max-content"><thead>';
+      var projScrollAttr=projTodayIdx>=0?' data-scroll-to="'+projTodayIdx+'"':'';
+      var tbl='<div class="gantt-scroll" style="overflow-x:auto"'+projScrollAttr+' data-col-width="100"><table style="border-collapse:collapse;width:max-content"><thead>';
       tbl+='<tr><td style="min-width:160px;max-width:160px;background:#f8fafc;border-right:2px solid #e2e8f0;border-bottom:1px solid #e2e8f0;padding:8px 12px;font-size:11px;font-weight:600;color:#64748b;position:sticky;left:0;z-index:3">인원</td>';
       mg.forEach(function(m){tbl+='<td colspan="'+m.s+'" style="text-align:center;padding:8px 0;font-size:10px;font-weight:600;color:#64748b;background:#f8fafc;border-bottom:1px solid #e2e8f0;border-right:1px solid #e2e8f0;min-width:'+colW+'px">'+m.l+'</td>';});
       tbl+='</tr><tr><td style="min-width:160px;max-width:160px;background:#f8fafc;border-right:2px solid #e2e8f0;border-bottom:1px solid #e2e8f0;position:sticky;left:0;z-index:3"></td>';
@@ -1153,14 +1160,14 @@ function renderProjItem(container,projName,pData,autoExpand){
       body.innerHTML=summaryHtml+tbl;
     }
 
-    if(autoExpand)buildProjBody();
+    if(autoExpand){buildProjBody();setTimeout(scrollGanttsToToday,200);}
 
     hdr.addEventListener("click",function(){
       var arrow=hdr.querySelector(".rank-toggle");
       if(body.style.display==="none"){
         closeSiblings(hdr);
         body.style.display="block";arrow.classList.add("open");hdr.classList.add("open");
-        buildProjBody();
+        buildProjBody();setTimeout(scrollGanttsToToday,200);
       } else {
         body.style.display="none";arrow.classList.remove("open");hdr.classList.remove("open");
       }
@@ -1419,6 +1426,7 @@ function goToProjSearch(projName){
   area.innerHTML='<div style="padding:20px;text-align:center;color:#94a3b8">로딩 중...</div>';
   requestAnimationFrame(function(){
     renderProjSearch(projName,true);
+    setTimeout(scrollGanttsToToday,300);
   });
 }
 
@@ -1542,11 +1550,11 @@ function renderCompareList(q){
   matched=matched.filter(function(k){return nameRankMap[k]!=="Partner"&&nameRankMap[k]!=="Managing Director";});
   
   if(!q&&matched.length>100){
-    area.innerHTML='<div class="empty-state"><div class="empty-icon">🔍</div>이름을 검색하여 비교할 인원을 선택하세요</div>';
+    area.innerHTML='<div class="empty-state"><div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></div>이름을 검색하여 비교할 인원을 선택하세요</div>';
     return;
   }
   if(!matched.length){
-    area.innerHTML='<div class="empty-state"><div class="empty-icon">🔍</div>"'+q+'" 검색 결과가 없습니다.</div>';
+    area.innerHTML='<div class="empty-state"><div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></div>"'+q+'" 검색 결과가 없습니다.</div>';
     return;
   }
   
