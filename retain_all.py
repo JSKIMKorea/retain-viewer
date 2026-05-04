@@ -341,23 +341,38 @@ body.grv-locked .custom-tip,
 body.grv-locked .loading-overlay{display:none !important}
 body.grv-locked{overflow:hidden}
 
-/* ── 헤더 위젯 바 (날씨·사용자·로그아웃·테마 토글) ── */
-#grv-widget-bar{display:flex;align-items:center;justify-content:flex-end;gap:8px;padding:6px 0 10px;margin-bottom:10px;border-bottom:1px solid #e2e8f0;flex-wrap:wrap;font-family:'IBM Plex Sans KR',-apple-system,sans-serif}
-.grv-w{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border:1px solid #e2e8f0;border-radius:8px;background:#fff;font-size:12px;color:#475569;white-space:nowrap;line-height:1.2}
+/* ── 헤더 위젯 바 (날씨·사용자·로그아웃·테마 토글) ──
+   알림 박스 위에 별도 행으로 배치. width:100% + max-width:560px 로
+   알림 박스와 정확히 같은 outer 폭. padding:0 16px 가 notice 의 좌·우 padding 과
+   같아 위젯들의 컨텐츠 영역이 notice 텍스트 영역과 일치.
+   → 첫 위젯(날씨) 좌측 = "1. 해당..." 시작선
+     마지막 위젯(토글) 우측 = "Smart Office System" 끝선
+   어느 모니터에서나 비율·정렬 동일하게 유지됨.
+   4개 위젯 모두 height:32px / font-size:12px / Noto Sans KR 통일. */
+#grv-widget-bar{display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;max-width:560px;padding:0 16px;box-sizing:border-box;margin-bottom:10px;flex-wrap:wrap;font-family:'Noto Sans KR','맑은 고딕','Malgun Gothic',sans-serif;font-size:12px}
+#grv-widget-bar *,
+#grv-widget-bar *::before,
+#grv-widget-bar *::after,
+#grv-widget-bar select,
+#grv-widget-bar button,
+#grv-widget-bar input{font-family:'Noto Sans KR','맑은 고딕','Malgun Gothic',sans-serif !important;font-size:12px}
+/* 4개 모두 동일 높이 32px. box-sizing 으로 border 포함 정확 매칭 */
+.grv-w,.grv-theme{height:32px;box-sizing:border-box}
+.grv-w{display:inline-flex;align-items:center;gap:6px;padding:0 10px;border:1px solid #e2e8f0;border-radius:8px;background:#fff;color:#475569;white-space:nowrap;line-height:1.2}
 .grv-weather{cursor:default}
-.grv-weather .grv-w-icon{font-size:14px;line-height:1}
-.grv-weather .grv-w-temp{color:#1e293b;font-weight:700;font-family:'JetBrains Mono',monospace}
+.grv-weather .grv-w-icon{line-height:1;display:flex;align-items:center}
+.grv-weather .grv-w-temp{color:#1e293b;font-weight:700}
 .grv-weather .grv-w-desc{color:#64748b}
-.grv-weather select{margin-left:2px;border:none;background:transparent;font-size:11px;color:#475569;font-family:inherit;cursor:pointer;outline:none;padding:2px 0}
+.grv-weather select{margin-left:2px;border:none;background:transparent;color:#475569;cursor:pointer;outline:none;padding:0}
 .grv-weather select:hover{color:#3b82f6}
 .grv-user .grv-w-name{color:#1e293b;font-weight:700}
-.grv-user .grv-w-dept{color:#94a3b8;font-size:11px}
-.grv-logout{cursor:pointer;border-color:#FFCDA8;background:#FFF5ED;color:#C44608;font-weight:600;font-family:inherit}
+.grv-user .grv-w-dept{color:#94a3b8}
+.grv-logout{cursor:pointer;border-color:#FFCDA8;background:#FFF5ED;color:#C44608;font-weight:600}
 .grv-logout:hover{background:#FFE8D4;border-color:#FFAA72}
 .grv-logout svg{vertical-align:-2px}
-.grv-theme{cursor:pointer;padding:5px 6px;border:1px solid #e2e8f0;border-radius:24px;background:#fff;display:inline-flex;align-items:center;gap:6px;font-family:inherit}
+.grv-theme{cursor:pointer;padding:0 8px;border:1px solid #e2e8f0;border-radius:24px;background:#fff;display:inline-flex;align-items:center;gap:6px}
 .grv-theme:hover{background:#f1f5f9}
-.grv-theme .grv-theme-icon{font-size:12px;line-height:1;color:#f59e0b}
+.grv-theme .grv-theme-icon{line-height:1;color:#f59e0b;display:flex;align-items:center}
 .grv-theme .grv-theme-track{position:relative;width:36px;height:18px;border-radius:9px;background:#cbd5e1;transition:background .2s}
 .grv-theme .grv-theme-knob{position:absolute;top:2px;left:2px;width:14px;height:14px;border-radius:50%;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.2);transition:left .25s,background .25s}
 
@@ -419,21 +434,21 @@ LOGIN_INJECT_HTML = """
           <label for="grv-login-pw">사번 (6자리)</label>
           <div class="grv-pw-wrap">
             <input type="password" id="grv-login-pw" placeholder="••••••" maxlength="10" autocomplete="current-password">
-            <button type="button" class="grv-pw-toggle" id="grv-pw-toggle" tabindex="-1" aria-label="사번 보기/숨기기">👁</button>
+            <button type="button" class="grv-pw-toggle" id="grv-pw-toggle" tabindex="-1" aria-label="사번 보기/숨기기"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
           </div>
         </div>
         <button id="grv-login-btn">로그인</button>
         <p id="grv-login-err">이메일 또는 사번이 올바르지 않습니다.</p>
         <div class="grv-login-tips">
-          <h4>💡 사용 안내</h4>
+          <h4><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a7 7 0 0 1 7 7c0 2.79-1.63 5.24-4 6.46V17H9v-1.54C6.63 14.24 5 11.79 5 9a7 7 0 0 1 7-7z"/></svg> 사용 안내</h4>
           <ul>
             <li>회사 PWC 이메일(@pwc.com) + 사번 6자리 입력</li>
-            <li>👁 아이콘 클릭 시 사번 표시/숨김 전환</li>
+            <li><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg> 아이콘 클릭 시 사번 표시/숨김 전환</li>
             <li>등록되지 않은 사용자는 관리자에게 문의해주세요.</li>
           </ul>
-          <p style="margin-top:8px"><strong>🔐 자동 로그아웃</strong>: 브라우저 창을 종료하면 자동으로 로그아웃됩니다. 탭만 닫고 다시 접속하실 경우 로그인 상태가 유지됩니다.</p>
+          <p style="margin-top:8px"><strong><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> 자동 로그아웃</strong>: 브라우저 창을 종료하면 자동으로 로그아웃됩니다. 탭만 닫고 다시 접속하실 경우 로그인 상태가 유지됩니다.</p>
         </div>
-        <p class="grv-login-footer">© 2026 JS KIM · 오류 및 개선 의견: jeesoo.j.kim@pwc.com</p>
+        <p class="grv-login-footer">© 2026 Copyright · 오류 및 개선 의견: <a href="mailto:jeesoo.j.kim@pwc.com?subject=%5BGlobal%20Retain%20Viewer%5D%20%EC%9D%98%EA%B2%AC" style="color:#1d4ed8;text-decoration:none;font-weight:600">jeesoo.j.kim@pwc.com</a></p>
       </div>
     </div>
   </div>
@@ -537,7 +552,9 @@ try {
     var bar = document.createElement('div');
     bar.id = 'grv-widget-bar';
     bar.innerHTML = buildWidgetBarHTML(user);
-    notice.insertBefore(bar, notice.firstChild);
+    // 알림 박스 위에 형제로 배치. CSS 의 width:100% + max-width:560px + padding:0 16px
+    // 가 notice 와 outer 폭·content 영역을 정확히 일치시킴.
+    notice.parentNode.insertBefore(bar, notice);
 
     // 이벤트 와이어
     wireWeatherWidget();
@@ -558,12 +575,12 @@ try {
     var name = (user.name || '').replace(/</g,'&lt;');
 
     var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-    var themeIcon = isDark ? '☾' : '☀';
+    var themeIcon = isDark ? '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>' : '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>';
 
     return [
       // 날씨
       '<div class="grv-w grv-weather" id="grv-weather">',
-      '  <span class="grv-w-icon" id="grv-weather-icon">⌛</span>',
+      '  <span class="grv-w-icon" id="grv-weather-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span>',
       '  <span class="grv-w-temp"  id="grv-weather-temp">--°C</span>',
       '  <span class="grv-w-desc"  id="grv-weather-desc">로딩</span>',
       '  <select id="grv-weather-region" title="지역 선택">' + opts + '</select>',
@@ -594,7 +611,7 @@ try {
     var tempEl = document.getElementById('grv-weather-temp');
     var descEl = document.getElementById('grv-weather-desc');
     if (!iconEl) return;
-    iconEl.textContent = '⌛';
+    iconEl.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>';
     descEl.textContent = '로딩';
     var url = 'https://wttr.in/' + encodeURIComponent(region) + '?format=j1&lang=ko';
     fetch(url).then(function(r){ return r.json(); }).then(function(d){
@@ -604,11 +621,11 @@ try {
       if (c.lang_ko && c.lang_ko[0]) descKR = c.lang_ko[0].value;
       else if (c.weatherDesc && c.weatherDesc[0]) descKR = c.weatherDesc[0].value;
       var code = parseInt(c.weatherCode || '0', 10);
-      iconEl.textContent = weatherIcon(code, c.weatherDesc && c.weatherDesc[0] && c.weatherDesc[0].value);
+      iconEl.innerHTML = weatherIcon(code, c.weatherDesc && c.weatherDesc[0] && c.weatherDesc[0].value);
       tempEl.textContent = temp + '°C';
       descEl.textContent = descKR || '-';
     }).catch(function(e){
-      iconEl.textContent = '⚠';
+      iconEl.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>';
       tempEl.textContent = '--';
       descEl.textContent = '조회 실패';
       console.warn('[weather] fetch 실패', e);
@@ -616,14 +633,14 @@ try {
   }
   function weatherIcon(code, descEN){
     descEN = (descEN || '').toLowerCase();
-    if (descEN.indexOf('thunder') >= 0) return '⛈';
-    if (descEN.indexOf('snow') >= 0)    return '❄';
-    if (descEN.indexOf('rain') >= 0 || descEN.indexOf('drizzle') >= 0) return '🌧';
-    if (descEN.indexOf('fog') >= 0 || descEN.indexOf('mist') >= 0)    return '🌫';
-    if (descEN.indexOf('overcast') >= 0)return '☁';
-    if (descEN.indexOf('cloud') >= 0)   return '⛅';
-    if (descEN.indexOf('clear') >= 0 || descEN.indexOf('sunny') >= 0) return '☀';
-    return '🌡';
+    if (descEN.indexOf('thunder') >= 0) return '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 16.9A5 5 0 0 0 18 7h-1.26a8 8 0 1 0-11.62 9"/><polyline points="13 11 9 17 15 17 11 23"/></svg>';
+    if (descEN.indexOf('snow') >= 0)    return '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 17.58A5 5 0 0 0 18 8h-1.26A8 8 0 1 0 4 16.25"/><line x1="8" y1="16" x2="8.01" y2="16"/><line x1="8" y1="20" x2="8.01" y2="20"/><line x1="12" y1="18" x2="12.01" y2="18"/><line x1="12" y1="22" x2="12.01" y2="22"/><line x1="16" y1="16" x2="16.01" y2="16"/><line x1="16" y1="20" x2="16.01" y2="20"/></svg>';
+    if (descEN.indexOf('rain') >= 0 || descEN.indexOf('drizzle') >= 0) return '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="16" y1="13" x2="16" y2="21"/><line x1="8" y1="13" x2="8" y2="21"/><line x1="12" y1="15" x2="12" y2="23"/><path d="M20 16.58A5 5 0 0 0 18 7h-1.26A8 8 0 1 0 4 15.25"/></svg>';
+    if (descEN.indexOf('fog') >= 0 || descEN.indexOf('mist') >= 0)    return '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.59 4.59A2 2 0 1 1 11 8H2m10.59 11.41A2 2 0 1 0 14 16H2m15.73-8.27A2.5 2.5 0 1 1 19.5 12H2"/></svg>';
+    if (descEN.indexOf('overcast') >= 0)return '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/></svg>';
+    if (descEN.indexOf('cloud') >= 0)   return '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/><circle cx="6" cy="6" r="3"/><line x1="6" y1="1" x2="6" y2="2"/><line x1="6" y1="11" x2="6" y2="10"/><line x1="1" y1="6" x2="2" y2="6"/><line x1="11" y1="6" x2="10" y2="6"/></svg>';
+    if (descEN.indexOf('clear') >= 0 || descEN.indexOf('sunny') >= 0) return '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>';
+    return '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z"/></svg>';
   }
   function wireWeatherWidget(){
     var sel = document.getElementById('grv-weather-region');
@@ -644,7 +661,7 @@ try {
       var next = cur === 'dark' ? 'light' : 'dark';
       document.documentElement.setAttribute('data-theme', next);
       localStorage.setItem(THEME_KEY, next);
-      if (ico) ico.textContent = next === 'dark' ? '☾' : '☀';
+      if (ico) ico.innerHTML = next === 'dark' ? '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>' : '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>';
     });
   }
 
@@ -663,8 +680,8 @@ try {
   $('grv-login-email').addEventListener('keydown', function(e){ if(e.key==='Enter') $('grv-login-pw').focus(); });
   $('grv-pw-toggle').addEventListener('click', function(){
     var inp = $('grv-login-pw'); var btn = $('grv-pw-toggle');
-    if (inp.type === 'password') { inp.type='text'; btn.textContent='🙈'; btn.classList.add('on'); }
-    else { inp.type='password'; btn.textContent='👁'; btn.classList.remove('on'); }
+    if (inp.type === 'password') { inp.type='text'; btn.innerHTML='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>'; btn.classList.add('on'); }
+    else { inp.type='password'; btn.innerHTML='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>'; btn.classList.remove('on'); }
   });
 
   function doLogin(){
