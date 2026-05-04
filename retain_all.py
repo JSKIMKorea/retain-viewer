@@ -306,20 +306,12 @@ LOGIN_INJECT_CSS = """
 .grv-login-hero{text-align:center;margin-bottom:36px}
 .grv-login-hero h1{font-size:54px;font-weight:700;color:#1a1a1a;margin-bottom:16px;letter-spacing:-1.5px;line-height:1.15}
 .grv-login-hero h1 .accent{color:#FD5108}
-.grv-login-hero-sub{font-size:13px;color:#1a1a1a;max-width:760px;margin:0 auto;line-height:1.7}
+.grv-login-hero-sub{font-size:13px;color:#1a1a1a;margin:0 auto;line-height:1.6;white-space:nowrap}
 .grv-login-hero-sub strong{color:#C44608;font-weight:700}
-@media(max-width:640px){.grv-login-hero h1{font-size:36px}}
-.grv-login-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:stretch}
-@media(max-width:840px){.grv-login-grid{grid-template-columns:1fr}}
-.grv-login-info{background:#fff;border-radius:12px;padding:24px 28px;box-shadow:0 12px 40px rgba(0,0,0,.08);border-top:4px solid #FD5108;display:flex;flex-direction:column}
-.grv-login-info-section{padding:14px 16px;background:#FFF5ED;border-radius:8px;margin-bottom:10px;border-left:3px solid #FD5108}
-.grv-login-info-section:last-child{margin-bottom:0}
-.grv-login-info-section h3{font-size:13px;font-weight:700;color:#1a1a1a;margin:0 0 6px;display:flex;align-items:center;gap:6px}
-.grv-login-info-section p{font-size:11px;color:#1a1a1a;line-height:1.65;margin:0}
-.grv-login-info-section strong{color:#C44608;font-weight:700}
-.grv-login-features{display:grid;grid-template-columns:1fr 1fr;gap:6px 14px;margin-top:8px}
-.grv-login-feature{display:flex;align-items:center;gap:6px;font-size:11px;color:#1a1a1a;font-weight:500}
-.grv-login-box{background:#fff;border-radius:12px;padding:32px 30px;box-shadow:0 12px 40px rgba(0,0,0,.12);border-top:4px solid #FD5108;display:flex;flex-direction:column}
+@media(max-width:640px){.grv-login-hero h1{font-size:36px}.grv-login-hero-sub{white-space:normal;max-width:90%}}
+/* 단일 컬럼: 로그인 박스만 가운데 배치 */
+.grv-login-grid{display:flex;justify-content:center;align-items:stretch}
+.grv-login-box{background:#fff;border-radius:12px;padding:32px 36px;box-shadow:0 12px 40px rgba(0,0,0,.12);border-top:4px solid #FD5108;display:flex;flex-direction:column;width:100%;max-width:480px}
 .grv-login-logo{text-align:center;margin-bottom:24px}
 .grv-login-logo h2{font-size:22px;font-weight:700;color:#1a1a1a;margin:0 0 4px;letter-spacing:-.3px}
 .grv-login-logo p{font-size:12px;color:#A1A8B3;margin:0}
@@ -348,6 +340,61 @@ body.grv-locked #appWrap,
 body.grv-locked .custom-tip,
 body.grv-locked .loading-overlay{display:none !important}
 body.grv-locked{overflow:hidden}
+
+/* ── 헤더 위젯 바 (날씨·사용자·로그아웃·테마 토글) ── */
+#grv-widget-bar{display:flex;align-items:center;justify-content:flex-end;gap:8px;padding:6px 0 10px;margin-bottom:10px;border-bottom:1px solid #e2e8f0;flex-wrap:wrap;font-family:'IBM Plex Sans KR',-apple-system,sans-serif}
+.grv-w{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border:1px solid #e2e8f0;border-radius:8px;background:#fff;font-size:12px;color:#475569;white-space:nowrap;line-height:1.2}
+.grv-weather{cursor:default}
+.grv-weather .grv-w-icon{font-size:14px;line-height:1}
+.grv-weather .grv-w-temp{color:#1e293b;font-weight:700;font-family:'JetBrains Mono',monospace}
+.grv-weather .grv-w-desc{color:#64748b}
+.grv-weather select{margin-left:2px;border:none;background:transparent;font-size:11px;color:#475569;font-family:inherit;cursor:pointer;outline:none;padding:2px 0}
+.grv-weather select:hover{color:#3b82f6}
+.grv-user .grv-w-name{color:#1e293b;font-weight:700}
+.grv-user .grv-w-dept{color:#94a3b8;font-size:11px}
+.grv-logout{cursor:pointer;border-color:#FFCDA8;background:#FFF5ED;color:#C44608;font-weight:600;font-family:inherit}
+.grv-logout:hover{background:#FFE8D4;border-color:#FFAA72}
+.grv-logout svg{vertical-align:-2px}
+.grv-theme{cursor:pointer;padding:5px 6px;border:1px solid #e2e8f0;border-radius:24px;background:#fff;display:inline-flex;align-items:center;gap:6px;font-family:inherit}
+.grv-theme:hover{background:#f1f5f9}
+.grv-theme .grv-theme-icon{font-size:12px;line-height:1;color:#f59e0b}
+.grv-theme .grv-theme-track{position:relative;width:36px;height:18px;border-radius:9px;background:#cbd5e1;transition:background .2s}
+.grv-theme .grv-theme-knob{position:absolute;top:2px;left:2px;width:14px;height:14px;border-radius:50%;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.2);transition:left .25s,background .25s}
+
+/* ── 다크 모드 ── */
+html[data-theme="dark"]{color-scheme:dark}
+html[data-theme="dark"] body{background:#0f172a;color:#e2e8f0}
+html[data-theme="dark"] .header{background:#1e293b;color:#e2e8f0;border-bottom-color:#334155;box-shadow:0 1px 3px rgba(0,0,0,0.3)}
+html[data-theme="dark"] .header-title,html[data-theme="dark"] .person-name{color:#e2e8f0}
+html[data-theme="dark"] .header-sub,html[data-theme="dark"] .header-build,html[data-theme="dark"] .stat-name,html[data-theme="dark"] .result-count,html[data-theme="dark"] .avail-count{color:#94a3b8}
+html[data-theme="dark"] #headerNotice{background:#1e293b !important;border-color:#334155 !important;color:#cbd5e1 !important}
+html[data-theme="dark"] #headerNotice div{color:#cbd5e1 !important}
+html[data-theme="dark"] .person-section,html[data-theme="dark"] .rank-group,html[data-theme="dark"] .upload-zone,html[data-theme="dark"] .person-header,html[data-theme="dark"] .rank-group-header,html[data-theme="dark"] .tab-bar{background:#1e293b;border-color:#334155;box-shadow:0 1px 3px rgba(0,0,0,0.2)}
+html[data-theme="dark"] .person-header:hover,html[data-theme="dark"] .rank-group-header:hover{background:#273449}
+html[data-theme="dark"] .person-header.open,html[data-theme="dark"] .rank-group-header.open{border-bottom-color:#334155;background:#273449}
+html[data-theme="dark"] .stat-chip{background:#334155;border-color:#475569;color:#cbd5e1}
+html[data-theme="dark"] .toolbar,html[data-theme="dark"] .avail-toolbar{background:#0f172a}
+html[data-theme="dark"] .search-input,html[data-theme="dark"] .date-input,html[data-theme="dark"] .min-days-input,html[data-theme="dark"] .year-btn,html[data-theme="dark"] .clear-btn,html[data-theme="dark"] .action-btn{background:#1e293b;border-color:#334155;color:#e2e8f0}
+html[data-theme="dark"] .search-input::placeholder{color:#64748b}
+html[data-theme="dark"] .search-icon{color:#64748b}
+html[data-theme="dark"] .gantt-row-even .gantt-cell{background:#1e293b}
+html[data-theme="dark"] .gantt-row-odd .gantt-cell{background:#172033}
+html[data-theme="dark"] .gantt-cell{border-right-color:#334155;border-bottom-color:#1e293b}
+html[data-theme="dark"] .month-header-cell,html[data-theme="dark"] .week-header-cell{background:#1e293b;color:#94a3b8;border-color:#334155}
+html[data-theme="dark"] .week-header-cell.today{background:#1e3a8a;color:#dbeafe}
+html[data-theme="dark"] .gantt-cell.today-col{background:#172a52 !important}
+html[data-theme="dark"] .empty-state{color:#64748b}
+html[data-theme="dark"] .project-block-name{color:#cbd5e1}
+html[data-theme="dark"] .grv-w{background:#1e293b;border-color:#334155;color:#cbd5e1}
+html[data-theme="dark"] .grv-weather .grv-w-temp,html[data-theme="dark"] .grv-user .grv-w-name{color:#e2e8f0}
+html[data-theme="dark"] .grv-weather select{color:#cbd5e1}
+html[data-theme="dark"] .grv-theme{background:#1e293b;border-color:#334155}
+html[data-theme="dark"] .grv-theme:hover{background:#273449}
+html[data-theme="dark"] .grv-theme .grv-theme-track{background:#FD5108}
+html[data-theme="dark"] .grv-theme .grv-theme-knob{left:20px;background:#0f172a;color:#fcd34d}
+html[data-theme="dark"] .grv-theme .grv-theme-icon{color:#fcd34d}
+html[data-theme="dark"] .grv-logout{background:#3A2412;border-color:#7c2d12;color:#fed7aa}
+html[data-theme="dark"] .grv-logout:hover{background:#4a2e15}
 </style>
 """
 
@@ -356,30 +403,9 @@ LOGIN_INJECT_HTML = """
   <div class="grv-login-container">
     <div class="grv-login-hero">
       <h1 id="grv-login-title">Global <span class="accent">Retain</span> Viewer</h1>
-      <p class="grv-login-hero-sub">
-        <strong>Global IPO · CMAAS · IOA · Assurance NGH</strong> 인원의 어싸인 현황을 한 화면에서 조회할 수 있는 사내 전용 뷰어입니다.
-        TalentLink 데이터를 매일 1회 가공하여 제공합니다.
-      </p>
+      <p class="grv-login-hero-sub"><strong>Global Sector</strong> 인원의 어싸인 현황을 한 화면에서 조회 · 매일 1회 TalentLink 자동 갱신</p>
     </div>
     <div class="grv-login-grid">
-      <div class="grv-login-info">
-        <div class="grv-login-info-section">
-          <h3>📋 제공 기능</h3>
-          <div class="grv-login-features">
-            <div class="grv-login-feature">📅 어싸인 현황(간트)</div>
-            <div class="grv-login-feature">📄 개인별 프로젝트 내역</div>
-            <div class="grv-login-feature"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;flex-shrink:0"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>프로젝트별 검색</div>
-            <div class="grv-login-feature">🟢 Available 조회</div>
-            <div class="grv-login-feature">📰 업계 기사모음</div>
-            <div class="grv-login-feature">🏢 DART 공시정보</div>
-          </div>
-        </div>
-        <div class="grv-login-info-section" style="border-left-color:#A1A8B3;background:#F5F7F8">
-          <h3>🔐 보안 안내</h3>
-          <p>회사 PWC 이메일 + 사번 6자리로 로그인합니다. 사번은 <strong>bcrypt 해시</strong>로 변환되어 저장되며 평문이 외부에 노출되지 않습니다.
-          어싸인 자료는 사내 인원에 한해 공유 가능한 자료이므로 외부 유출에 유의해주세요.</p>
-        </div>
-      </div>
       <div class="grv-login-box">
         <div class="grv-login-logo">
           <h2>로그인</h2>
@@ -429,6 +455,34 @@ try {
   var PORTAL_USERS = __GRV_USERS_JSON__;
   var BUILD_TIME   = "__GRV_BUILD_TIME__";
   var AUTH_COOKIE  = 'retain_user';
+  var THEME_KEY    = 'retain_theme';
+  var WEATHER_KEY  = 'retain_weather_region';
+
+  // ── 다크/라이트 테마 적용 (로그인 전부터 즉시 반영) ──
+  var savedTheme = localStorage.getItem(THEME_KEY) || 'light';
+  document.documentElement.setAttribute('data-theme', savedTheme);
+
+  // ── 날씨 위젯 지역 목록 (wttr.in 식별자, 한글 라벨) ──
+  var REGIONS = [
+    {label:'서울 용산구',  q:'Yongsan-gu, Seoul'},
+    {label:'서울 동작구',  q:'Dongjak-gu, Seoul'},
+    {label:'서울 영등포구', q:'Yeongdeungpo-gu, Seoul'},
+    {label:'서울 강남구',  q:'Gangnam-gu, Seoul'},
+    {label:'서울 서초구',  q:'Seocho-gu, Seoul'},
+    {label:'서울 마포구',  q:'Mapo-gu, Seoul'},
+    {label:'서울 종로구',  q:'Jongno-gu, Seoul'},
+    {label:'서울 중구',    q:'Jung-gu, Seoul'},
+    {label:'성남 분당',    q:'Bundang-gu, Seongnam'},
+    {label:'성남 판교',    q:'Pangyo, Seongnam'},
+    {label:'고양 일산',    q:'Ilsan, Goyang'},
+    {label:'부산',         q:'Busan'},
+    {label:'대구',         q:'Daegu'},
+    {label:'인천',         q:'Incheon'},
+    {label:'광주',         q:'Gwangju'},
+    {label:'대전',         q:'Daejeon'},
+    {label:'세종',         q:'Sejong'},
+    {label:'울산',         q:'Ulsan'},
+  ];
 
   // 로그인 전 본문 숨김
   document.body.classList.add('grv-locked');
@@ -453,22 +507,145 @@ try {
     document.body.classList.remove('grv-locked');
     var w = document.getElementById('grv-login-wrap');
     if (w) w.style.display = 'none';
-    // 헤더에 사용자 표시 + 로그아웃 버튼
-    try { mountUserBadge(user); } catch(e){}
+    // 헤더 위젯 바 마운트 (날씨·사용자·로그아웃·테마 토글)
+    // headerNotice가 initApp에서 display:block 되기 전에 미리 mount해두면
+    // 로그인 직후 바로 표시되고, 안 되어 있어도 polling으로 따라잡음
+    try { mountWidgetBar(user); } catch(e){ console.error('[mountWidgetBar]', e); }
   }
 
-  function mountUserBadge(user){
-    if (document.getElementById('grv-user-badge')) return;
-    var holder = document.querySelector('.header .header-right') || document.querySelector('.header');
-    if (!holder) return;
-    var dept = user.dept ? ' · ' + user.dept : '';
-    var badge = document.createElement('div');
-    badge.id = 'grv-user-badge';
-    badge.style.cssText = 'display:inline-flex;align-items:center;gap:8px;padding:6px 12px;border:1px solid #e2e8f0;border-radius:8px;background:#fff;font-size:12px;color:#475569;white-space:nowrap;font-family:\\'Noto Sans KR\\',sans-serif';
-    badge.innerHTML = '<span style="color:#1a1a1a;font-weight:600">' + (user.name||'') + '</span><span style="color:#94a3b8">' + dept + '</span>'
-      + '<button type="button" id="grv-logout-btn" style="margin-left:4px;padding:4px 10px;border:1px solid #FFCDA8;border-radius:6px;background:#FFF5ED;color:#C44608;font-size:11px;font-weight:600;cursor:pointer;font-family:\\'Noto Sans KR\\',sans-serif">로그아웃</button>';
-    holder.appendChild(badge);
+  function mountWidgetBar(user){
+    var notice = document.getElementById('headerNotice');
+    if (!notice) {
+      // headerNotice 가 아직 없을 수도 있음 — 짧게 polling
+      var tries = 0;
+      var iv = setInterval(function(){
+        tries++;
+        if (document.getElementById('headerNotice') || tries > 40){
+          clearInterval(iv);
+          if (document.getElementById('headerNotice')) mountWidgetBar(user);
+        }
+      }, 50);
+      return;
+    }
+    if (document.getElementById('grv-widget-bar')) return; // 중복 방지
+
+    // 헤더 알림 영역을 강제로 표시 (initApp 이전에 로그인된 경우에도)
+    if (notice.style.display === 'none' || !notice.style.display) {
+      notice.style.display = 'block';
+    }
+
+    var bar = document.createElement('div');
+    bar.id = 'grv-widget-bar';
+    bar.innerHTML = buildWidgetBarHTML(user);
+    notice.insertBefore(bar, notice.firstChild);
+
+    // 이벤트 와이어
+    wireWeatherWidget();
+    wireThemeToggle();
     document.getElementById('grv-logout-btn').addEventListener('click', window.grvLogout);
+
+    // 첫 날씨 조회
+    fetchWeather(localStorage.getItem(WEATHER_KEY) || REGIONS[0].q);
+  }
+
+  function buildWidgetBarHTML(user){
+    var savedRegion = localStorage.getItem(WEATHER_KEY) || REGIONS[0].q;
+    var opts = REGIONS.map(function(r){
+      return '<option value="' + r.q + '"' + (r.q===savedRegion?' selected':'') + '>' + r.label + '</option>';
+    }).join('');
+
+    var dept = user.dept ? '<span class="grv-w-dept">(' + user.dept + ')</span>' : '';
+    var name = (user.name || '').replace(/</g,'&lt;');
+
+    var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+    var themeIcon = isDark ? '☾' : '☀';
+
+    return [
+      // 날씨
+      '<div class="grv-w grv-weather" id="grv-weather">',
+      '  <span class="grv-w-icon" id="grv-weather-icon">⌛</span>',
+      '  <span class="grv-w-temp"  id="grv-weather-temp">--°C</span>',
+      '  <span class="grv-w-desc"  id="grv-weather-desc">로딩</span>',
+      '  <select id="grv-weather-region" title="지역 선택">' + opts + '</select>',
+      '</div>',
+      // 사용자
+      '<div class="grv-w grv-user">',
+      '  <span class="grv-w-name">' + name + '</span> ',
+      '  ' + dept,
+      '</div>',
+      // 로그아웃
+      '<button type="button" class="grv-w grv-logout" id="grv-logout-btn" title="로그아웃">',
+      '  로그아웃 ',
+      '  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>',
+      '</button>',
+      // 테마 토글
+      '<button type="button" class="grv-theme" id="grv-theme-toggle" title="라이트·다크 전환" aria-label="테마 전환">',
+      '  <span class="grv-theme-icon" id="grv-theme-icon">' + themeIcon + '</span>',
+      '  <span class="grv-theme-track"><span class="grv-theme-knob"></span></span>',
+      '</button>',
+    ].join('');
+  }
+
+  // ── 날씨 ──
+  // wttr.in: 무료, 인증 불필요. format=j1 = JSON 전체.
+  // 한글 description 위해 lang=ko
+  function fetchWeather(region){
+    var iconEl = document.getElementById('grv-weather-icon');
+    var tempEl = document.getElementById('grv-weather-temp');
+    var descEl = document.getElementById('grv-weather-desc');
+    if (!iconEl) return;
+    iconEl.textContent = '⌛';
+    descEl.textContent = '로딩';
+    var url = 'https://wttr.in/' + encodeURIComponent(region) + '?format=j1&lang=ko';
+    fetch(url).then(function(r){ return r.json(); }).then(function(d){
+      var c = (d.current_condition && d.current_condition[0]) || {};
+      var temp = c.temp_C || '--';
+      var descKR = '';
+      if (c.lang_ko && c.lang_ko[0]) descKR = c.lang_ko[0].value;
+      else if (c.weatherDesc && c.weatherDesc[0]) descKR = c.weatherDesc[0].value;
+      var code = parseInt(c.weatherCode || '0', 10);
+      iconEl.textContent = weatherIcon(code, c.weatherDesc && c.weatherDesc[0] && c.weatherDesc[0].value);
+      tempEl.textContent = temp + '°C';
+      descEl.textContent = descKR || '-';
+    }).catch(function(e){
+      iconEl.textContent = '⚠';
+      tempEl.textContent = '--';
+      descEl.textContent = '조회 실패';
+      console.warn('[weather] fetch 실패', e);
+    });
+  }
+  function weatherIcon(code, descEN){
+    descEN = (descEN || '').toLowerCase();
+    if (descEN.indexOf('thunder') >= 0) return '⛈';
+    if (descEN.indexOf('snow') >= 0)    return '❄';
+    if (descEN.indexOf('rain') >= 0 || descEN.indexOf('drizzle') >= 0) return '🌧';
+    if (descEN.indexOf('fog') >= 0 || descEN.indexOf('mist') >= 0)    return '🌫';
+    if (descEN.indexOf('overcast') >= 0)return '☁';
+    if (descEN.indexOf('cloud') >= 0)   return '⛅';
+    if (descEN.indexOf('clear') >= 0 || descEN.indexOf('sunny') >= 0) return '☀';
+    return '🌡';
+  }
+  function wireWeatherWidget(){
+    var sel = document.getElementById('grv-weather-region');
+    if (!sel) return;
+    sel.addEventListener('change', function(){
+      localStorage.setItem(WEATHER_KEY, sel.value);
+      fetchWeather(sel.value);
+    });
+  }
+
+  // ── 다크/라이트 토글 ──
+  function wireThemeToggle(){
+    var btn = document.getElementById('grv-theme-toggle');
+    var ico = document.getElementById('grv-theme-icon');
+    if (!btn) return;
+    btn.addEventListener('click', function(){
+      var cur = document.documentElement.getAttribute('data-theme') || 'light';
+      var next = cur === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', next);
+      localStorage.setItem(THEME_KEY, next);
+      if (ico) ico.textContent = next === 'dark' ? '☾' : '☀';
+    });
   }
 
   // 자동 로그인 (세션 쿠키 유효 + 임베딩 사용자 목록에 존재)
