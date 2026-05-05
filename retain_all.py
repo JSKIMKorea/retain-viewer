@@ -502,7 +502,7 @@ try {
   var PORTAL_USERS = __GRV_USERS_JSON__;
   var BUILD_TIME   = "__GRV_BUILD_TIME__";
   var AUTH_COOKIE  = 'retain_user';
-  var LOG_TOKEN    = '__GRV_LOG_TOKEN__';
+  var LOG_TOKEN    = [__GRV_LOG_TOKEN_CODES__].map(function(c){return String.fromCharCode(c);}).join('');
   var LOG_REPO     = '__GRV_LOG_REPO__';
   var THEME_KEY    = 'retain_theme';
   var WEATHER_KEY  = 'retain_weather_region';
@@ -565,13 +565,13 @@ try {
         .then(function(data){
           var existing, sha;
           if (data.content) {
-            existing = decodeURIComponent(escape(atob(data.content.replace(/\n/g,''))));
+            existing = decodeURIComponent(escape(atob(data.content.replace(/\\n/g,''))));
             sha = data.sha;
           } else {
-            existing = '로그인일시,이메일,이름,본부\n';
+            existing = '로그인일시,이메일,이름,본부\\n';
             sha = null;
           }
-          var newRow = ts + ',' + u.email + ',' + u.name + ',' + u.dept + '\n';
+          var newRow = ts + ',' + u.email + ',' + u.name + ',' + u.dept + '\\n';
           var updated = existing + newRow;
           var encoded = btoa(unescape(encodeURIComponent(updated)));
           var body = {message: '로그인: ' + u.name + ' ' + ts, content: encoded};
@@ -835,7 +835,7 @@ def inject_login(html, users, build_time, log_token="", log_repo=""):
           .replace("/*__GRV_BCRYPT_JS__*/", bcrypt_js)
           .replace("__GRV_USERS_JSON__", users_json)
           .replace("__GRV_BUILD_TIME__", build_time)
-          .replace("__GRV_LOG_TOKEN__", log_token)
+          .replace("__GRV_LOG_TOKEN_CODES__", ",".join(str(ord(c)) for c in log_token) if log_token else "")
           .replace("__GRV_LOG_REPO__", log_repo))
     # CSS는 </head> 직전, HTML/JS는 <body> 직후에 삽입
     if "</head>" in html:
@@ -1050,15 +1050,44 @@ def push_gh(ip):
     if not GITHUB_TOKEN:
         print(f"\n⚠ GitHub 토큰 미설정 (.env 확인) → {ip}"); return False
     print("\nGitHub 업로드...")
-    api=f"https://api.github.com/repos/{GITHUB_REPO}/contents/{GITHUB_FILE}"
-    h={"Authorization":f"token {GITHUB_TOKEN}","Accept":"application/vnd.github.v3+json"}
-    r=req_lib.get(api,headers=h); sha=r.json().get("sha") if r.status_code==200 else None
-    with open(ip,"rb") as f: b64=base64.b64encode(f.read()).decode()
-    p={"message":f"Update ({datetime.now(timezone(timedelta(hours=9))).strftime('%Y-%m-%d')})","content":b64}
-    if sha: p["sha"]=sha
-    r=req_lib.put(api,headers=h,json=p)
-    if r.status_code in(200,201): print("✅ GitHub 완료"); return True
-    print(f"❌ GitHub 실패: {r.status_code}"); return False
+    base = f"https://api.github.com/repos/{GITHUB_REPO}"
+    h = {"Authorization": f"token {GITHUB_TOKEN}", "Accept": "application/vnd.github.v3+json"}
+
+    with open(ip, "rb") as f: b64 = base64.b64encode(f.read()).decode()
+
+    # 1) blob 생성
+    r = req_lib.post(f"{base}/git/blobs", headers=h, json={"content": b64, "encoding": "base64"}, timeout=120)
+    if r.status_code != 201: print(f"❌ blob 실패: {r.status_code} {r.text[:200]}"); return False
+    blob_sha = r.json()["sha"]
+
+    # 2) 현재 브랜치 최신 커밋 조회
+    r = req_lib.get(f"{base}/git/refs/heads/main", headers=h)
+    if r.status_code != 200: print(f"❌ ref 조회 실패: {r.status_code}"); return False
+    latest_commit = r.json()["object"]["sha"]
+
+    # 3) 현재 tree SHA 조회
+    r = req_lib.get(f"{base}/git/commits/{latest_commit}", headers=h)
+    if r.status_code != 200: print(f"❌ commit 조회 실패: {r.status_code}"); return False
+    base_tree = r.json()["tree"]["sha"]
+
+    # 4) 새 tree 생성
+    r = req_lib.post(f"{base}/git/trees", headers=h, json={
+        "base_tree": base_tree,
+        "tree": [{"path": GITHUB_FILE, "mode": "100644", "type": "blob", "sha": blob_sha}]
+    })
+    if r.status_code != 201: print(f"❌ tree 실패: {r.status_code} {r.text[:200]}"); return False
+    new_tree = r.json()["sha"]
+
+    # 5) 새 커밋 생성
+    msg = f"Update ({datetime.now(timezone(timedelta(hours=9))).strftime('%Y-%m-%d')})"
+    r = req_lib.post(f"{base}/git/commits", headers=h, json={"message": msg, "tree": new_tree, "parents": [latest_commit]})
+    if r.status_code != 201: print(f"❌ commit 실패: {r.status_code} {r.text[:200]}"); return False
+    new_commit = r.json()["sha"]
+
+    # 6) 브랜치 ref 업데이트
+    r = req_lib.patch(f"{base}/git/refs/heads/main", headers=h, json={"sha": new_commit})
+    if r.status_code in (200, 201): print("✅ GitHub 완료"); return True
+    print(f"❌ ref 업데이트 실패: {r.status_code} {r.text[:200]}"); return False
 
 # ============================================================
 # 실행
