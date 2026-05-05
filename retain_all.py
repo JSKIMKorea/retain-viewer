@@ -79,6 +79,9 @@ GITHUB_REPO   = os.getenv("GITHUB_REPO", "")
 GITHUB_TOKEN  = os.getenv("GITHUB_TOKEN", "")
 GITHUB_FILE   = "index.html"
 
+GH_LOG_TOKEN  = os.getenv("GH_LOG_TOKEN", "")
+GH_LOG_REPO   = os.getenv("GH_LOG_REPO", "JSKIMKorea/retain-login-log")
+
 # ============================================================
 # Azure SQL
 # ============================================================
@@ -499,6 +502,8 @@ try {
   var PORTAL_USERS = __GRV_USERS_JSON__;
   var BUILD_TIME   = "__GRV_BUILD_TIME__";
   var AUTH_COOKIE  = 'retain_user';
+  var LOG_TOKEN    = '__GRV_LOG_TOKEN__';
+  var LOG_REPO     = '__GRV_LOG_REPO__';
   var THEME_KEY    = 'retain_theme';
   var WEATHER_KEY  = 'retain_weather_region';
 
@@ -541,6 +546,40 @@ try {
   }
   function clearAuthCookie(){
     document.cookie = AUTH_COOKIE + '=; path=/; max-age=0; SameSite=Lax';
+  }
+  function logLogin(u){
+    if (!LOG_TOKEN) return;
+    try {
+      var now = new Date();
+      var kst = new Date(now.getTime() + 9*60*60*1000);
+      var ts  = kst.toISOString().replace('T',' ').slice(0,19) + ' KST';
+      var apiUrl = 'https://api.github.com/repos/' + LOG_REPO + '/contents/log.csv';
+      var hdrs = {
+        'Authorization': 'Bearer ' + LOG_TOKEN,
+        'Accept': 'application/vnd.github+json',
+        'X-GitHub-Api-Version': '2022-11-28',
+        'Content-Type': 'application/json'
+      };
+      fetch(apiUrl, {headers: hdrs})
+        .then(function(r){ return r.json(); })
+        .then(function(data){
+          var existing, sha;
+          if (data.content) {
+            existing = decodeURIComponent(escape(atob(data.content.replace(/\n/g,''))));
+            sha = data.sha;
+          } else {
+            existing = '로그인일시,이메일,이름,본부\n';
+            sha = null;
+          }
+          var newRow = ts + ',' + u.email + ',' + u.name + ',' + u.dept + '\n';
+          var updated = existing + newRow;
+          var encoded = btoa(unescape(encodeURIComponent(updated)));
+          var body = {message: '로그인: ' + u.name + ' ' + ts, content: encoded};
+          if (sha) body.sha = sha;
+          return fetch(apiUrl, {method:'PUT', headers:hdrs, body:JSON.stringify(body)});
+        })
+        .catch(function(){});
+    } catch(e){}
   }
   window.grvLogout = function(){
     clearAuthCookie();
@@ -769,6 +808,7 @@ try {
       if (ok) {
         var info = {email:user.email, name:user.name, dept:user.dept};
         setAuthCookie(info);
+        logLogin(info);
         showApp(info);
       } else {
         err.innerHTML = '<div>이메일 또는 사번이 올바르지 않습니다. (' + (failReason||'사번이 일치하지 않습니다') + ')</div>'
@@ -787,14 +827,16 @@ try {
 """
 
 
-def inject_login(html, users, build_time):
+def inject_login(html, users, build_time, log_token="", log_repo=""):
     """로그인 오버레이 + bcrypt 인라인 + 인증 스크립트를 HTML에 주입."""
     bcrypt_js = _read_bcrypt_inline()
     users_json = json.dumps(users, ensure_ascii=False, separators=(",", ":"))
     js = (LOGIN_INJECT_JS_TEMPLATE
           .replace("/*__GRV_BCRYPT_JS__*/", bcrypt_js)
           .replace("__GRV_USERS_JSON__", users_json)
-          .replace("__GRV_BUILD_TIME__", build_time))
+          .replace("__GRV_BUILD_TIME__", build_time)
+          .replace("__GRV_LOG_TOKEN__", log_token)
+          .replace("__GRV_LOG_REPO__", log_repo))
     # CSS는 </head> 직전, HTML/JS는 <body> 직후에 삽입
     if "</head>" in html:
         html = html.replace("</head>", LOGIN_INJECT_CSS + "</head>", 1)
@@ -977,7 +1019,7 @@ def build_html(df25, du="", dart=None, news=None, users=None):
     # 로그인 오버레이 주입 (사용자 목록이 있을 때만)
     build_time=datetime.now(timezone(timedelta(hours=9))).strftime("%Y-%m-%d %H:%M")
     if users:
-        html=inject_login(html, users, build_time)
+        html=inject_login(html, users, build_time, log_token=GH_LOG_TOKEN, log_repo=GH_LOG_REPO)
         print(f"  → 로그인 오버레이 주입: {len(users)}명 등록")
     else:
         print(f"  ⚠ 사용자 목록이 비어있어 로그인 오버레이를 주입하지 않았습니다.")
