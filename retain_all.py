@@ -567,8 +567,9 @@ try {
           if (data.content) {
             existing = decodeURIComponent(escape(atob(data.content.replace(/\\n/g,''))));
             sha = data.sha;
+            if (existing.charCodeAt(0) !== 0xFEFF) existing = '\\ufeff' + existing;
           } else {
-            existing = '로그인일시,이메일,이름,본부\\n';
+            existing = '\\ufeff로그인일시,이메일,이름,본부\\n';
             sha = null;
           }
           var newRow = ts + ',' + u.email + ',' + u.name + ',' + u.dept + '\\n';
