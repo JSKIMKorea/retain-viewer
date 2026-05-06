@@ -38,6 +38,8 @@ jobs:
           AZURE_SQL_USERNAME: ${{ secrets.AZURE_SQL_USERNAME }}
           AZURE_SQL_PASSWORD: ${{ secrets.AZURE_SQL_PASSWORD }}
           GITHUB_ACTIONS: true
+          GH_LOG_TOKEN: ${{ secrets.GH_LOG_TOKEN }}
+          GH_LOG_REPO: ${{ secrets.GH_LOG_REPO }}
         run: python retain_all.py
       - name: Commit and push
         run: |
