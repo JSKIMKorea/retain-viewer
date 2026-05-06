@@ -13,7 +13,8 @@ DART 데이터 갱신은 dart_update.py를 별도 실행하세요.
 
 import pyodbc, pandas as pd, requests as req_lib
 from datetime import date, datetime, timezone, timedelta
-import os, sys, json, re, base64
+import os, sys, json, re, base64, urllib3
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 # ============================================================
 # 환경 감지: GitHub Actions vs 로컬 PC
@@ -1057,17 +1058,17 @@ def push_gh(ip):
     with open(ip, "rb") as f: b64 = base64.b64encode(f.read()).decode()
 
     # 1) blob 생성
-    r = req_lib.post(f"{base}/git/blobs", headers=h, json={"content": b64, "encoding": "base64"}, timeout=120)
+    r = req_lib.post(f"{base}/git/blobs", headers=h, json={"content": b64, "encoding": "base64"}, timeout=300, verify=False)
     if r.status_code != 201: print(f"❌ blob 실패: {r.status_code} {r.text[:200]}"); return False
     blob_sha = r.json()["sha"]
 
     # 2) 현재 브랜치 최신 커밋 조회
-    r = req_lib.get(f"{base}/git/refs/heads/main", headers=h)
+    r = req_lib.get(f"{base}/git/refs/heads/main", headers=h, verify=False)
     if r.status_code != 200: print(f"❌ ref 조회 실패: {r.status_code}"); return False
     latest_commit = r.json()["object"]["sha"]
 
     # 3) 현재 tree SHA 조회
-    r = req_lib.get(f"{base}/git/commits/{latest_commit}", headers=h)
+    r = req_lib.get(f"{base}/git/commits/{latest_commit}", headers=h, verify=False)
     if r.status_code != 200: print(f"❌ commit 조회 실패: {r.status_code}"); return False
     base_tree = r.json()["tree"]["sha"]
 
@@ -1075,18 +1076,18 @@ def push_gh(ip):
     r = req_lib.post(f"{base}/git/trees", headers=h, json={
         "base_tree": base_tree,
         "tree": [{"path": GITHUB_FILE, "mode": "100644", "type": "blob", "sha": blob_sha}]
-    })
+    }, verify=False)
     if r.status_code != 201: print(f"❌ tree 실패: {r.status_code} {r.text[:200]}"); return False
     new_tree = r.json()["sha"]
 
     # 5) 새 커밋 생성
     msg = f"Update ({datetime.now(timezone(timedelta(hours=9))).strftime('%Y-%m-%d')})"
-    r = req_lib.post(f"{base}/git/commits", headers=h, json={"message": msg, "tree": new_tree, "parents": [latest_commit]})
+    r = req_lib.post(f"{base}/git/commits", headers=h, json={"message": msg, "tree": new_tree, "parents": [latest_commit]}, verify=False)
     if r.status_code != 201: print(f"❌ commit 실패: {r.status_code} {r.text[:200]}"); return False
     new_commit = r.json()["sha"]
 
     # 6) 브랜치 ref 업데이트
-    r = req_lib.patch(f"{base}/git/refs/heads/main", headers=h, json={"sha": new_commit})
+    r = req_lib.patch(f"{base}/git/refs/heads/main", headers=h, json={"sha": new_commit}, verify=False)
     if r.status_code in (200, 201): print("✅ GitHub 완료"); return True
     print(f"❌ ref 업데이트 실패: {r.status_code} {r.text[:200]}"); return False
 
