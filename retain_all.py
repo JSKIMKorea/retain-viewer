@@ -475,7 +475,7 @@ LOGIN_INJECT_HTML = """
         <div class="grv-login-tips">
           <h4><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a7 7 0 0 1 7 7c0 2.79-1.63 5.24-4 6.46V17H9v-1.54C6.63 14.24 5 11.79 5 9a7 7 0 0 1 7-7z"/></svg> 사용 안내</h4>
           <ul>
-            <li>회사 PWC 이메일(@pwc.com) + 사번 6자리 입력</li>
+            <li>회사 PwC 이메일(@pwc.com) + 사번 6자리 입력</li>
             <li><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg> 아이콘 클릭 시 사번 표시/숨김 전환</li>
             <li>등록되지 않은 사용자는 관리자에게 문의해주세요.</li>
           </ul>
