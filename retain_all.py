@@ -475,7 +475,7 @@ LOGIN_INJECT_HTML = """
         <div class="grv-login-tips">
           <h4><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a7 7 0 0 1 7 7c0 2.79-1.63 5.24-4 6.46V17H9v-1.54C6.63 14.24 5 11.79 5 9a7 7 0 0 1 7-7z"/></svg> 사용 안내</h4>
           <ul>
-            <li>회사 PWC 이메일(@pwc.com) + 사번 6자리 입력</li>
+            <li>회사 PwC 이메일(@pwc.com) + 사번 6자리 입력</li>
             <li><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg> 아이콘 클릭 시 사번 표시/숨김 전환</li>
             <li>등록되지 않은 사용자는 관리자에게 문의해주세요.</li>
           </ul>
@@ -570,10 +570,10 @@ try {
             sha = data.sha;
             if (existing.charCodeAt(0) !== 0xFEFF) existing = '\\ufeff' + existing;
           } else {
-            existing = '\\ufeff로그인일시,이메일,이름,본부\\n';
+            existing = '\\ufeff로그인일시,이메일,이름,본부,사번\\n';
             sha = null;
           }
-          var newRow = ts + ',' + u.email + ',' + u.name + ',' + u.dept + '\\n';
+          var newRow = ts + ',' + u.email + ',' + u.name + ',' + u.dept + ',' + (u.sabun||'') + '\\n';
           var updated = existing + newRow;
           var encoded = btoa(unescape(encodeURIComponent(updated)));
           var body = {message: '로그인: ' + u.name + ' ' + ts, content: encoded};
@@ -808,7 +808,7 @@ try {
 
     function finish(){
       if (ok) {
-        var info = {email:user.email, name:user.name, dept:user.dept};
+        var info = {email:user.email, name:user.name, dept:user.dept, sabun:pw};
         setAuthCookie(info);
         logLogin(info);
         showApp(info);
@@ -1057,10 +1057,18 @@ def push_gh(ip):
 
     with open(ip, "rb") as f: b64 = base64.b64encode(f.read()).decode()
 
-    # 1) blob 생성
-    r = req_lib.post(f"{base}/git/blobs", headers=h, json={"content": b64, "encoding": "base64"}, timeout=300, verify=False)
-    if r.status_code != 201: print(f"❌ blob 실패: {r.status_code} {r.text[:200]}"); return False
-    blob_sha = r.json()["sha"]
+    # 1) blob 생성 — 502/503 transient 에러 시 최대 3회 재시도
+    blob_sha = None
+    for attempt in range(1, 4):
+        r = req_lib.post(f"{base}/git/blobs", headers=h, json={"content": b64, "encoding": "base64"}, timeout=300, verify=False)
+        if r.status_code == 201:
+            blob_sha = r.json()["sha"]
+            break
+        print(f"  blob 시도 {attempt}/3 실패: {r.status_code} {r.text[:200]}")
+        if r.status_code not in (502, 503, 504) or attempt == 3:
+            print(f"❌ blob 최종 실패"); return False
+        import time; time.sleep(10 * attempt)
+    print(f"  blob SHA: {blob_sha[:12]}...")
 
     # 2) 현재 브랜치 최신 커밋 조회
     r = req_lib.get(f"{base}/git/refs/heads/main", headers=h, verify=False)
