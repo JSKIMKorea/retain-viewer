@@ -353,47 +353,64 @@ body.grv-locked{overflow:hidden;position:fixed;width:100%;height:100%}
      마지막 위젯(토글) 우측 = "Smart Office System" 끝선
    어느 모니터에서나 비율·정렬 동일하게 유지됨.
    4개 위젯 모두 height:32px / font-size:12px / Noto Sans KR 통일. */
-/* ── 위젯 바 ── */
-#grv-widget-bar{display:flex;align-items:center;gap:4px;font-family:'Noto Sans KR','맑은 고딕','Malgun Gothic',sans-serif;font-size:12px;flex-shrink:0;box-sizing:border-box}
-#grv-widget-bar *{font-family:'Noto Sans KR','맑은 고딕','Malgun Gothic',sans-serif!important;font-size:12px!important;box-sizing:border-box}
-/* 날씨 칩 */
-.grv-w{display:inline-flex;align-items:center;gap:5px;padding:0 10px;height:32px;border:1px solid #e2e8f0;border-radius:8px;background:#fff;color:#475569;white-space:nowrap;line-height:1;flex-shrink:0}
+/* ── 위젯 바 :: 공지 박스와 동일한 톤 (Noto Sans KR + soft border + rounded 8px) ──
+   각 모듈은 상단 작은 라벨 + 하단 값(아이콘/온도/이름)의 2단 구조.
+   외곽 1px #e2e8f0 + border-radius 8px + bg #fafbfc 로 #headerNotice 와 일치. */
+#grv-widget-bar{display:flex;align-items:stretch;flex-shrink:0;box-sizing:border-box;border:1px solid #e2e8f0;border-radius:8px;background:#fafbfc;color:#1e293b;font-family:'Noto Sans KR','맑은 고딕','Malgun Gothic',sans-serif}
+/* first/last 모듈 라운드 보정 — overflow:hidden 대신 (드롭다운 클리핑 방지) */
+#grv-widget-bar > :first-child{border-top-left-radius:7px;border-bottom-left-radius:7px}
+#grv-widget-bar > :last-child{border-top-right-radius:7px;border-bottom-right-radius:7px}
+#grv-widget-bar > :last-child > .grv-profile-btn{border-top-right-radius:7px;border-bottom-right-radius:7px}
+#grv-widget-bar *{box-sizing:border-box;font-family:'Noto Sans KR','맑은 고딕','Malgun Gothic',sans-serif}
+/* 공통 모듈 — compact 2-line: 라벨(8px) + 값(11px) */
+.grv-mod{position:relative;display:flex;flex-direction:column;justify-content:center;min-height:32px;padding:3px 11px;gap:1px;border:0;background:transparent;color:inherit;font-family:inherit;cursor:pointer;transition:background .15s ease,color .15s ease;text-align:left}
+.grv-mod + .grv-mod,.grv-profile-wrap > .grv-profile-btn{border-left:1px solid #e2e8f0}
+.grv-mod-label{font-size:8px!important;line-height:1;font-weight:600;letter-spacing:0.04em;color:#94a3b8;white-space:nowrap}
+.grv-mod-body{display:inline-flex;align-items:center;gap:5px;font-size:11px;line-height:1.1;font-weight:600;color:#1e293b;white-space:nowrap}
+.grv-mod-body svg{display:block}
+/* hover: 부드러운 슬레이트 + 파란 액센트 */
+.grv-mod-btn:hover,.grv-weather:hover{background:#f1f5f9}
+.grv-mod-btn:hover .grv-mod-body,.grv-weather:hover .grv-mod-body,.grv-weather:hover .grv-w-icon{color:#3b82f6}
+/* 활성 토글: 연한 파란 배경 */
+.grv-mod-btn.active{background:#eff6ff}
+.grv-mod-btn.active .grv-mod-label{color:#60a5fa}
+.grv-mod-btn.active .grv-mod-body{color:#3b82f6}
+/* 날씨 모듈 */
 .grv-weather{cursor:default}
-.grv-w-icon{line-height:1;display:flex;align-items:center;color:#64748b}
-.grv-w-temp{color:#1e293b;font-weight:700}
-.grv-weather select{border:none;background:transparent;color:#475569;cursor:pointer;outline:none;padding:0 18px 0 1px;margin-left:1px;max-width:100px}
-.grv-weather select:hover{color:#3b82f6}
-/* 구분선 */
-.grv-sep{width:1px;height:20px;background:#e2e8f0;margin:0 2px;flex-shrink:0}
-/* 아이콘 버튼 */
-.grv-icon-btn{width:32px;height:32px;border:1px solid #e2e8f0;border-radius:8px;background:#fff;color:#64748b;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;transition:all .15s;flex-shrink:0;padding:0;line-height:1}
-.grv-icon-btn:hover{border-color:#93c5fd;color:#3b82f6;background:#f0f7ff}
-.grv-icon-btn.active{background:#eff6ff;border-color:#93c5fd;color:#3b82f6}
-/* 모바일 뷰 아이콘 전환 */
+.grv-w-icon{display:inline-flex;align-items:center;color:#64748b;transition:color .15s}
+.grv-w-temp{font-weight:700;color:inherit}
+.grv-weather select{border:0;background:transparent;color:#475569;cursor:pointer;outline:none;padding:0 13px 0 2px;margin-left:2px;max-width:96px;font-family:inherit;font-size:11px;font-weight:500;appearance:none;-webkit-appearance:none;background-image:linear-gradient(45deg,transparent 50%,currentColor 50%),linear-gradient(135deg,currentColor 50%,transparent 50%);background-position:calc(100% - 5px) 56%,calc(100% - 2px) 56%;background-size:4px 4px;background-repeat:no-repeat}
+.grv-weather:hover select{color:#3b82f6}
+.grv-weather select option{color:#1e293b;background:#fff}
+/* 모바일 뷰 토글 */
 .grv-mob-pc{display:inline-flex;align-items:center}
 .grv-mob-mob{display:none;align-items:center}
 body.mobile-view .grv-mob-pc{display:none}
 body.mobile-view .grv-mob-mob{display:inline-flex}
-body.mobile-view #grv-mob-toggle{background:#3b82f6!important;color:#fff!important;border-color:#3b82f6!important}
-body.mobile-view #grv-mob-toggle:hover{background:#2563eb!important}
-/* 프로필 버튼 */
-.grv-profile-wrap{position:relative;flex-shrink:0}
-.grv-profile-btn{display:inline-flex;align-items:center;gap:6px;padding:4px 8px 4px 4px;height:32px;border:1px solid #e2e8f0;border-radius:8px;background:#fff;cursor:pointer;transition:all .15s;font-family:'Noto Sans KR','맑은 고딕','Malgun Gothic',sans-serif;font-size:12px;color:#1e293b;white-space:nowrap}
-.grv-profile-btn:hover,.grv-profile-btn.open{border-color:#93c5fd;background:#f0f7ff}
-.grv-avatar{width:22px;height:22px;border-radius:50%;background:linear-gradient(135deg,#3b82f6,#7c3aed);color:#fff;font-size:10px!important;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;line-height:1}
-.grv-profile-name{font-weight:600;color:#1e293b}
-.grv-profile-chevron{color:#94a3b8;display:flex;align-items:center;transition:transform .2s;margin-left:1px}
+body.mobile-view #grv-mob-toggle{background:#3b82f6!important;color:#fff!important}
+body.mobile-view #grv-mob-toggle .grv-mod-label{color:rgba(255,255,255,0.78)!important}
+body.mobile-view #grv-mob-toggle .grv-mod-body{color:#fff!important}
+/* 프로필 모듈 */
+.grv-profile-wrap{position:relative;display:flex;flex-shrink:0}
+.grv-profile-btn{position:relative;display:flex;flex-direction:column;justify-content:center;min-height:32px;padding:3px 11px;gap:1px;border:0;background:transparent;color:inherit;font-family:inherit;cursor:pointer;transition:background .15s ease,color .15s ease;text-align:left}
+.grv-profile-btn:hover,.grv-profile-btn.open{background:#f1f5f9}
+.grv-profile-btn:hover .grv-mod-body,.grv-profile-btn.open .grv-mod-body{color:#3b82f6}
+.grv-profile-name{font-weight:600;color:inherit}
+.grv-profile-chevron{color:#94a3b8;display:flex;align-items:center;transition:transform .2s,color .15s;margin-left:1px}
 .grv-profile-btn.open .grv-profile-chevron{transform:rotate(180deg)}
-/* 드롭다운 */
-.grv-dropdown{position:absolute;top:calc(100% + 6px);right:0;min-width:176px;background:#fff;border:1px solid #e2e8f0;border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.12);z-index:9998;display:none;overflow:hidden}
+.grv-profile-btn:hover .grv-profile-chevron,.grv-profile-btn.open .grv-profile-chevron{color:#3b82f6}
+/* 드롭다운: 부드러운 모서리 + 그림자 */
+.grv-dropdown{position:absolute;top:calc(100% + 6px);right:0;min-width:200px;background:#fff;border:1px solid #e2e8f0;border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.12);z-index:9998;display:none;overflow:hidden;font-family:'Noto Sans KR','맑은 고딕','Malgun Gothic',sans-serif}
 .grv-dropdown.open{display:block}
-.grv-dd-header{padding:10px 14px 8px;border-bottom:1px solid #f1f5f9}
-.grv-dd-name{font-size:13px!important;font-weight:700;color:#1e293b}
-.grv-dd-dept{font-size:11px!important;color:#94a3b8;margin-top:1px}
-.grv-dd-item{display:flex;align-items:center;gap:8px;padding:8px 14px;font-size:12px!important;color:#475569;cursor:pointer;transition:background .1s;border:none;background:none;width:100%;text-align:left;font-family:'Noto Sans KR','맑은 고딕','Malgun Gothic',sans-serif}
-.grv-dd-item:hover{background:#f8fafc}
+.grv-dd-header{padding:11px 14px 10px;border-bottom:1px solid #f1f5f9;background:#fafbfc}
+.grv-dd-label{font-size:9px!important;font-weight:600;letter-spacing:0.06em;color:#94a3b8;margin-bottom:4px;line-height:1}
+.grv-dd-name{font-size:13px!important;font-weight:700;color:#1e293b;line-height:1.3}
+.grv-dd-dept{font-size:11px!important;color:#94a3b8;margin-top:2px}
+.grv-dd-item{display:flex;align-items:center;gap:8px;padding:10px 14px;font-size:12px!important;font-weight:500;color:#475569;cursor:pointer;transition:background .12s,color .12s;border:0;background:none;width:100%;text-align:left;font-family:inherit}
+.grv-dd-item + .grv-dd-item{border-top:1px solid #f1f5f9}
+.grv-dd-item:hover{background:#f8fafc;color:#1e293b}
 .grv-dd-item.danger{color:#C44608}
-.grv-dd-item.danger:hover{background:#FFF5ED}
+.grv-dd-item.danger:hover{background:#FFF5ED;color:#C44608}
 
 /* ── 다크 모드 ── */
 html[data-theme="dark"]{color-scheme:dark}
@@ -419,26 +436,35 @@ html[data-theme="dark"] .week-header-cell.today{background:#1e3a8a;color:#dbeafe
 html[data-theme="dark"] .gantt-cell.today-col{background:#dbeafe !important}
 html[data-theme="dark"] .empty-state{color:#64748b}
 html[data-theme="dark"] .project-block-name{color:#1e293b !important}
-html[data-theme="dark"] .grv-w{background:#1e293b;border-color:#334155;color:#cbd5e1}
-html[data-theme="dark"] .grv-w-temp{color:#e2e8f0}
+/* 위젯 바 다크 — 공지 박스와 동일 톤 (#1e293b 배경, #334155 테두리) */
+html[data-theme="dark"] #grv-widget-bar{background:#1e293b;border-color:#334155;color:#e2e8f0}
+html[data-theme="dark"] .grv-mod + .grv-mod,html[data-theme="dark"] .grv-profile-wrap > .grv-profile-btn{border-left-color:#334155}
+html[data-theme="dark"] .grv-mod-label{color:#64748b}
+html[data-theme="dark"] .grv-mod-body{color:#e2e8f0}
+html[data-theme="dark"] .grv-w-icon{color:#94a3b8}
+html[data-theme="dark"] .grv-mod-btn:hover,html[data-theme="dark"] .grv-weather:hover,html[data-theme="dark"] .grv-profile-btn:hover,html[data-theme="dark"] .grv-profile-btn.open{background:#273449}
+html[data-theme="dark"] .grv-mod-btn:hover .grv-mod-body,html[data-theme="dark"] .grv-weather:hover .grv-mod-body,html[data-theme="dark"] .grv-weather:hover .grv-w-icon,html[data-theme="dark"] .grv-profile-btn:hover .grv-mod-body,html[data-theme="dark"] .grv-profile-btn.open .grv-mod-body{color:#93c5fd}
+html[data-theme="dark"] .grv-mod-btn.active{background:#1e3a8a}
+html[data-theme="dark"] .grv-mod-btn.active .grv-mod-label{color:#60a5fa}
+html[data-theme="dark"] .grv-mod-btn.active .grv-mod-body{color:#dbeafe}
 html[data-theme="dark"] .grv-weather select{color:#cbd5e1}
-html[data-theme="dark"] .grv-sep{background:#334155}
-html[data-theme="dark"] .grv-icon-btn{background:#1e293b;border-color:#334155;color:#94a3b8}
-html[data-theme="dark"] .grv-icon-btn:hover{background:#273449;border-color:#475569;color:#e2e8f0}
-html[data-theme="dark"] .grv-icon-btn.active{background:#1e3a8a;border-color:#1d4ed8;color:#93c5fd}
-html[data-theme="dark"] body.mobile-view #grv-mob-toggle{background:#1d4ed8!important;border-color:#1d4ed8!important}
-html[data-theme="dark"] .grv-profile-btn{background:#1e293b;border-color:#334155;color:#e2e8f0}
-html[data-theme="dark"] .grv-profile-btn:hover,html[data-theme="dark"] .grv-profile-btn.open{background:#273449;border-color:#475569}
-html[data-theme="dark"] .grv-profile-name{color:#e2e8f0}
+html[data-theme="dark"] .grv-weather:hover select{color:#93c5fd}
+html[data-theme="dark"] .grv-weather select option{background:#1e293b;color:#e2e8f0}
+html[data-theme="dark"] body.mobile-view #grv-mob-toggle{background:#1d4ed8!important;color:#fff!important}
+html[data-theme="dark"] body.mobile-view #grv-mob-toggle .grv-mod-label{color:rgba(255,255,255,0.78)!important}
+html[data-theme="dark"] body.mobile-view #grv-mob-toggle .grv-mod-body{color:#fff!important}
 html[data-theme="dark"] .grv-profile-chevron{color:#64748b}
+html[data-theme="dark"] .grv-profile-btn:hover .grv-profile-chevron,html[data-theme="dark"] .grv-profile-btn.open .grv-profile-chevron{color:#93c5fd}
 html[data-theme="dark"] .grv-dropdown{background:#1e293b;border-color:#334155;box-shadow:0 8px 24px rgba(0,0,0,.3)}
-html[data-theme="dark"] .grv-dd-header{border-bottom-color:#334155}
+html[data-theme="dark"] .grv-dd-header{background:#162033;border-bottom-color:#334155}
+html[data-theme="dark"] .grv-dd-label{color:#64748b}
 html[data-theme="dark"] .grv-dd-name{color:#e2e8f0}
 html[data-theme="dark"] .grv-dd-dept{color:#64748b}
 html[data-theme="dark"] .grv-dd-item{color:#94a3b8;background:none}
-html[data-theme="dark"] .grv-dd-item:hover{background:#273449}
+html[data-theme="dark"] .grv-dd-item + .grv-dd-item{border-top-color:#334155}
+html[data-theme="dark"] .grv-dd-item:hover{background:#273449;color:#e2e8f0}
 html[data-theme="dark"] .grv-dd-item.danger{color:#fb923c}
-html[data-theme="dark"] .grv-dd-item.danger:hover{background:#3a1e0e}
+html[data-theme="dark"] .grv-dd-item.danger:hover{background:#3a1e0e;color:#fb923c}
 html[data-theme="dark"] .frd-date{color:#93c5fd !important;background:none !important;text-decoration:underline;text-decoration-color:rgba(99,102,241,0.7);text-underline-offset:3px;text-decoration-thickness:2px;line-height:1.5}
 html[data-theme="dark"] .frd-label{color:#94a3b8 !important}
 html[data-theme="dark"] #ganttGuide,html[data-theme="dark"] #detailGuide,html[data-theme="dark"] #projGuide{color:#94a3b8 !important}
@@ -469,12 +495,11 @@ html[data-theme="dark"] #newsContent [style*="color:#475569"]{color:#cbd5e1 !imp
 html[data-theme="dark"] #newsContent div[style*="border-bottom"]{border-color:#334155 !important}
 html[data-theme="dark"] #newsContent tr{border-color:#334155 !important}
 /* ── 모바일 뷰: 위젯 바 축소 ── */
-body.mobile-view #grv-widget-bar{flex-wrap:wrap;gap:4px}
-body.mobile-view .grv-w{height:28px;padding:0 8px;gap:4px}
-body.mobile-view .grv-weather select{max-width:80px;padding-right:16px}
-body.mobile-view .grv-icon-btn{width:28px;height:28px}
-body.mobile-view .grv-profile-btn{height:28px;padding:3px 7px 3px 3px;gap:5px}
-body.mobile-view .grv-avatar{width:20px;height:20px}
+body.mobile-view #grv-widget-bar{flex-wrap:wrap}
+body.mobile-view .grv-mod,body.mobile-view .grv-profile-btn{min-height:28px;padding:2px 9px;gap:0}
+body.mobile-view .grv-mod-label{font-size:7px!important;letter-spacing:0.02em}
+body.mobile-view .grv-mod-body{font-size:10px;gap:4px}
+body.mobile-view .grv-weather select{max-width:74px;font-size:10px;padding-right:11px}
 body.mobile-view #headerNotice{font-size:12px!important;padding:8px 12px!important}
 body.mobile-view #headerNotice>div{font-size:12px!important;line-height:1.5}
 </style>
@@ -546,26 +571,27 @@ try {
   var savedTheme = localStorage.getItem(THEME_KEY) || 'light';
   document.documentElement.setAttribute('data-theme', savedTheme);
 
-  // ── 날씨 위젯 지역 목록 (wttr.in 식별자, 한글 라벨) ──
+  // ── 날씨 위젯 지역 목록 (Open-Meteo: lat/lng + 한글 라벨) ──
+  // wttr.in 은 PwC 사내망에서 차단/지연이 잦아 Open-Meteo (CORS-friendly, no-auth) 사용.
   var REGIONS = [
-    {label:'서울 용산구',  q:'Yongsan-gu, Seoul'},
-    {label:'서울 동작구',  q:'Dongjak-gu, Seoul'},
-    {label:'서울 영등포구', q:'Yeongdeungpo-gu, Seoul'},
-    {label:'서울 강남구',  q:'Gangnam-gu, Seoul'},
-    {label:'서울 서초구',  q:'Seocho-gu, Seoul'},
-    {label:'서울 마포구',  q:'Mapo-gu, Seoul'},
-    {label:'서울 종로구',  q:'Jongno-gu, Seoul'},
-    {label:'서울 중구',    q:'Jung-gu, Seoul'},
-    {label:'성남 분당',    q:'Bundang-gu, Seongnam'},
-    {label:'성남 판교',    q:'Pangyo, Seongnam'},
-    {label:'고양 일산',    q:'Ilsan, Goyang'},
-    {label:'부산',         q:'Busan'},
-    {label:'대구',         q:'Daegu'},
-    {label:'인천',         q:'Incheon'},
-    {label:'광주',         q:'Gwangju'},
-    {label:'대전',         q:'Daejeon'},
-    {label:'세종',         q:'Sejong'},
-    {label:'울산',         q:'Ulsan'},
+    {label:'서울 용산구',  lat:37.5384, lng:126.9654},
+    {label:'서울 동작구',  lat:37.5124, lng:126.9393},
+    {label:'서울 영등포구', lat:37.5264, lng:126.8962},
+    {label:'서울 강남구',  lat:37.5172, lng:127.0473},
+    {label:'서울 서초구',  lat:37.4837, lng:127.0324},
+    {label:'서울 마포구',  lat:37.5663, lng:126.9019},
+    {label:'서울 종로구',  lat:37.5735, lng:126.9788},
+    {label:'서울 중구',    lat:37.5641, lng:126.9979},
+    {label:'성남 분당',    lat:37.3852, lng:127.1227},
+    {label:'성남 판교',    lat:37.3953, lng:127.1112},
+    {label:'고양 일산',    lat:37.6585, lng:126.7700},
+    {label:'부산',         lat:35.1796, lng:129.0756},
+    {label:'대구',         lat:35.8714, lng:128.6014},
+    {label:'인천',         lat:37.4563, lng:126.7052},
+    {label:'광주',         lat:35.1595, lng:126.8526},
+    {label:'대전',         lat:36.3504, lng:127.3845},
+    {label:'세종',         lat:36.4801, lng:127.2890},
+    {label:'울산',         lat:35.5384, lng:129.3114},
   ];
 
   // 로그인 전 본문 숨김
@@ -702,18 +728,17 @@ try {
     document.getElementById('grv-logout-btn').addEventListener('click', window.grvLogout);
 
     // 첫 날씨 조회
-    fetchWeather(localStorage.getItem(WEATHER_KEY) || REGIONS[0].q);
+    fetchWeather(localStorage.getItem(WEATHER_KEY) || REGIONS[0].label);
   }
 
   function buildWidgetBarHTML(user){
-    var savedRegion = localStorage.getItem(WEATHER_KEY) || REGIONS[0].q;
+    var savedRegion = localStorage.getItem(WEATHER_KEY) || REGIONS[0].label;
     var opts = REGIONS.map(function(r){
-      return '<option value="'+r.q+'"'+(r.q===savedRegion?' selected':'')+'>'+r.label+'</option>';
+      return '<option value="'+r.label+'"'+(r.label===savedRegion?' selected':'')+'>'+r.label+'</option>';
     }).join('');
 
     var name     = (user.name||'').replace(/</g,'&lt;');
     var dept     = (user.dept||'').replace(/</g,'&lt;');
-    var initials = (user.name||'U').replace(/\\s/g,'').slice(0,2)||'U';
 
     var isDark   = document.documentElement.getAttribute('data-theme')==='dark';
     var sunSvg   = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>';
@@ -724,78 +749,107 @@ try {
     var chevSvg  = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>';
     var outSvg   = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>';
 
+    // Editorial Mono Bar: 각 모듈 = 상단 트래킹 라벨(한글) + 하단 값(아이콘/숫자/이름)
     return [
-      // 날씨 칩
-      '<div class="grv-w grv-weather" id="grv-weather">',
-      '<span class="grv-w-icon" id="grv-weather-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span>',
-      '<span class="grv-w-temp" id="grv-weather-temp">--°C</span>',
-      '<select id="grv-weather-region" title="지역 선택">'+opts+'</select>',
+      // 날씨 모듈
+      '<div class="grv-mod grv-weather" id="grv-weather">',
+        '<span class="grv-mod-label">날씨</span>',
+        '<span class="grv-mod-body">',
+          '<span class="grv-w-icon" id="grv-weather-icon"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span>',
+          '<span class="grv-w-temp" id="grv-weather-temp">--°C</span>',
+          '<select id="grv-weather-region" title="지역 선택">'+opts+'</select>',
+        '</span>',
       '</div>',
-      '<div class="grv-sep"></div>',
       // 공지 토글
-      '<button type="button" class="grv-icon-btn" id="grv-notice-toggle" title="공지사항 보기/숨기기" aria-label="공지사항">'+infoSvg+'</button>',
-      // 테마
-      '<button type="button" class="grv-icon-btn" id="grv-theme-toggle" title="라이트/다크 전환" aria-label="테마 전환"><span id="grv-theme-icon">'+(isDark?moonSvg:sunSvg)+'</span></button>',
-      // 모바일 뷰
-      '<button type="button" class="grv-icon-btn" id="grv-mob-toggle" title="모바일/PC 화면 전환" aria-label="화면 모드 전환" onclick="toggleMobileView()">',
-      '<span class="grv-mob-pc">'+monSvg+'</span><span class="grv-mob-mob">'+phSvg+'</span>',
+      '<button type="button" class="grv-mod grv-mod-btn" id="grv-notice-toggle" title="공지사항 보기/숨기기" aria-label="공지사항">',
+        '<span class="grv-mod-label">공지</span>',
+        '<span class="grv-mod-body">'+infoSvg+'</span>',
       '</button>',
-      // 프로필 드롭다운
+      // 테마 토글
+      '<button type="button" class="grv-mod grv-mod-btn" id="grv-theme-toggle" title="라이트/다크 전환" aria-label="테마 전환">',
+        '<span class="grv-mod-label">테마</span>',
+        '<span class="grv-mod-body" id="grv-theme-icon">'+(isDark?moonSvg:sunSvg)+'</span>',
+      '</button>',
+      // 모바일/PC 뷰 토글
+      '<button type="button" class="grv-mod grv-mod-btn" id="grv-mob-toggle" title="모바일/PC 화면 전환" aria-label="화면 모드 전환" onclick="toggleMobileView()">',
+        '<span class="grv-mod-label">모드</span>',
+        '<span class="grv-mod-body"><span class="grv-mob-pc">'+monSvg+'</span><span class="grv-mob-mob">'+phSvg+'</span></span>',
+      '</button>',
+      // 프로필 + 드롭다운 (아바타 제거 — 이름만 표시)
       '<div class="grv-profile-wrap" id="grv-profile-wrap">',
-      '<button type="button" class="grv-profile-btn" id="grv-profile-btn" aria-label="프로필 메뉴">',
-      '<div class="grv-avatar">'+initials+'</div>',
-      '<span class="grv-profile-name">'+name+'</span>',
-      '<span class="grv-profile-chevron">'+chevSvg+'</span>',
-      '</button>',
-      '<div class="grv-dropdown" id="grv-profile-dropdown">',
-      '<div class="grv-dd-header">',
-      '<div class="grv-dd-name">'+name+'</div>',
-      (dept?'<div class="grv-dd-dept">'+dept+'</div>':''),
-      '</div>',
-      '<button type="button" class="grv-dd-item danger" id="grv-logout-btn">'+outSvg+' 로그아웃</button>',
-      '</div>',
+        '<button type="button" class="grv-profile-btn" id="grv-profile-btn" aria-label="프로필 메뉴">',
+          '<span class="grv-mod-label">사용자</span>',
+          '<span class="grv-mod-body">',
+            '<span class="grv-profile-name">'+name+'</span>',
+            '<span class="grv-profile-chevron">'+chevSvg+'</span>',
+          '</span>',
+        '</button>',
+        '<div class="grv-dropdown" id="grv-profile-dropdown">',
+          '<div class="grv-dd-header">',
+            '<div class="grv-dd-label">로그인 정보</div>',
+            '<div class="grv-dd-name">'+name+'</div>',
+            (dept?'<div class="grv-dd-dept">'+dept+'</div>':''),
+          '</div>',
+          '<button type="button" class="grv-dd-item danger" id="grv-logout-btn">'+outSvg+' 로그아웃</button>',
+        '</div>',
       '</div>',
     ].join('');
   }
 
-  // ── 날씨 ──
-  // wttr.in: 무료, 인증 불필요. format=j1 = JSON 전체.
-  // 한글 description 위해 lang=ko
-  function fetchWeather(region){
+  // ── 날씨 (Open-Meteo) ──
+  // 무료, no-auth, CORS-friendly. 파라미터: latitude/longitude + current_weather=true.
+  // 응답: { current_weather: { temperature, weathercode, ... } } — WMO 기상코드 사용.
+  function fetchWeather(regionLabel){
     var iconEl = document.getElementById('grv-weather-icon');
     var tempEl = document.getElementById('grv-weather-temp');
-    var descEl = document.getElementById('grv-weather-desc');
-    if (!iconEl) return;
+    if (!iconEl || !tempEl) return;
+    var region = REGIONS.filter(function(r){return r.label===regionLabel})[0] || REGIONS[0];
     iconEl.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>';
-    if (descEl) descEl.textContent = '로딩';
-    var url = 'https://wttr.in/' + encodeURIComponent(region) + '?format=j1&lang=ko';
+    var url = 'https://api.open-meteo.com/v1/forecast?latitude='+region.lat+'&longitude='+region.lng+'&current_weather=true&timezone=Asia%2FSeoul';
     fetch(url).then(function(r){ return r.json(); }).then(function(d){
-      var c = (d.current_condition && d.current_condition[0]) || {};
-      var temp = c.temp_C || '--';
-      var descKR = '';
-      if (c.lang_ko && c.lang_ko[0]) descKR = c.lang_ko[0].value;
-      else if (c.weatherDesc && c.weatherDesc[0]) descKR = c.weatherDesc[0].value;
-      var code = parseInt(c.weatherCode || '0', 10);
-      iconEl.innerHTML = weatherIcon(code, c.weatherDesc && c.weatherDesc[0] && c.weatherDesc[0].value);
+      var cw = d && d.current_weather;
+      if (!cw || cw.temperature === undefined) throw new Error('no current_weather');
+      var temp = Math.round(cw.temperature);
+      var code = parseInt(cw.weathercode || 0, 10);
+      iconEl.innerHTML = weatherIcon(code);
+      iconEl.title = weatherDescKR(code);
       tempEl.textContent = temp + '°C';
-      if (descEl) descEl.textContent = descKR || '-';
     }).catch(function(e){
       iconEl.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>';
-      tempEl.textContent = '--';
-      if (descEl) descEl.textContent = '조회 실패';
-      console.warn('[weather] fetch 실패', e);
+      tempEl.textContent = '--°C';
+      console.warn('[weather] Open-Meteo fetch 실패', e);
     });
   }
-  function weatherIcon(code, descEN){
-    descEN = (descEN || '').toLowerCase();
-    if (descEN.indexOf('thunder') >= 0) return '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 16.9A5 5 0 0 0 18 7h-1.26a8 8 0 1 0-11.62 9"/><polyline points="13 11 9 17 15 17 11 23"/></svg>';
-    if (descEN.indexOf('snow') >= 0)    return '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 17.58A5 5 0 0 0 18 8h-1.26A8 8 0 1 0 4 16.25"/><line x1="8" y1="16" x2="8.01" y2="16"/><line x1="8" y1="20" x2="8.01" y2="20"/><line x1="12" y1="18" x2="12.01" y2="18"/><line x1="12" y1="22" x2="12.01" y2="22"/><line x1="16" y1="16" x2="16.01" y2="16"/><line x1="16" y1="20" x2="16.01" y2="20"/></svg>';
-    if (descEN.indexOf('rain') >= 0 || descEN.indexOf('drizzle') >= 0) return '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="16" y1="13" x2="16" y2="21"/><line x1="8" y1="13" x2="8" y2="21"/><line x1="12" y1="15" x2="12" y2="23"/><path d="M20 16.58A5 5 0 0 0 18 7h-1.26A8 8 0 1 0 4 15.25"/></svg>';
-    if (descEN.indexOf('fog') >= 0 || descEN.indexOf('mist') >= 0)    return '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.59 4.59A2 2 0 1 1 11 8H2m10.59 11.41A2 2 0 1 0 14 16H2m15.73-8.27A2.5 2.5 0 1 1 19.5 12H2"/></svg>';
-    if (descEN.indexOf('overcast') >= 0)return '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/></svg>';
-    if (descEN.indexOf('cloud') >= 0)   return '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/><circle cx="6" cy="6" r="3"/><line x1="6" y1="1" x2="6" y2="2"/><line x1="6" y1="11" x2="6" y2="10"/><line x1="1" y1="6" x2="2" y2="6"/><line x1="11" y1="6" x2="10" y2="6"/></svg>';
-    if (descEN.indexOf('clear') >= 0 || descEN.indexOf('sunny') >= 0) return '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>';
-    return '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z"/></svg>';
+  // WMO 기상코드 → SVG 아이콘 매핑
+  // (참고: https://open-meteo.com/en/docs#weathervariables)
+  function weatherIcon(code){
+    var sun     = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>';
+    var cloud   = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/></svg>';
+    var fog     = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.59 4.59A2 2 0 1 1 11 8H2m10.59 11.41A2 2 0 1 0 14 16H2m15.73-8.27A2.5 2.5 0 1 1 19.5 12H2"/></svg>';
+    var rain    = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="16" y1="13" x2="16" y2="21"/><line x1="8" y1="13" x2="8" y2="21"/><line x1="12" y1="15" x2="12" y2="23"/><path d="M20 16.58A5 5 0 0 0 18 7h-1.26A8 8 0 1 0 4 15.25"/></svg>';
+    var snow    = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 17.58A5 5 0 0 0 18 8h-1.26A8 8 0 1 0 4 16.25"/><line x1="8" y1="16" x2="8.01" y2="16"/><line x1="8" y1="20" x2="8.01" y2="20"/><line x1="12" y1="18" x2="12.01" y2="18"/><line x1="12" y1="22" x2="12.01" y2="22"/><line x1="16" y1="16" x2="16.01" y2="16"/><line x1="16" y1="20" x2="16.01" y2="20"/></svg>';
+    var thunder = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 16.9A5 5 0 0 0 18 7h-1.26a8 8 0 1 0-11.62 9"/><polyline points="13 11 9 17 15 17 11 23"/></svg>';
+    if (code === 0) return sun;
+    if (code <= 3) return cloud;
+    if (code === 45 || code === 48) return fog;
+    if ((code >= 51 && code <= 67) || (code >= 80 && code <= 82)) return rain;
+    if ((code >= 71 && code <= 77) || code === 85 || code === 86) return snow;
+    if (code >= 95) return thunder;
+    return cloud;
+  }
+  function weatherDescKR(code){
+    if (code === 0) return '맑음';
+    if (code === 1) return '대체로 맑음';
+    if (code === 2) return '구름 조금';
+    if (code === 3) return '흐림';
+    if (code === 45 || code === 48) return '안개';
+    if (code >= 51 && code <= 57) return '이슬비';
+    if (code >= 61 && code <= 67) return '비';
+    if (code >= 71 && code <= 77) return '눈';
+    if (code >= 80 && code <= 82) return '소나기';
+    if (code === 85 || code === 86) return '눈 소나기';
+    if (code >= 95) return '천둥번개';
+    return '-';
   }
   function wireWeatherWidget(){
     var sel = document.getElementById('grv-weather-region');
