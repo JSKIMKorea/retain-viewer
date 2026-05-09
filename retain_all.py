@@ -361,7 +361,7 @@ body.grv-locked{overflow:hidden;position:fixed;width:100%;height:100%}
 .grv-weather{cursor:default}
 .grv-w-icon{line-height:1;display:flex;align-items:center;color:#64748b}
 .grv-w-temp{color:#1e293b;font-weight:700}
-.grv-weather select{border:none;background:transparent;color:#475569;cursor:pointer;outline:none;padding:0;margin-left:1px;max-width:72px}
+.grv-weather select{border:none;background:transparent;color:#475569;cursor:pointer;outline:none;padding:0 18px 0 1px;margin-left:1px;max-width:100px}
 .grv-weather select:hover{color:#3b82f6}
 /* 구분선 */
 .grv-sep{width:1px;height:20px;background:#e2e8f0;margin:0 2px;flex-shrink:0}
@@ -471,7 +471,7 @@ html[data-theme="dark"] #newsContent tr{border-color:#334155 !important}
 /* ── 모바일 뷰: 위젯 바 축소 ── */
 body.mobile-view #grv-widget-bar{flex-wrap:wrap;gap:4px}
 body.mobile-view .grv-w{height:28px;padding:0 8px;gap:4px}
-body.mobile-view .grv-weather select{max-width:55px}
+body.mobile-view .grv-weather select{max-width:80px;padding-right:16px}
 body.mobile-view .grv-icon-btn{width:28px;height:28px}
 body.mobile-view .grv-profile-btn{height:28px;padding:3px 7px 3px 3px;gap:5px}
 body.mobile-view .grv-avatar{width:20px;height:20px}
