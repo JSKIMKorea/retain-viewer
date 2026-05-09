@@ -304,9 +304,9 @@ def _read_bcrypt_inline():
 LOGIN_INJECT_CSS = """
 <style id="grv-login-style">
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&display=swap');
-#grv-login-wrap{position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#FFF5ED 0%,#FFFFFF 50%,#FFCDA8 100%);font-family:'Noto Sans KR',sans-serif;padding:30px 20px;overflow-y:auto}
+#grv-login-wrap{position:fixed;inset:0;z-index:99999;display:flex;align-items:flex-start;justify-content:center;background:linear-gradient(135deg,#FFF5ED 0%,#FFFFFF 50%,#FFCDA8 100%);font-family:'Noto Sans KR',sans-serif;padding:30px 20px;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
 #grv-login-wrap *{box-sizing:border-box;font-family:'Noto Sans KR',sans-serif}
-.grv-login-container{max-width:1080px;width:100%}
+.grv-login-container{max-width:1080px;width:100%;margin:auto}
 .grv-login-hero{text-align:center;margin-bottom:36px}
 .grv-login-hero h1{font-size:54px;font-weight:700;color:#1a1a1a;margin-bottom:16px;letter-spacing:-1.5px;line-height:1.15}
 .grv-login-hero h1 .accent{color:#FD5108}
@@ -343,7 +343,7 @@ LOGIN_INJECT_CSS = """
 body.grv-locked #appWrap,
 body.grv-locked .custom-tip,
 body.grv-locked .loading-overlay{display:none !important}
-body.grv-locked{overflow:hidden}
+body.grv-locked{overflow:hidden;position:fixed;width:100%;height:100%}
 
 /* ── 헤더 위젯 바 (날씨·사용자·로그아웃·테마 토글) ──
    알림 박스 위에 별도 행으로 배치. width:100% + max-width:560px 로
@@ -353,32 +353,47 @@ body.grv-locked{overflow:hidden}
      마지막 위젯(토글) 우측 = "Smart Office System" 끝선
    어느 모니터에서나 비율·정렬 동일하게 유지됨.
    4개 위젯 모두 height:32px / font-size:12px / Noto Sans KR 통일. */
-#grv-widget-bar{display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;max-width:560px;padding:0 16px;box-sizing:border-box;margin-bottom:10px;flex-wrap:wrap;font-family:'Noto Sans KR','맑은 고딕','Malgun Gothic',sans-serif;font-size:12px}
-#grv-widget-bar *,
-#grv-widget-bar *::before,
-#grv-widget-bar *::after,
-#grv-widget-bar select,
-#grv-widget-bar button,
-#grv-widget-bar input{font-family:'Noto Sans KR','맑은 고딕','Malgun Gothic',sans-serif !important;font-size:12px}
-/* 4개 모두 동일 높이 32px. box-sizing 으로 border 포함 정확 매칭 */
-.grv-w,.grv-theme{height:32px;box-sizing:border-box}
-.grv-w{display:inline-flex;align-items:center;gap:6px;padding:0 10px;border:1px solid #e2e8f0;border-radius:8px;background:#fff;color:#475569;white-space:nowrap;line-height:1.2}
+/* ── 위젯 바 ── */
+#grv-widget-bar{display:flex;align-items:center;gap:4px;font-family:'Noto Sans KR','맑은 고딕','Malgun Gothic',sans-serif;font-size:12px;flex-shrink:0;box-sizing:border-box}
+#grv-widget-bar *{font-family:'Noto Sans KR','맑은 고딕','Malgun Gothic',sans-serif!important;font-size:12px!important;box-sizing:border-box}
+/* 날씨 칩 */
+.grv-w{display:inline-flex;align-items:center;gap:5px;padding:0 10px;height:32px;border:1px solid #e2e8f0;border-radius:8px;background:#fff;color:#475569;white-space:nowrap;line-height:1;flex-shrink:0}
 .grv-weather{cursor:default}
-.grv-weather .grv-w-icon{line-height:1;display:flex;align-items:center}
-.grv-weather .grv-w-temp{color:#1e293b;font-weight:700}
-.grv-weather .grv-w-desc{color:#64748b}
-.grv-weather select{margin-left:2px;border:none;background:transparent;color:#475569;cursor:pointer;outline:none;padding:0}
+.grv-w-icon{line-height:1;display:flex;align-items:center;color:#64748b}
+.grv-w-temp{color:#1e293b;font-weight:700}
+.grv-weather select{border:none;background:transparent;color:#475569;cursor:pointer;outline:none;padding:0;margin-left:1px;max-width:72px}
 .grv-weather select:hover{color:#3b82f6}
-.grv-user .grv-w-name{color:#1e293b;font-weight:700}
-.grv-user .grv-w-dept{color:#94a3b8}
-.grv-logout{cursor:pointer;border-color:#FFCDA8;background:#FFF5ED;color:#C44608;font-weight:600}
-.grv-logout:hover{background:#FFE8D4;border-color:#FFAA72}
-.grv-logout svg{vertical-align:-2px}
-.grv-theme{cursor:pointer;padding:0 8px;border:1px solid #e2e8f0;border-radius:24px;background:#fff;display:inline-flex;align-items:center;gap:6px}
-.grv-theme:hover{background:#f1f5f9}
-.grv-theme .grv-theme-icon{line-height:1;color:#f59e0b;display:flex;align-items:center}
-.grv-theme .grv-theme-track{position:relative;width:36px;height:18px;border-radius:9px;background:#cbd5e1;transition:background .2s}
-.grv-theme .grv-theme-knob{position:absolute;top:2px;left:2px;width:14px;height:14px;border-radius:50%;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.2);transition:left .25s,background .25s}
+/* 구분선 */
+.grv-sep{width:1px;height:20px;background:#e2e8f0;margin:0 2px;flex-shrink:0}
+/* 아이콘 버튼 */
+.grv-icon-btn{width:32px;height:32px;border:1px solid #e2e8f0;border-radius:8px;background:#fff;color:#64748b;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;transition:all .15s;flex-shrink:0;padding:0;line-height:1}
+.grv-icon-btn:hover{border-color:#93c5fd;color:#3b82f6;background:#f0f7ff}
+.grv-icon-btn.active{background:#eff6ff;border-color:#93c5fd;color:#3b82f6}
+/* 모바일 뷰 아이콘 전환 */
+.grv-mob-pc{display:inline-flex;align-items:center}
+.grv-mob-mob{display:none;align-items:center}
+body.mobile-view .grv-mob-pc{display:none}
+body.mobile-view .grv-mob-mob{display:inline-flex}
+body.mobile-view #grv-mob-toggle{background:#3b82f6!important;color:#fff!important;border-color:#3b82f6!important}
+body.mobile-view #grv-mob-toggle:hover{background:#2563eb!important}
+/* 프로필 버튼 */
+.grv-profile-wrap{position:relative;flex-shrink:0}
+.grv-profile-btn{display:inline-flex;align-items:center;gap:6px;padding:4px 8px 4px 4px;height:32px;border:1px solid #e2e8f0;border-radius:8px;background:#fff;cursor:pointer;transition:all .15s;font-family:'Noto Sans KR','맑은 고딕','Malgun Gothic',sans-serif;font-size:12px;color:#1e293b;white-space:nowrap}
+.grv-profile-btn:hover,.grv-profile-btn.open{border-color:#93c5fd;background:#f0f7ff}
+.grv-avatar{width:22px;height:22px;border-radius:50%;background:linear-gradient(135deg,#3b82f6,#7c3aed);color:#fff;font-size:10px!important;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;line-height:1}
+.grv-profile-name{font-weight:600;color:#1e293b}
+.grv-profile-chevron{color:#94a3b8;display:flex;align-items:center;transition:transform .2s;margin-left:1px}
+.grv-profile-btn.open .grv-profile-chevron{transform:rotate(180deg)}
+/* 드롭다운 */
+.grv-dropdown{position:absolute;top:calc(100% + 6px);right:0;min-width:176px;background:#fff;border:1px solid #e2e8f0;border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.12);z-index:9998;display:none;overflow:hidden}
+.grv-dropdown.open{display:block}
+.grv-dd-header{padding:10px 14px 8px;border-bottom:1px solid #f1f5f9}
+.grv-dd-name{font-size:13px!important;font-weight:700;color:#1e293b}
+.grv-dd-dept{font-size:11px!important;color:#94a3b8;margin-top:1px}
+.grv-dd-item{display:flex;align-items:center;gap:8px;padding:8px 14px;font-size:12px!important;color:#475569;cursor:pointer;transition:background .1s;border:none;background:none;width:100%;text-align:left;font-family:'Noto Sans KR','맑은 고딕','Malgun Gothic',sans-serif}
+.grv-dd-item:hover{background:#f8fafc}
+.grv-dd-item.danger{color:#C44608}
+.grv-dd-item.danger:hover{background:#FFF5ED}
 
 /* ── 다크 모드 ── */
 html[data-theme="dark"]{color-scheme:dark}
@@ -405,15 +420,25 @@ html[data-theme="dark"] .gantt-cell.today-col{background:#dbeafe !important}
 html[data-theme="dark"] .empty-state{color:#64748b}
 html[data-theme="dark"] .project-block-name{color:#1e293b !important}
 html[data-theme="dark"] .grv-w{background:#1e293b;border-color:#334155;color:#cbd5e1}
-html[data-theme="dark"] .grv-weather .grv-w-temp,html[data-theme="dark"] .grv-user .grv-w-name{color:#e2e8f0}
+html[data-theme="dark"] .grv-w-temp{color:#e2e8f0}
 html[data-theme="dark"] .grv-weather select{color:#cbd5e1}
-html[data-theme="dark"] .grv-theme{background:#1e293b;border-color:#334155}
-html[data-theme="dark"] .grv-theme:hover{background:#273449}
-html[data-theme="dark"] .grv-theme .grv-theme-track{background:#FD5108}
-html[data-theme="dark"] .grv-theme .grv-theme-knob{left:20px;background:#0f172a;color:#fcd34d}
-html[data-theme="dark"] .grv-theme .grv-theme-icon{color:#fcd34d}
-html[data-theme="dark"] .grv-logout{background:#3A2412;border-color:#7c2d12;color:#fed7aa}
-html[data-theme="dark"] .grv-logout:hover{background:#4a2e15}
+html[data-theme="dark"] .grv-sep{background:#334155}
+html[data-theme="dark"] .grv-icon-btn{background:#1e293b;border-color:#334155;color:#94a3b8}
+html[data-theme="dark"] .grv-icon-btn:hover{background:#273449;border-color:#475569;color:#e2e8f0}
+html[data-theme="dark"] .grv-icon-btn.active{background:#1e3a8a;border-color:#1d4ed8;color:#93c5fd}
+html[data-theme="dark"] body.mobile-view #grv-mob-toggle{background:#1d4ed8!important;border-color:#1d4ed8!important}
+html[data-theme="dark"] .grv-profile-btn{background:#1e293b;border-color:#334155;color:#e2e8f0}
+html[data-theme="dark"] .grv-profile-btn:hover,html[data-theme="dark"] .grv-profile-btn.open{background:#273449;border-color:#475569}
+html[data-theme="dark"] .grv-profile-name{color:#e2e8f0}
+html[data-theme="dark"] .grv-profile-chevron{color:#64748b}
+html[data-theme="dark"] .grv-dropdown{background:#1e293b;border-color:#334155;box-shadow:0 8px 24px rgba(0,0,0,.3)}
+html[data-theme="dark"] .grv-dd-header{border-bottom-color:#334155}
+html[data-theme="dark"] .grv-dd-name{color:#e2e8f0}
+html[data-theme="dark"] .grv-dd-dept{color:#64748b}
+html[data-theme="dark"] .grv-dd-item{color:#94a3b8;background:none}
+html[data-theme="dark"] .grv-dd-item:hover{background:#273449}
+html[data-theme="dark"] .grv-dd-item.danger{color:#fb923c}
+html[data-theme="dark"] .grv-dd-item.danger:hover{background:#3a1e0e}
 html[data-theme="dark"] .frd-date{color:#93c5fd !important;background:none !important;text-decoration:underline;text-decoration-color:rgba(99,102,241,0.7);text-underline-offset:3px;text-decoration-thickness:2px;line-height:1.5}
 html[data-theme="dark"] .frd-label{color:#94a3b8 !important}
 html[data-theme="dark"] #ganttGuide,html[data-theme="dark"] #detailGuide,html[data-theme="dark"] #projGuide{color:#94a3b8 !important}
@@ -443,6 +468,15 @@ html[data-theme="dark"] #newsContent [style*="color:#64748b"]{color:#94a3b8 !imp
 html[data-theme="dark"] #newsContent [style*="color:#475569"]{color:#cbd5e1 !important}
 html[data-theme="dark"] #newsContent div[style*="border-bottom"]{border-color:#334155 !important}
 html[data-theme="dark"] #newsContent tr{border-color:#334155 !important}
+/* ── 모바일 뷰: 위젯 바 축소 ── */
+body.mobile-view #grv-widget-bar{flex-wrap:wrap;gap:4px}
+body.mobile-view .grv-w{height:28px;padding:0 8px;gap:4px}
+body.mobile-view .grv-weather select{max-width:55px}
+body.mobile-view .grv-icon-btn{width:28px;height:28px}
+body.mobile-view .grv-profile-btn{height:28px;padding:3px 7px 3px 3px;gap:5px}
+body.mobile-view .grv-avatar{width:20px;height:20px}
+body.mobile-view #headerNotice{font-size:12px!important;padding:8px 12px!important}
+body.mobile-view #headerNotice>div{font-size:12px!important;line-height:1.5}
 </style>
 """
 
@@ -574,7 +608,10 @@ try {
             sha = null;
           }
           var newRow = ts + ',' + u.email + ',' + u.name + ',' + u.dept + ',' + (u.sabun||'') + '\\n';
-          var updated = existing + newRow;
+          var csvLines = existing.split('\\n');
+          var csvHeader = csvLines[0] + '\\n';
+          var csvData = csvLines.slice(1).filter(function(l){ return l.trim() !== ''; });
+          var updated = csvHeader + newRow + (csvData.length ? csvData.join('\\n') + '\\n' : '');
           var encoded = btoa(unescape(encodeURIComponent(updated)));
           var body = {message: '로그인: ' + u.name + ' ' + ts, content: encoded};
           if (sha) body.sha = sha;
@@ -629,6 +666,39 @@ try {
     // 이벤트 와이어
     wireWeatherWidget();
     wireThemeToggle();
+
+    // 프로필 드롭다운
+    var profBtn = document.getElementById('grv-profile-btn');
+    var profDD  = document.getElementById('grv-profile-dropdown');
+    if (profBtn && profDD) {
+      profBtn.addEventListener('click', function(e){
+        e.stopPropagation();
+        var open = profDD.classList.toggle('open');
+        profBtn.classList.toggle('open', open);
+      });
+      document.addEventListener('click', function(){
+        profDD.classList.remove('open');
+        profBtn.classList.remove('open');
+      });
+    }
+
+    // 공지 토글
+    var noticeToggle = document.getElementById('grv-notice-toggle');
+    if (noticeToggle && notice) {
+      var updateNoticeBtn = function(){
+        var shown = notice.style.display !== 'none' && notice.style.display !== '';
+        noticeToggle.classList.toggle('active', shown);
+      };
+      noticeToggle.addEventListener('click', function(){
+        var shown = notice.style.display !== 'none' && notice.style.display !== '';
+        notice.style.display = shown ? 'none' : 'block';
+        updateNoticeBtn();
+        if (window.updateStickyOffsets) updateStickyOffsets();
+      });
+      updateNoticeBtn();
+    }
+
+    // 로그아웃
     document.getElementById('grv-logout-btn').addEventListener('click', window.grvLogout);
 
     // 첫 날씨 조회
@@ -638,38 +708,53 @@ try {
   function buildWidgetBarHTML(user){
     var savedRegion = localStorage.getItem(WEATHER_KEY) || REGIONS[0].q;
     var opts = REGIONS.map(function(r){
-      return '<option value="' + r.q + '"' + (r.q===savedRegion?' selected':'') + '>' + r.label + '</option>';
+      return '<option value="'+r.q+'"'+(r.q===savedRegion?' selected':'')+'>'+r.label+'</option>';
     }).join('');
 
-    var dept = user.dept ? '<span class="grv-w-dept">(' + user.dept + ')</span>' : '';
-    var name = (user.name || '').replace(/</g,'&lt;');
+    var name     = (user.name||'').replace(/</g,'&lt;');
+    var dept     = (user.dept||'').replace(/</g,'&lt;');
+    var initials = (user.name||'U').replace(/\\s/g,'').slice(0,2)||'U';
 
-    var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-    var themeIcon = isDark ? '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>' : '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>';
+    var isDark   = document.documentElement.getAttribute('data-theme')==='dark';
+    var sunSvg   = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>';
+    var moonSvg  = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>';
+    var monSvg   = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>';
+    var phSvg    = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>';
+    var infoSvg  = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>';
+    var chevSvg  = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>';
+    var outSvg   = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>';
 
     return [
-      // 날씨
+      // 날씨 칩
       '<div class="grv-w grv-weather" id="grv-weather">',
-      '  <span class="grv-w-icon" id="grv-weather-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span>',
-      '  <span class="grv-w-temp"  id="grv-weather-temp">--°C</span>',
-      '  <span class="grv-w-desc"  id="grv-weather-desc">로딩</span>',
-      '  <select id="grv-weather-region" title="지역 선택">' + opts + '</select>',
+      '<span class="grv-w-icon" id="grv-weather-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span>',
+      '<span class="grv-w-temp" id="grv-weather-temp">--°C</span>',
+      '<select id="grv-weather-region" title="지역 선택">'+opts+'</select>',
       '</div>',
-      // 사용자
-      '<div class="grv-w grv-user">',
-      '  <span class="grv-w-name">' + name + '</span> ',
-      '  ' + dept,
+      '<div class="grv-sep"></div>',
+      // 공지 토글
+      '<button type="button" class="grv-icon-btn" id="grv-notice-toggle" title="공지사항 보기/숨기기" aria-label="공지사항">'+infoSvg+'</button>',
+      // 테마
+      '<button type="button" class="grv-icon-btn" id="grv-theme-toggle" title="라이트/다크 전환" aria-label="테마 전환"><span id="grv-theme-icon">'+(isDark?moonSvg:sunSvg)+'</span></button>',
+      // 모바일 뷰
+      '<button type="button" class="grv-icon-btn" id="grv-mob-toggle" title="모바일/PC 화면 전환" aria-label="화면 모드 전환" onclick="toggleMobileView()">',
+      '<span class="grv-mob-pc">'+monSvg+'</span><span class="grv-mob-mob">'+phSvg+'</span>',
+      '</button>',
+      // 프로필 드롭다운
+      '<div class="grv-profile-wrap" id="grv-profile-wrap">',
+      '<button type="button" class="grv-profile-btn" id="grv-profile-btn" aria-label="프로필 메뉴">',
+      '<div class="grv-avatar">'+initials+'</div>',
+      '<span class="grv-profile-name">'+name+'</span>',
+      '<span class="grv-profile-chevron">'+chevSvg+'</span>',
+      '</button>',
+      '<div class="grv-dropdown" id="grv-profile-dropdown">',
+      '<div class="grv-dd-header">',
+      '<div class="grv-dd-name">'+name+'</div>',
+      (dept?'<div class="grv-dd-dept">'+dept+'</div>':''),
       '</div>',
-      // 로그아웃
-      '<button type="button" class="grv-w grv-logout" id="grv-logout-btn" title="로그아웃">',
-      '  로그아웃 ',
-      '  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>',
-      '</button>',
-      // 테마 토글
-      '<button type="button" class="grv-theme" id="grv-theme-toggle" title="라이트·다크 전환" aria-label="테마 전환">',
-      '  <span class="grv-theme-icon" id="grv-theme-icon">' + themeIcon + '</span>',
-      '  <span class="grv-theme-track"><span class="grv-theme-knob"></span></span>',
-      '</button>',
+      '<button type="button" class="grv-dd-item danger" id="grv-logout-btn">'+outSvg+' 로그아웃</button>',
+      '</div>',
+      '</div>',
     ].join('');
   }
 
@@ -726,12 +811,14 @@ try {
     var btn = document.getElementById('grv-theme-toggle');
     var ico = document.getElementById('grv-theme-icon');
     if (!btn) return;
+    var sunSvg  = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>';
+    var moonSvg = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>';
     btn.addEventListener('click', function(){
-      var cur = document.documentElement.getAttribute('data-theme') || 'light';
+      var cur  = document.documentElement.getAttribute('data-theme') || 'light';
       var next = cur === 'dark' ? 'light' : 'dark';
       document.documentElement.setAttribute('data-theme', next);
       localStorage.setItem(THEME_KEY, next);
-      if (ico) ico.innerHTML = next === 'dark' ? '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>' : '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>';
+      if (ico) ico.innerHTML = next === 'dark' ? moonSvg : sunSvg;
     });
   }
 
@@ -1048,7 +1135,20 @@ def build_html(df25, du="", dart=None, news=None, users=None):
 # ============================================================
 # GitHub
 # ============================================================
+def _gh_req(method, url, headers, timeout=60, retries=3, verify=False, **kwargs):
+    """502/503/504 transient 에러 자동 재시도 래퍼 (blob 제외 범용)"""
+    import time
+    for attempt in range(1, retries + 1):
+        r = getattr(req_lib, method)(url, headers=headers, timeout=timeout, verify=verify, **kwargs)
+        if r.status_code not in (502, 503, 504) or attempt == retries:
+            return r
+        wait = 10 * attempt
+        print(f"  [{method.upper()}] {r.status_code} — {wait}초 후 재시도 ({attempt}/{retries})...")
+        time.sleep(wait)
+    return r
+
 def push_gh(ip):
+    import time
     if not GITHUB_TOKEN:
         print(f"\n⚠ GitHub 토큰 미설정 (.env 확인) → {ip}"); return False
     print("\nGitHub 업로드...")
@@ -1057,45 +1157,51 @@ def push_gh(ip):
 
     with open(ip, "rb") as f: b64 = base64.b64encode(f.read()).decode()
 
-    # 1) blob 생성 — 502/503 transient 에러 시 최대 3회 재시도
+    # 1) blob 생성 — 대용량(~30MB) 업로드, 최대 5회 지수 백오프 재시도
     blob_sha = None
-    for attempt in range(1, 4):
-        r = req_lib.post(f"{base}/git/blobs", headers=h, json={"content": b64, "encoding": "base64"}, timeout=300, verify=False)
+    for attempt in range(1, 6):
+        r = req_lib.post(f"{base}/git/blobs", headers=h,
+                         json={"content": b64, "encoding": "base64"},
+                         timeout=360, verify=False)
         if r.status_code == 201:
             blob_sha = r.json()["sha"]
             break
-        print(f"  blob 시도 {attempt}/3 실패: {r.status_code} {r.text[:200]}")
-        if r.status_code not in (502, 503, 504) or attempt == 3:
-            print(f"❌ blob 최종 실패"); return False
-        import time; time.sleep(10 * attempt)
+        print(f"  blob 시도 {attempt}/5 실패: {r.status_code} {r.text[:200]}")
+        if r.status_code not in (502, 503, 504) or attempt == 5:
+            print("❌ blob 최종 실패"); return False
+        wait = min(15 * (2 ** (attempt - 1)), 120)  # 15 → 30 → 60 → 120초
+        print(f"  {wait}초 후 재시도...")
+        time.sleep(wait)
     print(f"  blob SHA: {blob_sha[:12]}...")
 
     # 2) 현재 브랜치 최신 커밋 조회
-    r = req_lib.get(f"{base}/git/refs/heads/main", headers=h, verify=False)
+    r = _gh_req('get', f"{base}/git/refs/heads/main", h, timeout=30)
     if r.status_code != 200: print(f"❌ ref 조회 실패: {r.status_code}"); return False
     latest_commit = r.json()["object"]["sha"]
 
     # 3) 현재 tree SHA 조회
-    r = req_lib.get(f"{base}/git/commits/{latest_commit}", headers=h, verify=False)
+    r = _gh_req('get', f"{base}/git/commits/{latest_commit}", h, timeout=30)
     if r.status_code != 200: print(f"❌ commit 조회 실패: {r.status_code}"); return False
     base_tree = r.json()["tree"]["sha"]
 
     # 4) 새 tree 생성
-    r = req_lib.post(f"{base}/git/trees", headers=h, json={
+    r = _gh_req('post', f"{base}/git/trees", h, timeout=60, json={
         "base_tree": base_tree,
         "tree": [{"path": GITHUB_FILE, "mode": "100644", "type": "blob", "sha": blob_sha}]
-    }, verify=False)
+    })
     if r.status_code != 201: print(f"❌ tree 실패: {r.status_code} {r.text[:200]}"); return False
     new_tree = r.json()["sha"]
 
     # 5) 새 커밋 생성
     msg = f"Update ({datetime.now(timezone(timedelta(hours=9))).strftime('%Y-%m-%d')})"
-    r = req_lib.post(f"{base}/git/commits", headers=h, json={"message": msg, "tree": new_tree, "parents": [latest_commit]}, verify=False)
+    r = _gh_req('post', f"{base}/git/commits", h, timeout=60,
+                json={"message": msg, "tree": new_tree, "parents": [latest_commit]})
     if r.status_code != 201: print(f"❌ commit 실패: {r.status_code} {r.text[:200]}"); return False
     new_commit = r.json()["sha"]
 
     # 6) 브랜치 ref 업데이트
-    r = req_lib.patch(f"{base}/git/refs/heads/main", headers=h, json={"sha": new_commit}, verify=False)
+    r = _gh_req('patch', f"{base}/git/refs/heads/main", h, timeout=30,
+                json={"sha": new_commit})
     if r.status_code in (200, 201): print("✅ GitHub 완료"); return True
     print(f"❌ ref 업데이트 실패: {r.status_code} {r.text[:200]}"); return False
 
