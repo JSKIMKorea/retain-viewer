@@ -176,6 +176,56 @@ body{font-family:'IBM Plex Sans KR',-apple-system,sans-serif;background:#FFF8F4;
 /* 파일 날짜 표시 (다크모드 오버라이드용 클래스) */
 .frd-date{color:#1e293b;background:linear-gradient(transparent 60%,#bfdbfe 60%);font-size:17px;font-weight:700;padding:0 2px}
 .frd-label{color:#475569;font-size:17px;margin-left:6px}
+/* 모바일 뷰 버튼은 위젯 바(retain_all.py)에서 관리 */
+/* ===== 모바일 뷰 레이아웃 오버라이드 ===== */
+/* [Fix1] 가로 오버플로우 차단 */
+body.mobile-view{overflow-x:hidden}
+/* 헤더 */
+body.mobile-view .header{position:relative!important;top:auto!important;padding:10px 16px;flex-wrap:wrap;gap:6px;align-items:flex-start}
+body.mobile-view .header-left{width:100%}
+body.mobile-view .header-title{font-size:16px}
+body.mobile-view .header-right{width:100%;flex-direction:row;flex-wrap:wrap;align-items:center;justify-content:flex-start;gap:6px}
+/* [Fix2] 공지: Copyright 수준 폰트, 각 줄 한 행(가로 스크롤) */
+body.mobile-view #headerNotice{max-width:100%!important;font-size:11px!important;padding:5px 10px!important;line-height:1.5!important}
+body.mobile-view #headerNotice>div{font-size:11px!important;white-space:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:2px}
+/* [Fix3] 탭바: 가로 스크롤만, sticky 제거 */
+body.mobile-view .tab-bar{position:relative!important;top:auto!important;width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+body.mobile-view .tab-bar::-webkit-scrollbar{display:none}
+body.mobile-view .tab-btn{padding:8px 13px;font-size:13px;white-space:nowrap}
+/* [Fix3] Toolbar: 검색창만 viewport 상단 고정 */
+body.mobile-view .toolbar{position:sticky!important;top:0!important;z-index:150;flex-direction:column;align-items:stretch;gap:6px;padding:8px 0 6px}
+body.mobile-view .avail-toolbar{position:sticky!important;top:0!important;z-index:150;flex-direction:column;align-items:stretch;gap:6px}
+body.mobile-view .search-wrap{width:100%}
+body.mobile-view .search-input{width:100%!important}
+body.mobile-view #projSearchInput{width:100%!important}
+body.mobile-view .year-filters{flex-wrap:wrap}
+/* Person section */
+body.mobile-view .person-header{padding:10px 14px;gap:10px}
+body.mobile-view .person-stats{gap:4px}
+body.mobile-view .stat-chip{font-size:9px;padding:2px 5px}
+body.mobile-view .stat-name{max-width:70px}
+/* Available tab: 세로 스택 */
+body.mobile-view #tabAvail>div{flex-direction:column!important;min-height:auto!important}
+body.mobile-view #tabAvail>div>div:first-child{border-right:none!important;border-bottom:2px solid #e2e8f0;padding-right:0!important;padding-bottom:16px;margin-bottom:4px}
+body.mobile-view #tabAvail>div>div:nth-child(2){padding-left:0!important;padding-top:16px}
+/* [Fix3] Available sticky: title만 sticky, 가이드 숨김, 필터는 가로 스크롤 */
+body.mobile-view #availLeftSticky{position:sticky!important;top:0!important;z-index:160}
+body.mobile-view #availRightSticky{position:sticky!important;top:0!important;z-index:160}
+body.mobile-view #availLeftGuide{display:none}
+body.mobile-view #availRightGuide{display:none}
+/* [Fix4] Available 필터 바: 가로 스크롤, 항목 축소 방지 */
+body.mobile-view #avail-filter-bar{overflow-x:auto!important;-webkit-overflow-scrolling:touch;padding-bottom:6px!important}
+body.mobile-view #avail-filter-bar>*{flex-shrink:0!important}
+/* 테이블 가로 스크롤 */
+body.mobile-view .avail-table,body.mobile-view .detail-table{display:block;overflow-x:auto;-webkit-overflow-scrolling:touch}
+/* Compare bar */
+body.mobile-view .compare-bar{padding:10px 16px;flex-direction:column;gap:8px;align-items:flex-start}
+/* Proj summary cards */
+body.mobile-view .proj-summary-card{min-width:90px;padding:10px 12px}
+body.mobile-view .proj-summary-card .value{font-size:15px}
+/* News table 가로 스크롤 */
+body.mobile-view #tabNews table{table-layout:auto!important}
+body.mobile-view #tabNews colgroup{display:none}
 </style>
 </head>
 <body>
@@ -229,7 +279,7 @@ body{font-family:'IBM Plex Sans KR',-apple-system,sans-serif;background:#FFF8F4;
                 <div style="padding:4px 0 6px;font-size:14px;color:#1e293b;padding-left:20px;text-indent:-20px;line-height:1.6"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;flex-shrink:0"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a7 7 0 0 1 7 7c0 2.79-1.63 5.24-4 6.46V17H9v-1.54C6.63 14.24 5 11.79 5 9a7 7 0 0 1 7-7z"/></svg> 기간과 최소 일수를 설정한 뒤 조회하면, 해당 기간 내 어싸인이 없는 인원을 본부·직급별로 확인할 수 있습니다. 종료일을 비워두면 시작일 하루만 조회됩니다.</div>
                 <div style="padding:0 0 4px;font-size:13px;color:#dc2626;font-weight:400;margin-left:24px">(시스템 추출 로직 상 '휴직자'가 포함되어 있을 수 있습니다. 참고용으로 검색하시고, 찾은 인원의 정확한 정보는 TalentLink 상에서 한 번 더 확인 부탁드립니다.)</div>
               </div>
-              <div style="position:static;padding:8px 14px;margin-bottom:6px;background:#fff;border:1px solid #e2e8f0;border-radius:10px;display:flex;align-items:center;gap:6px;flex-wrap:nowrap">
+              <div id="avail-filter-bar" style="position:static;padding:8px 14px;margin-bottom:6px;background:#fff;border:1px solid #e2e8f0;border-radius:10px;display:flex;align-items:center;gap:6px;flex-wrap:nowrap">
                   <label style="font-size:13px;color:#1e293b;font-weight:700">기간</label>
                   <input type="date" class="date-input" id="availDateFrom" style="padding:5px 4px;font-size:11px;width:120px">
                   <span style="color:#94a3b8;font-size:11px">~</span>
@@ -1834,6 +1884,32 @@ function renderNews(){
   });
   area.innerHTML=h;
 }
+/* ===== 모바일 뷰 토글 ===== */
+function updateStickyOffsets(){
+  /* 모바일: CSS가 position 전부 처리. JS 인라인 top 초기화만 */
+  var els=document.querySelectorAll('.tab-bar,.toolbar,.avail-toolbar');
+  els.forEach(function(el){el.style.top='';el.style.position='';});
+  var al=document.getElementById('availLeftSticky');
+  if(al){al.style.top='';al.style.position='';}
+  var ar=document.getElementById('availRightSticky');
+  if(ar){ar.style.top='';ar.style.position='';}
+}
+function toggleMobileView(){
+  var on=document.body.classList.toggle('mobile-view');
+  localStorage.setItem('grv-mobile-view',on?'1':'0');
+  /* [Fix1] html overflow-y 조정 */
+  document.documentElement.style.overflowY=on?'auto':'';
+  updateStickyOffsets();
+}
+(function(){
+  var saved=localStorage.getItem('grv-mobile-view');
+  var autoMob=/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+  if(saved==='1'||(saved===null&&autoMob)){
+    document.body.classList.add('mobile-view');
+    document.documentElement.style.overflowY='auto';
+  }
+  updateStickyOffsets();
+})();
 </script>
 <div id="saveTimestamp" style="position:fixed;bottom:8px;left:12px;font-size:9px;color:#64748b;letter-spacing:-0.3px;z-index:1"></div>
 </body>
