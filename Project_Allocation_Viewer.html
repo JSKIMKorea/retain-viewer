@@ -223,6 +223,22 @@ body.mobile-view .compare-bar{padding:10px 16px;flex-direction:column;gap:8px;al
 /* Proj summary cards */
 body.mobile-view .proj-summary-card{min-width:90px;padding:10px 12px}
 body.mobile-view .proj-summary-card .value{font-size:15px}
+/* [Fix] 프로젝트 투입내역 - detail-section 가로스크롤, PC 2컬럼 레이아웃 유지 */
+body.mobile-view .detail-section{overflow-x:auto}
+body.mobile-view .detail-year-header{min-width:max-content}
+/* [Fix] 헤더 빌드날짜 폰트 축소 (overflow-x:hidden 잘림 방지) */
+body.mobile-view .frd-date{font-size:13px!important}
+body.mobile-view .frd-label{font-size:13px!important}
+body.mobile-view .proj-summary{flex-wrap:nowrap!important}
+body.mobile-view .proj-summary .dart-card{flex-shrink:0;min-width:200px}
+body.mobile-view .proj-summary .proj-invest-box{flex-shrink:0;min-width:260px}
+body.mobile-view .pib-cards{flex-wrap:nowrap!important}
+body.mobile-view .pib-cards .proj-summary-card{flex:0 0 auto!important;min-width:90px}
+/* [Fix] 어싸인현황 stat-chips 접기 토글 (모바일) */
+.person-stats-toggle{display:none}
+body.mobile-view .person-stats-toggle{display:inline-flex;align-items:center;gap:3px;padding:3px 8px;font-size:10px;color:#3b82f6;cursor:pointer;background:#eff6ff;border-radius:6px;border:1px solid #bfdbfe;user-select:none;white-space:nowrap;flex-shrink:0;align-self:center}
+body.mobile-view .person-stats{display:none!important}
+body.mobile-view .person-stats.open{display:flex!important}
 /* News table 가로 스크롤 */
 body.mobile-view #tabNews table{table-layout:auto!important}
 body.mobile-view #tabNews colgroup{display:none}
@@ -577,8 +593,8 @@ function loadEmbeddedData(){
     yearFilter="all";searchQuery="";expandedSet=new Set();personCache={};
     document.getElementById("uploadZone").style.display="none";document.getElementById("mainUI").style.display="block";
     if(!IS_SHARED){document.getElementById("replaceWrap").style.display="block";document.getElementById("saveBtn").style.display="inline-flex";}
-    document.getElementById("headerNotice").style.display="block";
-    
+    document.getElementById("headerNotice").style.display=document.body.classList.contains('mobile-view')?'none':'block';
+
     document.getElementById("availDateFrom").value=fmtDate(getKoreaToday());
     document.getElementById("availDateTo").value="";document.getElementById("availDateTo").min=document.getElementById("availDateFrom").value;
     buildYearFilter();hideLoading();showLoading("차트 렌더링 중...");setTimeout(function(){renderAll();setTimeout(scrollGanttsToToday,150);hideLoading();},50);
@@ -596,7 +612,7 @@ function processFile(file){
     yearFilter="all";searchQuery="";expandedSet=new Set();personCache={};
     document.getElementById("uploadZone").style.display="none";document.getElementById("mainUI").style.display="block";
     document.getElementById("replaceWrap").style.display="block";document.getElementById("saveBtn").style.display="inline-flex";
-    document.getElementById("headerNotice").style.display="block";
+    document.getElementById("headerNotice").style.display=document.body.classList.contains('mobile-view')?'none':'block';
     document.getElementById("searchInput").value="";document.getElementById("clearBtn").style.display="none";
     document.getElementById("availDateFrom").value=fmtDate(getKoreaToday());
     document.getElementById("availDateTo").value="";document.getElementById("availDateTo").min=document.getElementById("availDateFrom").value;
@@ -849,11 +865,20 @@ function renderPersonSection(container,name,names){
     var extra=showAll?0:Object.keys(data.totals).length-5;
     var section=document.createElement("div");section.className="person-section";section.dataset.name=name;
     var header=document.createElement("div");header.className="person-header"+(isOpen?" open":"");
-    header.innerHTML='<div class="person-avatar">'+realName[0]+'</div><div class="person-info"><div class="person-name">'+escapeHtml(dispName)+'<span style="font-size:11px;color:#94a3b8;font-weight:400;margin-left:4px">'+escapeHtml(infoText(data.info.rank,data.info.dept,data.info.jobCode))+'</span><span style="font-size:11px;color:#3b82f6;margin-left:8px">'+fmtHours(data.totalHours)+'</span></div></div><div class="person-stats">'+displayP.map(function(x){var c=data.colorMap[x[0]]||"#666",pn=x[0].length>15?x[0].slice(0,15)+"…":x[0];return '<div class="stat-chip" style="cursor:pointer" data-proj="'+x[0].replace(/"/g,"&quot;")+'" title="클릭 → 프로젝트별 검색으로 이동"><div class="stat-dot" style="background:'+c+'"></div><span class="stat-name">'+pn+'</span><span class="stat-hours">'+fmtHours(x[1])+'</span></div>';}).join("")+(extra>0?'<div class="stat-chip" style="color:#94a3b8">+'+extra+'</div>':"")+'</div><span class="toggle-arrow'+(isOpen?' open':'')+'">▶</span>';
+    var statsHtml=displayP.map(function(x){var c=data.colorMap[x[0]]||"#666",pn=x[0].length>15?x[0].slice(0,15)+"…":x[0];return '<div class="stat-chip" style="cursor:pointer" data-proj="'+x[0].replace(/"/g,"&quot;")+'" title="클릭 → 프로젝트별 검색으로 이동"><div class="stat-dot" style="background:'+c+'"></div><span class="stat-name">'+pn+'</span><span class="stat-hours">'+fmtHours(x[1])+'</span></div>';}).join("")+(extra>0?'<div class="stat-chip" style="color:#94a3b8">+'+extra+'</div>':"");
+    header.innerHTML='<div class="person-avatar">'+realName[0]+'</div><div class="person-info"><div class="person-name">'+escapeHtml(dispName)+'<span style="font-size:11px;color:#94a3b8;font-weight:400;margin-left:4px">'+escapeHtml(infoText(data.info.rank,data.info.dept,data.info.jobCode))+'</span><span style="font-size:11px;color:#3b82f6;margin-left:8px">'+fmtHours(data.totalHours)+'</span></div></div><button type="button" class="person-stats-toggle"><span class="pst-arrow">▶</span> 프로젝트 내역 ('+topP.length+'개)</button><div class="person-stats">'+statsHtml+'</div><span class="toggle-arrow'+(isOpen?' open':'')+'">▶</span>';
     section.appendChild(header);
     if(isOpen){var body=document.createElement("div");body.className="gantt-body";body.innerHTML=buildGanttHTML(data,yearFilter);section.appendChild(body);}
     header.addEventListener("click",function(ev){
       if(ev.target.closest("[data-proj]"))return;
+      if(ev.target.closest(".person-stats-toggle")){
+        var stats=header.querySelector(".person-stats");
+        var btn=ev.target.closest(".person-stats-toggle");
+        var isOpen=stats.classList.contains("open");
+        stats.classList.toggle("open",!isOpen);
+        btn.querySelector(".pst-arrow").textContent=isOpen?"▶":"▼";
+        ev.stopPropagation();return;
+      }
       var arrow=header.querySelector(".toggle-arrow");
       if(expandedSet.has(name)){expandedSet.delete(name);header.classList.remove("open");arrow.classList.remove("open");var b=section.querySelector(".gantt-body");if(b)b.remove();}
       else{closeSiblings(header);expandedSet.add(name);header.classList.add("open");arrow.classList.add("open");var b=document.createElement("div");b.className="gantt-body";b.innerHTML=buildGanttHTML(data,yearFilter);section.appendChild(b);setTimeout(scrollGanttsToToday,200);}
