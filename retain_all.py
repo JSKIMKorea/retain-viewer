@@ -767,7 +767,7 @@ try {
     var descEl = document.getElementById('grv-weather-desc');
     if (!iconEl) return;
     iconEl.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>';
-    descEl.textContent = '로딩';
+    if (descEl) descEl.textContent = '로딩';
     var url = 'https://wttr.in/' + encodeURIComponent(region) + '?format=j1&lang=ko';
     fetch(url).then(function(r){ return r.json(); }).then(function(d){
       var c = (d.current_condition && d.current_condition[0]) || {};
@@ -778,11 +778,11 @@ try {
       var code = parseInt(c.weatherCode || '0', 10);
       iconEl.innerHTML = weatherIcon(code, c.weatherDesc && c.weatherDesc[0] && c.weatherDesc[0].value);
       tempEl.textContent = temp + '°C';
-      descEl.textContent = descKR || '-';
+      if (descEl) descEl.textContent = descKR || '-';
     }).catch(function(e){
       iconEl.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>';
       tempEl.textContent = '--';
-      descEl.textContent = '조회 실패';
+      if (descEl) descEl.textContent = '조회 실패';
       console.warn('[weather] fetch 실패', e);
     });
   }
