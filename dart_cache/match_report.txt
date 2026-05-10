@@ -1,7 +1,7 @@
-DART 매칭 리포트 (2026-05-08 00:37)
+DART 매칭 리포트 (2026-05-10 23:23)
 ==================================================
 
-[퍼지 매칭 결과] (90건)
+[퍼지 매칭 결과] (91건)
 아래 매칭이 맞는지 확인하세요. 틀리면 dart_aliases.json에서 수정하세요.
 
   (주)더블유에스피아시아리미티드 → [prefix:더블유에스피아시아리미티드⊃더블유에스]
@@ -58,6 +58,7 @@ DART 매칭 리포트 (2026-05-08 00:37)
   에스비성보(주) → [translit:에스비성보→SB성보]
   에스이더블류유로드라이브코리아(주) → [prefix:에스이더블류유로드라이브코리아⊃에스이]
   에스지씨에너지(주) → [translit:에스지씨에너지→SGC에너지]
+  에스케이엔무브유럽 → [prefix:에스케이엔무브유럽⊃에스케이엔무브]
   에스케이하이닉스(주) → [translit:에스케이하이닉스→SK하이닉스]
   에이치비솔루션(주) → [translit:에이치비솔루션→HB솔루션]
   에이치엘만도(주) → [translit:에이치엘만도→HL만도]
@@ -95,7 +96,7 @@ DART 매칭 리포트 (2026-05-08 00:37)
   한국산업단지공단 → [prefix:한국산업단지공단⊃한국산업]
   한스바이오메드USA → [prefix:한스바이오메드USA⊃한스바이오메드]
 
-[미매칭 고객사] (216건)
+[미매칭 고객사] (219건)
 수동 매핑이 필요하면 dart_aliases.json에 추가하세요.
 
 dart_aliases.json 예시:
@@ -157,7 +158,9 @@ dart_aliases.json 예시:
     "PwC Global": "DART에 등록된 정확한 회사명",
     "PwC US": "DART에 등록된 정확한 회사명",
     "R&Q": "DART에 등록된 정확한 회사명",
+    "SK Battery America Inc.": "DART에 등록된 정확한 회사명",
     "SK Battery Manufacturing Kft.": "DART에 등록된 정확한 회사명",
+    "SK Energy Americas, Inc.": "DART에 등록된 정확한 회사명",
     "SK On Jiangsu Co., Ltd.": "DART에 등록된 정확한 회사명",
     "SK팜테코": "DART에 등록된 정확한 회사명",
     "Samsung HVAC America": "DART에 등록된 정확한 회사명",
@@ -264,6 +267,7 @@ dart_aliases.json 예시:
     "엠씨디코리아알이(유)": "DART에 등록된 정확한 회사명",
     "연월차 휴가": "DART에 등록된 정확한 회사명",
     "영국 외무성": "DART에 등록된 정확한 회사명",
+    "오씨아이에스이(주)": "DART에 등록된 정확한 회사명",
     "오큘러스브이알코리아(유)": "DART에 등록된 정확한 회사명",
     "오티스이앤엠코리아(주)": "DART에 등록된 정확한 회사명",
     "올리콘메트코싱가포르피티이엘티디": "DART에 등록된 정확한 회사명",
@@ -375,7 +379,9 @@ dart_aliases.json 예시:
   - PwC Global
   - PwC US
   - R&Q
+  - SK Battery America Inc.
   - SK Battery Manufacturing Kft.
+  - SK Energy Americas, Inc.
   - SK On Jiangsu Co., Ltd.
   - SK팜테코
   - Samsung HVAC America
@@ -482,6 +488,7 @@ dart_aliases.json 예시:
   - 엠씨디코리아알이(유)
   - 연월차 휴가
   - 영국 외무성
+  - 오씨아이에스이(주)
   - 오큘러스브이알코리아(유)
   - 오티스이앤엠코리아(주)
   - 올리콘메트코싱가포르피티이엘티디
