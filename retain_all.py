@@ -387,9 +387,13 @@ body.grv-locked{overflow:hidden;position:fixed;width:100%;height:100%}
 .grv-mob-mob{display:none;align-items:center}
 body.mobile-view .grv-mob-pc{display:none}
 body.mobile-view .grv-mob-mob{display:inline-flex}
-body.mobile-view #grv-mob-toggle{background:#3b82f6!important;color:#fff!important}
-body.mobile-view #grv-mob-toggle .grv-mod-label{color:rgba(255,255,255,0.78)!important}
-body.mobile-view #grv-mob-toggle .grv-mod-body{color:#fff!important}
+/* 현재 보기 모드 토글 (클릭 시 PC/모바일 전환 — 텍스트+아이콘) */
+#grv-viewmode .grv-mob-pc,#grv-viewmode .grv-mob-mob{gap:5px}
+.grv-vm-text{font-weight:600;letter-spacing:0.01em}
+/* 모바일 모드일 때: 활성 상태 강조 (강한 파란 배경) */
+body.mobile-view #grv-viewmode{background:#3b82f6!important;color:#fff!important}
+body.mobile-view #grv-viewmode .grv-mod-label{color:rgba(255,255,255,0.78)!important}
+body.mobile-view #grv-viewmode .grv-mod-body{color:#fff!important}
 /* 프로필 모듈 */
 .grv-profile-wrap{position:relative;display:flex;flex-shrink:0}
 .grv-profile-btn{position:relative;display:flex;flex-direction:column;justify-content:center;min-height:32px;padding:3px 11px;gap:1px;border:0;background:transparent;color:inherit;font-family:inherit;cursor:pointer;transition:background .15s ease,color .15s ease;text-align:left}
@@ -450,9 +454,9 @@ html[data-theme="dark"] .grv-mod-btn.active .grv-mod-body{color:#dbeafe}
 html[data-theme="dark"] .grv-weather select{color:#cbd5e1}
 html[data-theme="dark"] .grv-weather:hover select{color:#93c5fd}
 html[data-theme="dark"] .grv-weather select option{background:#1e293b;color:#e2e8f0}
-html[data-theme="dark"] body.mobile-view #grv-mob-toggle{background:#1d4ed8!important;color:#fff!important}
-html[data-theme="dark"] body.mobile-view #grv-mob-toggle .grv-mod-label{color:rgba(255,255,255,0.78)!important}
-html[data-theme="dark"] body.mobile-view #grv-mob-toggle .grv-mod-body{color:#fff!important}
+html[data-theme="dark"] body.mobile-view #grv-viewmode{background:#1d4ed8!important;color:#fff!important}
+html[data-theme="dark"] body.mobile-view #grv-viewmode .grv-mod-label{color:rgba(255,255,255,0.78)!important}
+html[data-theme="dark"] body.mobile-view #grv-viewmode .grv-mod-body{color:#fff!important}
 html[data-theme="dark"] .grv-profile-chevron{color:#64748b}
 html[data-theme="dark"] .grv-profile-btn:hover .grv-profile-chevron,html[data-theme="dark"] .grv-profile-btn.open .grv-profile-chevron{color:#93c5fd}
 html[data-theme="dark"] .grv-dropdown{background:#1e293b;border-color:#334155;box-shadow:0 8px 24px rgba(0,0,0,.3)}
@@ -751,6 +755,14 @@ try {
 
     // Editorial Mono Bar: 각 모듈 = 상단 트래킹 라벨(한글) + 하단 값(아이콘/숫자/이름)
     return [
+      // 현재 보기 모드 (클릭 시 PC/모바일 전환 — body.mobile-view 클래스에 따라 CSS로 아이콘·텍스트 자동 스왑)
+      '<button type="button" class="grv-mod grv-mod-btn grv-viewmode" id="grv-viewmode" title="클릭하여 PC/모바일 화면 전환" aria-label="화면 모드 전환" onclick="toggleMobileView()">',
+        '<span class="grv-mod-label">현재</span>',
+        '<span class="grv-mod-body">',
+          '<span class="grv-mob-pc">'+monSvg+'<span class="grv-vm-text">PC용 화면</span></span>',
+          '<span class="grv-mob-mob">'+phSvg+'<span class="grv-vm-text">모바일용 화면</span></span>',
+        '</span>',
+      '</button>',
       // 날씨 모듈
       '<div class="grv-mod grv-weather" id="grv-weather">',
         '<span class="grv-mod-label">날씨</span>',
@@ -769,11 +781,6 @@ try {
       '<button type="button" class="grv-mod grv-mod-btn" id="grv-theme-toggle" title="라이트/다크 전환" aria-label="테마 전환">',
         '<span class="grv-mod-label">테마</span>',
         '<span class="grv-mod-body" id="grv-theme-icon">'+(isDark?moonSvg:sunSvg)+'</span>',
-      '</button>',
-      // 모바일/PC 뷰 토글
-      '<button type="button" class="grv-mod grv-mod-btn" id="grv-mob-toggle" title="모바일/PC 화면 전환" aria-label="화면 모드 전환" onclick="toggleMobileView()">',
-        '<span class="grv-mod-label">모드</span>',
-        '<span class="grv-mod-body"><span class="grv-mob-pc">'+monSvg+'</span><span class="grv-mob-mob">'+phSvg+'</span></span>',
       '</button>',
       // 프로필 + 드롭다운 (아바타 제거 — 이름만 표시)
       '<div class="grv-profile-wrap" id="grv-profile-wrap">',
