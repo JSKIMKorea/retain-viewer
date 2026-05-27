@@ -1221,9 +1221,18 @@ def push_gh(ip):
     # 1) blob 생성 — 대용량(~30MB) 업로드, 최대 5회 지수 백오프 재시도
     blob_sha = None
     for attempt in range(1, 6):
-        r = req_lib.post(f"{base}/git/blobs", headers=h,
-                         json={"content": b64, "encoding": "base64"},
-                         timeout=360, verify=False)
+        try:
+            r = req_lib.post(f"{base}/git/blobs", headers=h,
+                             json={"content": b64, "encoding": "base64"},
+                             timeout=360, verify=False)
+        except Exception as e:
+            print(f"  blob 시도 {attempt}/5 예외: {e}")
+            if attempt == 5:
+                print("❌ blob 최종 실패"); return False
+            wait = min(15 * (2 ** (attempt - 1)), 120)
+            print(f"  {wait}초 후 재시도...")
+            time.sleep(wait)
+            continue
         if r.status_code == 201:
             blob_sha = r.json()["sha"]
             break
