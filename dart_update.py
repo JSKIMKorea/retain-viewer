@@ -71,14 +71,20 @@ BIZ_WORDS = [
 ]
 
 # 한글 알파벳 발음 → 영문자 매핑 (개별 글자 단위, 긴 것부터)
+# ★ 순서 주의: 긴 항목이 짧은 항목보다 먼저 와야 함 (에이치 > 에이, 아이 > 이)
 LETTER_MAP = [
+    # 3글자
     ("에이치","H"), ("더블유","W"),
+    # 2글자
+    ("엑스","X"),
     ("에이","A"), ("에스","S"), ("에프","F"),
     ("케이","K"), ("아이","I"), ("제이","J"),
     ("와이","Y"), ("브이","V"),
+    # 1글자 (다른 항목과 충돌 없는 글자만)
     ("엘","L"), ("엠","M"), ("엔","N"),
     ("비","B"), ("씨","C"), ("디","D"), ("지","G"),
     ("피","P"), ("티","T"), ("알","R"), ("큐","Q"), ("오","O"),
+    ("이","E"), ("유","U"),  # ★ 삼성이앤에이→삼성E&A, 엘지유플러스→LGU플러스 등
 ]
 SPECIAL_CHAR = [("앤","&")]
 
@@ -203,49 +209,24 @@ def _transliterate(n):
     """한영 음차 변환 + 외래어 표기 변형 — 모든 변형을 생성"""
     variants = set()
     for fn in [_kor_to_eng_prefix, _kor_to_eng_all, _eng_to_kor_prefix, _eng_to_kor_all]:
-        v = fn(n)
-        if v: variants.add(v)
+        variants.update(fn(n))
     # 외래어 표기 변형
     for v in _foreign_variants(n):
         variants.add(v)
     variants.discard(n)
     return list(variants)
 
-def _kor_to_eng_prefix(name):
-    """앞부분 한글 알파벳만 영문 변환 (브랜드명 우선, 2글자+, 비알파벳 만나면 즉시 중단)"""
-    # 1차: 브랜드명 매핑 (엘지→LG, 에스케이→SK 등)
-    for kor, eng in BRAND_MAP:
-        if name.startswith(kor):
-            return eng + name[len(kor):]
-    # 2차: 개별 글자 변환
-    pos = 0; letters = []
-    while pos < len(name):
-        matched = False
-        for kor, eng in SPECIAL_CHAR + LETTER_MAP:
-            if name[pos:].startswith(kor):
-                letters.append(eng); pos += len(kor); matched = True; break
-        if not matched: break
-    if len(letters) < 2: return None
-    return "".join(letters) + name[pos:]
-
-def _kor_to_eng_all(name):
-    """전체 문자열에서 브랜드명 + 2글자+ 연속 구간을 영문 변환"""
-    # 브랜드명 먼저 치환
-    result_name = name
-    for kor, eng in BRAND_MAP:
-        result_name = result_name.replace(kor, eng)
-    if result_name != name:
-        return result_name
-    # 개별 글자 변환
+def _kor_letters_only(n):
+    """한글 알파벳 발음 연속 2글자+ 구간을 영문으로 변환 (브랜드 치환은 안 함)"""
     tokens = []; pos = 0
-    while pos < len(name):
+    while pos < len(n):
         matched = False
         for kor, eng in SPECIAL_CHAR + LETTER_MAP:
-            if name[pos:].startswith(kor):
-                tokens.append((name[pos:pos+len(kor)], eng))
+            if n[pos:].startswith(kor):
+                tokens.append((n[pos:pos+len(kor)], eng))
                 pos += len(kor); matched = True; break
         if not matched:
-            tokens.append((name[pos], None)); pos += 1
+            tokens.append((n[pos], None)); pos += 1
     result = []; i = 0
     while i < len(tokens):
         if tokens[i][1] is not None:
@@ -257,29 +238,12 @@ def _kor_to_eng_all(name):
                 result.append(tokens[rs][0])
         else:
             result.append(tokens[i][0]); i += 1
-    out = "".join(result)
-    return out if out != name else None
+    return "".join(result)
 
-def _eng_to_kor_prefix(name):
-    """앞부분 영문자를 한글 발음 변환 (브랜드명 우선, 2글자+)"""
-    # 1차: 브랜드명 역매핑 (LG→엘지, SK→에스케이 등)
-    for kor, eng in BRAND_MAP:
-        if name.upper().startswith(eng):
-            return kor + name[len(eng):]
-    # 2차: 개별 글자 변환
-    pos = 0; letters = []
-    while pos < len(name):
-        ch = name[pos].upper()
-        if ch in ENG_KOR:
-            letters.append(ENG_KOR[ch]); pos += 1
-        else: break
-    if len(letters) < 2: return None
-    return "".join(letters) + name[pos:]
-
-def _eng_to_kor_all(name):
-    """전체 문자열에서 2글자+ 영문 연속 구간을 한글 발음 변환"""
+def _eng_letters_only(n):
+    """영문 연속 2글자+ 구간을 한글 발음으로 변환"""
     tokens = []
-    for ch in name:
+    for ch in n:
         if ch.upper() in ENG_KOR: tokens.append((ch, ENG_KOR[ch.upper()]))
         else: tokens.append((ch, None))
     result = []; i = 0
@@ -293,8 +257,72 @@ def _eng_to_kor_all(name):
                 result.append(tokens[rs][0])
         else:
             result.append(tokens[i][0]); i += 1
-    out = "".join(result)
-    return out if out != name else None
+    return "".join(result)
+
+def _kor_to_eng_prefix(name):
+    """앞부분 한글 알파벳만 영문 변환 — 브랜드 변형 + 글자 변형 모두 반환"""
+    variants = set()
+    # 1차: 브랜드명 매핑 (엘지→LG, 에스케이→SK 등)
+    for kor, eng in BRAND_MAP:
+        if name.startswith(kor):
+            variants.add(eng + name[len(kor):])
+    # 2차: 개별 글자 변환 (브랜드와 다른 결과 가능 — 엘지유플러스→LG유플러스 vs LGU플러스)
+    pos = 0; letters = []
+    while pos < len(name):
+        matched = False
+        for kor, eng in SPECIAL_CHAR + LETTER_MAP:
+            if name[pos:].startswith(kor):
+                letters.append(eng); pos += len(kor); matched = True; break
+        if not matched: break
+    if len(letters) >= 2:
+        variants.add("".join(letters) + name[pos:])
+    return variants
+
+def _kor_to_eng_all(name):
+    """전체에서 브랜드명 + 2글자+ 연속 한글을 영문 변환 — 다양한 변형 반환
+    예: 엘지유플러스 → {LG유플러스(브랜드만), LGU플러스(글자만), LGU플러스(브랜드+글자 cascade)}
+    """
+    variants = set()
+    # V1: 브랜드명만 치환
+    name_brand = name
+    for kor, eng in BRAND_MAP:
+        name_brand = name_brand.replace(kor, eng)
+    if name_brand != name:
+        variants.add(name_brand)
+    # V2: 원본에서 글자 변환만
+    out1 = _kor_letters_only(name)
+    if out1 != name: variants.add(out1)
+    # V3: 브랜드 치환 후 추가 글자 변환 (cascade)
+    if name_brand != name:
+        out2 = _kor_letters_only(name_brand)
+        if out2 != name and out2 != name_brand: variants.add(out2)
+    return variants
+
+def _eng_to_kor_prefix(name):
+    """앞부분 영문자를 한글 발음 변환 — 브랜드 변형 + 글자 변형 모두 반환"""
+    variants = set()
+    name_upper = name.upper()
+    # 1차: 브랜드명 역매핑 (LG→엘지, SK→에스케이 등)
+    for kor, eng in BRAND_MAP:
+        if name_upper.startswith(eng):
+            variants.add(kor + name[len(eng):])
+    # 2차: 개별 글자 변환
+    pos = 0; letters = []
+    while pos < len(name):
+        ch = name[pos].upper()
+        if ch in ENG_KOR:
+            letters.append(ENG_KOR[ch]); pos += 1
+        else: break
+    if len(letters) >= 2:
+        variants.add("".join(letters) + name[pos:])
+    return variants
+
+def _eng_to_kor_all(name):
+    """전체에서 2글자+ 연속 영문을 한글 발음 변환"""
+    variants = set()
+    out = _eng_letters_only(name)
+    if out != name: variants.add(out)
+    return variants
 
 def _build_stripped_index(corps):
     """corps dict에서 _strip_corp된 이름 → 원본이름 역인덱스"""
