@@ -56,7 +56,7 @@ NEWS_CACHE_DIR      = os.path.join(_SCRIPT_DIR, "news_cache")
 CUSTOM_NEWS_FILE    = os.path.join(NEWS_CACHE_DIR, "custom_news.txt")
 MAX_ARTICLES_PER_CAT = 10  # 카테고리당 최대 기사 수 (실제로는 쿼리 수만큼)
 MAX_DAYS = 7               # 최근 N일 이내 기사만
-AI_MODEL = "llama3.1-8b"
+AI_MODEL = "gpt-oss-120b"  # 2026.05 기준: llama3.1-8b가 deprecated되어 변경. 사용 가능 모델은 GET /v1/models로 확인
 AI_API_URL = "https://api.cerebras.ai/v1/chat/completions"
 
 # ============================================================
@@ -723,8 +723,9 @@ def ai_summarize(title, body, category):
                 json={
                     "model": AI_MODEL,
                     "messages": [{"role": "user", "content": prompt}],
-                    "max_tokens": 400,
-                    "temperature": 0.3
+                    "max_tokens": 600,        # gpt-oss: reasoning + content 둘 다 들어가므로 여유
+                    "temperature": 0.3,
+                    "reasoning_effort": "low" # gpt-oss reasoning 최소화 — content 토큰 확보
                 },
                 timeout=15,
                 verify=False
@@ -740,7 +741,11 @@ def ai_summarize(title, body, category):
                     print(f"       ⏳ JSON 파싱 실패 — {(attempt+1)*3}초 대기...")
                     time.sleep((attempt + 1) * 3)
                     continue
-                text = data["choices"][0]["message"]["content"]
+                # gpt-oss는 reasoning model이라 max_tokens 부족하면 reasoning만 차고 content가 빔
+                text = (data["choices"][0]["message"].get("content") or "").strip()
+                if not text:
+                    print(f"       ⚠ content 빈 응답 (reasoning에 토큰 소진 가능성)")
+                    return None
                 relevance = ""
                 summary = ""
                 impact = ""
@@ -905,9 +910,8 @@ def main():
                     total_summarized += 1
                     print(f"       ✅ 요약 완료 (재시도)")
                 else:
-                    # 재시도도 실패 → 원문 넣지 않고 건너뜀
-                    print(f"       ⏭️ AI 요약 실패 → 건너뜀")
-                    continue
+                    # 재시도도 실패 → 요약 공란으로 두고 기사는 포함 (Cerebras 키 만료 등 보호장치)
+                    print(f"       ⚠ AI 요약 실패 → 요약 공란으로 포함")
             time.sleep(2)
         else:
             print(f"       ⚠ 본문/description 모두 부족")
@@ -1048,9 +1052,17 @@ def main():
                     time.sleep(2)
                     break  # 이 쿼리 성공 → 다음 쿼리로
                 else:
-                    print(f"       ⏭️ AI요약 실패 → 같은 주제 다음 기사 시도")
+                    # AI 실패 (gem=None) — 요약 공란으로 두고 기사는 포함 (Cerebras 키 만료 등 보호장치)
+                    article = {
+                        "title": title, "url": url, "source": source,
+                        "summary": "", "impact": ""
+                    }
+                    total_articles += 1
+                    section["items"].append(article)
+                    print(f"       ⚠ AI요약 실패 → 요약 공란으로 포함")
+                    found = True
                     time.sleep(2)
-                    continue
+                    break
 
             if not found:
                 print(f"  [{qi_idx+1}] ⚠ 이 주제에서 적합한 기사 없음")
@@ -1090,6 +1102,16 @@ def main():
                         total_articles += 1
                         section["items"].append(article)
                         print(f"       ✅ 요약 완료")
+                        time.sleep(2)
+                    else:
+                        # AI 실패 — 요약 공란으로 두고 기사는 포함 (Cerebras 키 만료 등 보호장치)
+                        article = {
+                            "title": title, "url": url, "source": item["source"],
+                            "summary": "", "impact": ""
+                        }
+                        total_articles += 1
+                        section["items"].append(article)
+                        print(f"  [추가] ⚠ AI요약 실패 → 요약 공란으로 포함")
                         time.sleep(2)
 
         result["sections"].append(section)
