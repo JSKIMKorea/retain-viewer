@@ -575,8 +575,8 @@ try {
   var savedTheme = localStorage.getItem(THEME_KEY) || 'light';
   document.documentElement.setAttribute('data-theme', savedTheme);
 
-  // ── 날씨 위젯 지역 목록 (Open-Meteo: lat/lng + 한글 라벨) ──
-  // wttr.in 은 PwC 사내망에서 차단/지연이 잦아 Open-Meteo (CORS-friendly, no-auth) 사용.
+  // ── 날씨 위젯 지역 목록 (lat/lng + 한글 라벨) ──
+  // wttr.in·api.open-meteo.com 은 PwC 사내망에서 차단(타임아웃) → MET Norway api.met.no 사용 (CORS *, no-auth).
   var REGIONS = [
     {label:'서울 용산구',  lat:37.5384, lng:126.9654},
     {label:'서울 동작구',  lat:37.5124, lng:126.9393},
@@ -803,59 +803,61 @@ try {
     ].join('');
   }
 
-  // ── 날씨 (Open-Meteo) ──
-  // 무료, no-auth, CORS-friendly. 파라미터: latitude/longitude + current_weather=true.
-  // 응답: { current_weather: { temperature, weathercode, ... } } — WMO 기상코드 사용.
+  // ── 날씨 (MET Norway locationforecast 2.0) ──
+  // 무료, no-auth, CORS *. api.open-meteo.com 은 PwC 사내망 차단으로 교체.
+  // 응답: { properties: { timeseries: [ { data: { instant:{details:{air_temperature}}, next_1_hours:{summary:{symbol_code}} } } ] } }
   function fetchWeather(regionLabel){
     var iconEl = document.getElementById('grv-weather-icon');
     var tempEl = document.getElementById('grv-weather-temp');
     if (!iconEl || !tempEl) return;
     var region = REGIONS.filter(function(r){return r.label===regionLabel})[0] || REGIONS[0];
     iconEl.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>';
-    var url = 'https://api.open-meteo.com/v1/forecast?latitude='+region.lat+'&longitude='+region.lng+'&current_weather=true&timezone=Asia%2FSeoul';
+    var url = 'https://api.met.no/weatherapi/locationforecast/2.0/compact?lat='+region.lat+'&lon='+region.lng;
     fetch(url).then(function(r){ return r.json(); }).then(function(d){
-      var cw = d && d.current_weather;
-      if (!cw || cw.temperature === undefined) throw new Error('no current_weather');
-      var temp = Math.round(cw.temperature);
-      var code = parseInt(cw.weathercode || 0, 10);
-      iconEl.innerHTML = weatherIcon(code);
-      iconEl.title = weatherDescKR(code);
+      var ts  = d && d.properties && d.properties.timeseries && d.properties.timeseries[0];
+      var det = ts && ts.data && ts.data.instant && ts.data.instant.details;
+      if (!det || det.air_temperature === undefined) throw new Error('no forecast data');
+      var temp = Math.round(det.air_temperature);
+      var sum  = (ts.data.next_1_hours || ts.data.next_6_hours || {}).summary;
+      var sym  = (sum && sum.symbol_code) || '';
+      iconEl.innerHTML = weatherIcon(sym);
+      iconEl.title = weatherDescKR(sym);
       tempEl.textContent = temp + '°C';
     }).catch(function(e){
       iconEl.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>';
       tempEl.textContent = '--°C';
-      console.warn('[weather] Open-Meteo fetch 실패', e);
+      console.warn('[weather] met.no fetch 실패', e);
     });
   }
-  // WMO 기상코드 → SVG 아이콘 매핑
-  // (참고: https://open-meteo.com/en/docs#weathervariables)
-  function weatherIcon(code){
+  // met.no symbol_code(문자열) → SVG 아이콘 매핑
+  // (참고: https://api.met.no/weatherapi/weathericon/2.0/documentation)
+  function weatherIcon(sym){
     var sun     = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>';
     var cloud   = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/></svg>';
     var fog     = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.59 4.59A2 2 0 1 1 11 8H2m10.59 11.41A2 2 0 1 0 14 16H2m15.73-8.27A2.5 2.5 0 1 1 19.5 12H2"/></svg>';
     var rain    = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="16" y1="13" x2="16" y2="21"/><line x1="8" y1="13" x2="8" y2="21"/><line x1="12" y1="15" x2="12" y2="23"/><path d="M20 16.58A5 5 0 0 0 18 7h-1.26A8 8 0 1 0 4 15.25"/></svg>';
     var snow    = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 17.58A5 5 0 0 0 18 8h-1.26A8 8 0 1 0 4 16.25"/><line x1="8" y1="16" x2="8.01" y2="16"/><line x1="8" y1="20" x2="8.01" y2="20"/><line x1="12" y1="18" x2="12.01" y2="18"/><line x1="12" y1="22" x2="12.01" y2="22"/><line x1="16" y1="16" x2="16.01" y2="16"/><line x1="16" y1="20" x2="16.01" y2="20"/></svg>';
     var thunder = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 16.9A5 5 0 0 0 18 7h-1.26a8 8 0 1 0-11.62 9"/><polyline points="13 11 9 17 15 17 11 23"/></svg>';
-    if (code === 0) return sun;
-    if (code <= 3) return cloud;
-    if (code === 45 || code === 48) return fog;
-    if ((code >= 51 && code <= 67) || (code >= 80 && code <= 82)) return rain;
-    if ((code >= 71 && code <= 77) || code === 85 || code === 86) return snow;
-    if (code >= 95) return thunder;
+    if (sym.indexOf('thunder') >= 0) return thunder;
+    if (sym.indexOf('snow') >= 0 || sym.indexOf('sleet') >= 0) return snow;
+    if (sym.indexOf('rain') >= 0) return rain;
+    if (sym.indexOf('fog') >= 0) return fog;
+    if (sym.indexOf('clearsky') >= 0 || sym.indexOf('fair') >= 0) return sun;
     return cloud;
   }
-  function weatherDescKR(code){
-    if (code === 0) return '맑음';
-    if (code === 1) return '대체로 맑음';
-    if (code === 2) return '구름 조금';
-    if (code === 3) return '흐림';
-    if (code === 45 || code === 48) return '안개';
-    if (code >= 51 && code <= 57) return '이슬비';
-    if (code >= 61 && code <= 67) return '비';
-    if (code >= 71 && code <= 77) return '눈';
-    if (code >= 80 && code <= 82) return '소나기';
-    if (code === 85 || code === 86) return '눈 소나기';
-    if (code >= 95) return '천둥번개';
+  function weatherDescKR(sym){
+    if (sym.indexOf('thunder') >= 0) return '천둥번개';
+    if (sym.indexOf('sleet') >= 0) return '진눈깨비';
+    if (sym.indexOf('snowshowers') >= 0) return '눈 소나기';
+    if (sym.indexOf('snow') >= 0) return '눈';
+    if (sym.indexOf('rainshowers') >= 0) return '소나기';
+    if (sym.indexOf('lightrain') >= 0) return '이슬비';
+    if (sym.indexOf('rain') >= 0) return '비';
+    if (sym.indexOf('fog') >= 0) return '안개';
+    if (sym.indexOf('clearsky') >= 0) return '맑음';
+    if (sym.indexOf('fair') >= 0) return '대체로 맑음';
+    if (sym.indexOf('partlycloudy') >= 0) return '구름 조금';
+    if (sym.indexOf('cloudy') >= 0) return '흐림';
     return '-';
   }
   function wireWeatherWidget(){
