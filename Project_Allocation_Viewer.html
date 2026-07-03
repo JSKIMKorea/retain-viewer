@@ -248,20 +248,6 @@ body.mobile-view #tabNews colgroup{display:none}
 <div id="appWrap">
   <div class="header">
     <div class="header-left" id="headerReset"><div><div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap"><div class="header-title" style="cursor:pointer" id="headerTitleReset">Global Retain Viewer<div style="font-size:14px;color:#64748b;font-weight:500;margin-top:2px">(Global IPO, CMAAS, IOA + NGH 전체 인원)</div></div></div><div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap"><div class="header-sub" id="headerSub">Copyright © 2026 JS KIM. All rights reserved.</div></div><div id="fileRunDateInfo" style="display:none;margin-top:6px"></div><div id="contactBar" style="display:none;margin-top:8px;font-size:12px;color:#94a3b8;letter-spacing:-0.2px">(오류 신고 및 기능 개선 의견 접수: <a href="mailto:jeesoo.j.kim@pwc.com?subject=[Global Retain Viewer] 의견" target="_blank" style="color:#3b82f6;text-decoration:none;font-weight:500" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">jeesoo.j.kim@pwc.com</a>)</div></div></div>
-    <style>
-      body.mobile-view .header-center{display:none!important}
-      html[data-theme="dark"] .header-center>div{background:#2a1618!important;border-color:#7f1d1d!important}
-      html[data-theme="dark"] .header-center>div *{color:#fca5a5!important}
-    </style>
-    <div class="header-center" style="flex:1;min-width:340px;max-width:560px;margin:0 16px;align-self:flex-end">
-      <div style="display:flex;gap:11px;align-items:center;padding:14px 18px;border:1px solid #fecaca;border-radius:10px;background:#fff;box-sizing:border-box">
-        <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" style="flex:0 0 auto"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-        <div style="font-size:14px;font-weight:700;color:#b91c1c;line-height:1.6;letter-spacing:-0.2px">
-          <span style="display:block;font-size:12px;font-weight:800;color:#dc2626;letter-spacing:0.3px;margin-bottom:3px">어싸인 업데이트 지연 안내</span>
-          <span style="font-weight:700;color:#7f1d1d">TalentLink 대량 어싸인 변경</span>에 따른 일시적인 데이터 과부하로 일부 인원의 어싸인 정보 업데이트가 지연되고 있으며, <span style="text-decoration:underline;text-underline-offset:2px">다음 주 중 차례로 정상 반영</span>될 예정입니다.
-        </div>
-      </div>
-    </div>
     <div class="header-right">
       <div id="headerNotice" style="display:none;width:100%;max-width:560px;padding:12px 16px;border:1px solid #e2e8f0;border-radius:8px;background:#fafbfc;font-size:13px;color:#475569;line-height:1.6">
         <div style="margin-bottom:4px">해당 어싸인 표는 TalentLink와 달리 <span style="color:#dc2626;font-weight:700">실시간으로 업데이트되지 않으며</span>, 매일 오전 9시 기준 데이터로 하루 1회만 업데이트됩니다.</div>
@@ -1950,23 +1936,5 @@ function toggleMobileView(){
 })();
 </script>
 <div id="saveTimestamp" style="position:fixed;bottom:8px;left:12px;font-size:9px;color:#64748b;letter-spacing:-0.3px;z-index:1"></div>
-<script>
-/* 공지 배너: 우측 #headerNotice 박스와 상단·높이 일치 (모바일 제외) */
-(function(){
-  function syncBanner(){
-    var n=document.getElementById('headerNotice');
-    var c=document.querySelector('.header-center');
-    if(!n||!c) return;
-    var box=c.firstElementChild; if(!box) return;
-    if(document.body.classList.contains('mobile-view')){ box.style.height=''; return; }
-    if(n.offsetParent===null) return;           // 아직 표시 전이면 대기
-    box.style.height=n.offsetHeight+'px';
-    box.style.boxSizing='border-box';
-  }
-  var t=0, iv=setInterval(function(){ t++; syncBanner(); if(t>80) clearInterval(iv); },250);
-  window.addEventListener('resize', syncBanner);
-  try{ var n=document.getElementById('headerNotice'); if(window.ResizeObserver&&n){ new ResizeObserver(syncBanner).observe(n); } }catch(e){}
-})();
-</script>
 </body>
 </html>
