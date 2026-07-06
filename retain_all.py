@@ -112,7 +112,8 @@ INNER JOIN BI_STAFFREPORT_GRADE_V g ON e.GRADCD=g.GRADCD
 LEFT JOIN BI_STAFFREPORT_PRJT_V p ON src.PRJTCD=p.PRJTCD
 LEFT JOIN BI_STAFFREPORT_EMP_V ep ON p.CHARGPTR=ep.EMPNO
 LEFT JOIN BI_STAFFREPORT_EMP_V em ON p.CHARGMGR=em.EMPNO
-WHERE e.ORG_NM IN ('Global CMAAS','IOA','Global IPO','Assurance NGH')"""
+-- 'Global': 2026-07 조직개편으로 IPO/CMAAS/IOA의 Manager 미만(SA/A 등)이 통합된 신설 본부
+WHERE e.ORG_NM IN ('Global CMAAS','IOA','Global IPO','Assurance NGH','Global')"""
 
 def fetch_data():
     print("Azure SQL 연결 중...")
@@ -135,6 +136,8 @@ def process_data(df):
     df = df.rename(columns={"EMPNM":"이름","GRADNM":"직급","EMPNO":"사번","CM_NM":"소속",
         "PRJTNM":"Project Name","YMD":"Start Date","RETAIN":"Time (Hours)",
         "CHARGMGR":"PM","PRJTCD":"Job Code","CHARGPTR":"EL"})
+    # 직급명 변형 정규화: 'Senior-Associate 1/2' 등 뒤에 붙는 숫자 제거 → 기존 직급 그룹에 합류
+    df["직급"]=df["직급"].astype(str).str.replace(r"\s+\d+$","",regex=True)
     df["End Date"]=df["Start Date"]
     df["Start Date"]=pd.to_datetime(df["Start Date"]); df["End Date"]=pd.to_datetime(df["End Date"])
     # DUP_SEQ from SQL CTE (소스 테이블 레벨 중복 번호)
