@@ -72,11 +72,13 @@ def fetch_from_azure() -> pd.DataFrame:
     )
     print("Azure SQL 연결 중...")
     with pyodbc.connect(conn_str) as conn:
+        # 로그인 허용 대상: LOS가 Assurance 또는 AX Node인 인원만 (2026-07 정책)
         df = pd.read_sql("""
             SELECT PWC_ID, EMPNO, EMPNM, CM_NM, ORG_NM, EMP_STAT
             FROM BI_STAFFREPORT_EMP_V
+            WHERE LOS IN ('Assurance', 'AX Node')
         """, conn).fillna("")
-    print(f"  → {len(df):,}명 원본 조회")
+    print(f"  → {len(df):,}명 원본 조회 (LOS: Assurance + AX Node)")
 
     def _dept(row):
         org = str(row.get("ORG_NM", "")).strip()
