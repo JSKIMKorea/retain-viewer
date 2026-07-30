@@ -517,7 +517,7 @@ LOGIN_INJECT_HTML = """
   <div class="grv-login-container">
     <div class="grv-login-hero">
       <h1 id="grv-login-title">Global <span class="accent">Retain</span> Viewer</h1>
-      <p class="grv-login-hero-sub"><strong>Global Sector</strong> 인원의 어싸인 현황을 한 화면에서 조회 · 매일 1회 TalentLink 자동 갱신</p>
+      <p class="grv-login-hero-sub"><strong>Global Sector</strong> 인원의 어싸인 현황을 한 화면에서 조회 · 매일 1회 자동 갱신</p>
     </div>
     <div class="grv-login-grid">
       <div class="grv-login-box">
@@ -1188,7 +1188,7 @@ def build_html(df25, du="", dart=None, news=None, users=None):
     ix=re.sub(r'var IS_SHARED\s*=\s*false\s*;','var IS_SHARED = true;',html)
     ts=datetime.now(timezone(timedelta(hours=9))).strftime("%Y.%m.%d %H:%M:%S")
     ix=re.sub(r'(<div id="saveTimestamp"[^>]*>)([^<]*)(</div>)',rf'\g<1>업데이트: {ts}\3',ix)
-    tl_div=f'<div style="position:fixed;bottom:8px;right:12px;font-size:9px;color:#64748b;letter-spacing:-0.3px;z-index:1">TalentLink: {du}</div>'
+    tl_div=f'<div style="position:fixed;bottom:8px;right:12px;font-size:9px;color:#64748b;letter-spacing:-0.3px;z-index:1">데이터 기준: {du}</div>'
     ix=ix.replace(dj+nj+'\n</body>',dj+nj+'\n'+tl_div+'\n</body>')
     if IS_CI:
         ip=INDEX_OUTPUT  # 직접 덮어쓰기
