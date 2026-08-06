@@ -1936,5 +1936,28 @@ function toggleMobileView(){
 })();
 </script>
 <div id="saveTimestamp" style="position:fixed;bottom:8px;left:12px;font-size:9px;color:#64748b;letter-spacing:-0.3px;z-index:1"></div>
+<!-- 서비스 잠정 중단 안내 팝업 (로그인 후 화면 진입 시 표시, X로 닫기) -->
+<style>
+#grvSuspendPopup{position:fixed;inset:0;z-index:9998;display:flex;align-items:center;justify-content:center;background:rgba(15,23,42,.45)}
+body.grv-locked #grvSuspendPopup{display:none!important}
+#grvSuspendPopup.closed{display:none!important}
+.grv-suspend-card{position:relative;background:#fff;border:1px solid #e2e8f0;border-radius:14px;box-shadow:0 20px 50px rgba(15,23,42,.25);max-width:480px;width:calc(100% - 40px);padding:28px 30px 26px;box-sizing:border-box}
+.grv-suspend-card h3{margin:0 0 10px;font-size:16px;font-weight:700;color:#1e293b;display:flex;align-items:center;gap:8px}
+.grv-suspend-card h3 svg{color:#dc2626;flex:0 0 auto}
+.grv-suspend-card p{margin:0;font-size:14px;color:#475569;line-height:1.7}
+.grv-suspend-close{position:absolute;top:12px;right:12px;width:30px;height:30px;border:0;background:transparent;border-radius:8px;cursor:pointer;color:#94a3b8;display:flex;align-items:center;justify-content:center}
+.grv-suspend-close:hover{background:#f1f5f9;color:#334155}
+html[data-theme="dark"] .grv-suspend-card{background:#1e293b;border-color:#334155}
+html[data-theme="dark"] .grv-suspend-card h3{color:#e2e8f0}
+html[data-theme="dark"] .grv-suspend-card p{color:#94a3b8}
+html[data-theme="dark"] .grv-suspend-close:hover{background:#273449;color:#cbd5e1}
+</style>
+<div id="grvSuspendPopup">
+  <div class="grv-suspend-card">
+    <button type="button" class="grv-suspend-close" title="닫기" aria-label="닫기" onclick="document.getElementById('grvSuspendPopup').classList.add('closed')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    <h3><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>서비스 잠정 중단 안내</h3>
+    <p>TalentLink 서비스 종료 및 Team Builder 도입에 따라 잠정 중단 중입니다.</p>
+  </div>
+</div>
 </body>
 </html>
