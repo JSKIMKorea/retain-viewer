@@ -242,11 +242,27 @@ body.mobile-view .person-stats.open{display:flex!important}
 /* News table 가로 스크롤 */
 body.mobile-view #tabNews table{table-layout:auto!important}
 body.mobile-view #tabNews colgroup{display:none}
-/* 프로젝트별 검색 EL/PM 필터 */
-.proj-filter-sel{padding:10px 12px;border:1px solid #e2e8f0;border-radius:8px;background:#fff;color:#475569;font-size:13px;font-family:inherit;outline:none;cursor:pointer;max-width:170px}
-.proj-filter-sel:hover{border-color:#93c5fd}
-html[data-theme="dark"] .proj-filter-sel{background:#1e293b;border-color:#334155;color:#cbd5e1}
-body.mobile-view .proj-filter-sel{max-width:48%;font-size:12px}
+/* 프로젝트별 검색 EL/PM 멀티 필터 */
+.pf-wrap{position:relative}
+.pf-btn{padding:10px 12px;border:1px solid #e2e8f0;border-radius:8px;background:#fff;color:#475569;font-size:13px;font-family:inherit;cursor:pointer;max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pf-btn:hover{border-color:#93c5fd}
+.pf-btn.active{border-color:#3b82f6;color:#3b82f6;font-weight:600}
+.pf-panel{display:none;position:absolute;top:calc(100% + 4px);left:0;z-index:500;width:240px;background:#fff;border:1px solid #e2e8f0;border-radius:10px;box-shadow:0 10px 30px rgba(15,23,42,.14);padding:8px;box-sizing:border-box}
+.pf-panel.open{display:block}
+.pf-search{width:100%;box-sizing:border-box;padding:7px 10px;border:1px solid #e2e8f0;border-radius:7px;font-size:12px;font-family:inherit;outline:none;margin-bottom:6px;background:#fff;color:#1e293b}
+.pf-list{max-height:260px;overflow-y:auto}
+.pf-item{display:flex;align-items:center;gap:7px;padding:6px 8px;font-size:13px;color:#334155;border-radius:6px;cursor:pointer}
+.pf-item:hover{background:#f1f5f9}
+.pf-item input{cursor:pointer;flex-shrink:0}
+.pf-empty{padding:10px 8px;font-size:12px;color:#94a3b8}
+.pf-reset{padding:10px 14px;border:1px solid #e2e8f0;border-radius:8px;background:#fff;color:#64748b;font-size:13px;font-family:inherit;cursor:pointer;white-space:nowrap}
+.pf-reset:hover{border-color:#fca5a5;color:#dc2626}
+html[data-theme="dark"] .pf-btn,html[data-theme="dark"] .pf-reset,html[data-theme="dark"] .pf-panel,html[data-theme="dark"] .pf-search{background:#1e293b;border-color:#334155;color:#cbd5e1}
+html[data-theme="dark"] .pf-item{color:#cbd5e1}
+html[data-theme="dark"] .pf-item:hover{background:#273449}
+html[data-theme="dark"] .pf-empty{color:#64748b}
+body.mobile-view .pf-btn{max-width:126px;font-size:12px}
+body.mobile-view .pf-reset{font-size:12px;padding:8px 10px}
 </style>
 </head>
 <body>
@@ -286,7 +302,7 @@ body.mobile-view .proj-filter-sel{max-width:48%;font-size:12px}
       </div>
       <div id="tabProjSearch" style="display:none">
         <div id="projGuide" style="padding:8px 0 4px;font-size:14px;color:#1e293b;display:flex;align-items:center;gap:6px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a7 7 0 0 1 7 7c0 2.79-1.63 5.24-4 6.46V17H9v-1.54C6.63 14.24 5 11.79 5 9a7 7 0 0 1 7-7z"/></svg>프로젝트명을 직접 검색하거나 해당하는 EL명을 클릭하여 조회할 수 있습니다. 인원 이름을 클릭하면 해당 인원의 어싸인 현황으로 이동합니다.</div>
-        <div class="toolbar"><div class="search-wrap"><span class="search-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span><input class="search-input" id="projSearchInput" placeholder="프로젝트명 검색..." autocomplete="off" style="width:400px"></div><select id="projElFilter" class="proj-filter-sel" title="EL명으로 필터링"><option value="">EL 전체</option></select><select id="projPmFilter" class="proj-filter-sel" title="PM명으로 필터링"><option value="">PM 전체</option></select></div>
+        <div class="toolbar"><div class="search-wrap"><span class="search-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span><input class="search-input" id="projSearchInput" placeholder="프로젝트명 검색..." autocomplete="off" style="width:400px"></div><div class="pf-wrap"><button type="button" class="pf-btn" id="pfElBtn" title="EL명으로 필터링 (다중 선택)">EL 전체</button><div class="pf-panel" id="pfElPanel"><input class="pf-search" id="pfElSearch" placeholder="EL명 검색..." autocomplete="off"><div class="pf-list" id="pfElList"></div></div></div><div class="pf-wrap"><button type="button" class="pf-btn" id="pfPmBtn" title="PM명으로 필터링 (다중 선택)">PM 전체</button><div class="pf-panel" id="pfPmPanel"><input class="pf-search" id="pfPmSearch" placeholder="PM명 검색..." autocomplete="off"><div class="pf-list" id="pfPmList"></div></div></div><button type="button" class="pf-reset" id="pfResetBtn" title="EL/PM 필터 선택 모두 해제">필터 초기화</button></div>
         <div id="projSearchArea"></div>
       </div>
       <div id="tabAvail" style="display:none">
@@ -984,7 +1000,7 @@ function renderDetailPerson(container,pk){
     // Group by project within year
     var years=Object.keys(byYear).sort(function(a,b){return parseInt(b)-parseInt(a);});
     var wrapper=document.createElement("div");
-    wrapper.innerHTML='<div style="padding:16px 0 8px;display:flex;align-items:center;gap:10px"><div><span style="font-size:15px;font-weight:600">'+escapeHtml(dispName)+'</span><span style="font-size:12px;color:#94a3b8;margin-left:8px">'+escapeHtml(infoText(info.rank,info.dept,info.jobCode))+'</span></div></div>';
+    wrapper.innerHTML='<div style="padding:16px 0 8px 14px;display:flex;align-items:center;gap:10px"><div><span style="font-size:15px;font-weight:600">'+escapeHtml(dispName)+'</span><span style="font-size:12px;color:#94a3b8;margin-left:8px">'+escapeHtml(infoText(info.rank,info.dept,info.jobCode))+'</span></div></div>';
     container.appendChild(wrapper);
 
     years.forEach(function(yr){
@@ -1033,24 +1049,92 @@ var projSearchInput=document.getElementById("projSearchInput");
 var projSearchTimer=null;
 projSearchInput.addEventListener("input",function(){clearTimeout(projSearchTimer);projSearchTimer=setTimeout(function(){renderProjSearch(projSearchInput.value.trim());},300);});
 projSearchInput.addEventListener("keydown",function(e){if(e.key==="Enter"){clearTimeout(projSearchTimer);renderProjSearch(projSearchInput.value.trim());}});
-var _projElFilterSel=document.getElementById("projElFilter"),_projPmFilterSel=document.getElementById("projPmFilter");
-if(_projElFilterSel)_projElFilterSel.addEventListener("change",function(){renderProjSearch(projSearchInput.value.trim());});
-if(_projPmFilterSel)_projPmFilterSel.addEventListener("change",function(){renderProjSearch(projSearchInput.value.trim());});
+// ===== EL/PM 멀티 필터 (검색 + 체크박스 다중선택 + 상호 연동) =====
+var pfSelEls={},pfSelPms={};   // 선택된 이름 집합
+var pfProjIndex=null;          // 프로젝트 단위 {els:[],pms:[]} 인덱스 (최초 1회 구축)
+function pfBuildIndex(){
+  if(pfProjIndex)return;
+  var m={};
+  allData.forEach(function(r){
+    if(!r.project)return;
+    if(!m[r.project])m[r.project]={els:{},pms:{}};
+    if(r.el)m[r.project].els[r.el]=1;
+    if(r.pm)m[r.project].pms[r.pm]=1;
+  });
+  pfProjIndex=Object.keys(m).map(function(p){return {els:Object.keys(m[p].els),pms:Object.keys(m[p].pms)};});
+}
+function pfProjPass(entry,selEls,selPms){
+  if(Object.keys(selEls).length&&!entry.els.some(function(e){return selEls[e];}))return false;
+  if(Object.keys(selPms).length&&!entry.pms.some(function(p){return selPms[p];}))return false;
+  return true;
+}
+// 상대 필터 선택 기준으로 실제 조합이 존재하는 옵션만 반환
+function pfAvailable(kind){
+  pfBuildIndex();
+  var avail={};
+  pfProjIndex.forEach(function(entry){
+    if(kind==="el"){ if(pfProjPass(entry,{},pfSelPms))entry.els.forEach(function(e){avail[e]=1;}); }
+    else { if(pfProjPass(entry,pfSelEls,{}))entry.pms.forEach(function(p){avail[p]=1;}); }
+  });
+  return avail;
+}
+function pfRenderList(kind){
+  var list=document.getElementById(kind==="el"?"pfElList":"pfPmList");
+  var q=(document.getElementById(kind==="el"?"pfElSearch":"pfPmSearch").value||"").trim();
+  var sel=kind==="el"?pfSelEls:pfSelPms;
+  var avail=pfAvailable(kind);
+  var names=Object.keys(avail);
+  Object.keys(sel).forEach(function(n){if(names.indexOf(n)<0)names.push(n);}); // 선택값은 항상 표시
+  if(q)names=names.filter(function(n){return n.indexOf(q)>=0;});
+  names.sort(function(a,b){return a.localeCompare(b);});
+  if(!names.length){list.innerHTML='<div class="pf-empty">해당하는 정보 없음</div>';return;}
+  list.innerHTML=names.map(function(n){
+    return '<label class="pf-item"><input type="checkbox" data-name="'+escapeAttr(n)+'"'+(sel[n]?' checked':'')+'> '+escapeHtml(n)+'</label>';
+  }).join("");
+  Array.prototype.forEach.call(list.querySelectorAll("input[type=checkbox]"),function(cb){
+    cb.addEventListener("change",function(){
+      var n=cb.getAttribute("data-name");
+      if(cb.checked)sel[n]=1;else delete sel[n];
+      pfUpdateBtn("el");pfUpdateBtn("pm");
+      pfRenderList(kind==="el"?"pm":"el"); // 상대 목록 연동 갱신
+      renderProjSearch(projSearchInput.value.trim());
+    });
+  });
+}
+function pfUpdateBtn(kind){
+  var btn=document.getElementById(kind==="el"?"pfElBtn":"pfPmBtn");
+  var sel=kind==="el"?pfSelEls:pfSelPms;
+  var ks=Object.keys(sel).sort(function(a,b){return a.localeCompare(b);});
+  var base=kind==="el"?"EL":"PM";
+  btn.textContent=ks.length?base+": "+ks[0]+(ks.length>1?" 외 "+(ks.length-1):""):base+" 전체";
+  btn.classList.toggle("active",ks.length>0);
+}
+function pfWire(kind){
+  var btn=document.getElementById(kind==="el"?"pfElBtn":"pfPmBtn");
+  var panel=document.getElementById(kind==="el"?"pfElPanel":"pfPmPanel");
+  var search=document.getElementById(kind==="el"?"pfElSearch":"pfPmSearch");
+  btn.addEventListener("click",function(e){
+    e.stopPropagation();
+    var wasOpen=panel.classList.contains("open");
+    Array.prototype.forEach.call(document.querySelectorAll(".pf-panel.open"),function(p){p.classList.remove("open");});
+    if(!wasOpen){panel.classList.add("open");pfRenderList(kind);search.focus();}
+  });
+  panel.addEventListener("click",function(e){e.stopPropagation();});
+  search.addEventListener("input",function(){pfRenderList(kind);});
+}
+pfWire("el");pfWire("pm");
+document.addEventListener("click",function(){Array.prototype.forEach.call(document.querySelectorAll(".pf-panel.open"),function(p){p.classList.remove("open");});});
+document.getElementById("pfResetBtn").addEventListener("click",function(){
+  pfSelEls={};pfSelPms={};
+  document.getElementById("pfElSearch").value="";document.getElementById("pfPmSearch").value="";
+  pfUpdateBtn("el");pfUpdateBtn("pm");
+  renderProjSearch(projSearchInput.value.trim());
+});
 
 function renderProjSearch(q,autoExpand){
   var area=document.getElementById("projSearchArea");
   var projGuide=document.getElementById("projGuide");
-  // EL/PM 필터 옵션 채우기 (최초 1회)
-  var elSel=document.getElementById("projElFilter"),pmSel=document.getElementById("projPmFilter");
-  if(elSel&&!elSel.dataset.filled&&allData.length){
-    var optEls={},optPms={};
-    allData.forEach(function(r){if(r.el)optEls[r.el]=1;if(r.pm)optPms[r.pm]=1;});
-    Object.keys(optEls).sort(function(a,b){return a.localeCompare(b);}).forEach(function(n){var o=document.createElement("option");o.value=n;o.textContent=n;elSel.appendChild(o);});
-    Object.keys(optPms).sort(function(a,b){return a.localeCompare(b);}).forEach(function(n){var o=document.createElement("option");o.value=n;o.textContent=n;pmSel.appendChild(o);});
-    elSel.dataset.filled="1";
-  }
-  var elF=elSel?elSel.value:"",pmF=pmSel?pmSel.value:"";
-  var filterActive=!!(elF||pmF);
+  var filterActive=!!(Object.keys(pfSelEls).length||Object.keys(pfSelPms).length);
   if(projGuide)projGuide.style.display=(q||filterActive)?"none":"flex";
   var projMap={};
   allData.forEach(function(r){
@@ -1063,12 +1147,12 @@ function renderProjSearch(q,autoExpand){
     pm.records.push(r);
   });
   var projects=Object.keys(projMap).sort();
-  // EL/PM 필터 적용 (프로젝트의 EL/PM 목록에 선택값이 포함되면 통과)
+  // EL/PM 필터 적용 (프로젝트의 EL/PM 목록에 선택값 중 하나라도 포함되면 통과)
   if(filterActive){
     projects=projects.filter(function(projName){
       var recs=projMap[projName].records;
-      if(elF&&uniqueNonEmpty(recs.map(function(r){return r.el;})).indexOf(elF)<0)return false;
-      if(pmF&&uniqueNonEmpty(recs.map(function(r){return r.pm;})).indexOf(pmF)<0)return false;
+      if(Object.keys(pfSelEls).length&&!uniqueNonEmpty(recs.map(function(r){return r.el;})).some(function(e){return pfSelEls[e];}))return false;
+      if(Object.keys(pfSelPms).length&&!uniqueNonEmpty(recs.map(function(r){return r.pm;})).some(function(p){return pfSelPms[p];}))return false;
       return true;
     });
   }
@@ -1972,6 +2056,27 @@ function toggleMobileView(){
   }
   updateStickyOffsets();
 })();
+// ===== 로그인 사용자 기본 화면: 어싸인 현황에서 본인 이름 자동 검색 =====
+// 로그인 오버레이(retain_all.py 주입)가 showApp 시 window.GRV_USER 설정 + 이 함수 호출.
+// 자동로그인(쿠키)은 본 스크립트보다 먼저 실행되므로 GRV_USER를 여기서 후속 적용.
+window.grvApplyDefaultUser=function(userName,userSabun){
+  var sab=(userSabun===undefined||userSabun===null)?"":String(userSabun).trim().replace(/\.0$/,"");
+  if(!sab)return;
+  // 로그인 사번과 정확 일치하는 인원 찾기 — 없으면(어싸인 데이터 없는 타본부 인원 등) 기본 첫 화면 유지
+  var match=null;
+  for(var i=0;i<allNames.length;i++){
+    if(String(personKeyJobCode(allNames[i])).trim().replace(/\.0$/,"")===sab){match=allNames[i];break;}
+  }
+  if(!match)return;
+  var dataName=personKeyName(match);
+  var si=document.getElementById("searchInput"),cb=document.getElementById("clearBtn");
+  if(!si)return;
+  searchQuery=dataName;si.value=dataName;if(cb)cb.style.display="flex";
+  expandedSet=new Set();
+  var m=getFilteredNames();if(m.length<=3)m.forEach(function(n){expandedSet.add(n);});
+  renderAll();setTimeout(scrollGanttsToToday,150);
+};
+if(window.GRV_USER&&window.GRV_USER.sabun){try{window.grvApplyDefaultUser(window.GRV_USER.name,window.GRV_USER.sabun);}catch(e){}}
 </script>
 <div id="saveTimestamp" style="position:fixed;bottom:8px;left:12px;font-size:9px;color:#64748b;letter-spacing:-0.3px;z-index:1"></div>
 </body>
