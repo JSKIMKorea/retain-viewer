@@ -125,7 +125,38 @@ def fetch_data():
         etl = pd.read_sql("SELECT TOP 1 CREATED_DATE FROM BI_STAFFREPORT_RETAIN_V ORDER BY CREATED_DATE DESC", conn)
     finally:
         conn.close()
+    _du_file    = os.path.join(_SCRIPT_DIR, "last_du.txt")
+    _cache_file = os.path.join(_SCRIPT_DIR, "retain_cache.pkl")
+
+    def _prev_du():
+        try:
+            with open(_du_file, encoding="utf-8") as f:
+                p = f.read().strip()
+            return p if p else "?"
+        except OSError:
+            return "?"
+
+    # ETL 재적재 창(심야 비움 → 오전 8시대 적재): 0건이면 직전 정상 조회 캐시로 대체
+    if len(df) == 0:
+        if os.path.exists(_cache_file):
+            df = pd.read_pickle(_cache_file)
+            du = _prev_du()
+            print(f"  ⚠ 조회 0건 (ETL 재적재 중) → 직전 정상 데이터로 대체: {len(df):,}건 / 기준 {du}")
+            return df, du
+        print("  ❌ 조회 결과 0건 + 직전 캐시 없음 — 오전 9시 이후(적재 완료 후) 다시 실행하세요.")
+        sys.exit(1)
+
     du = pd.to_datetime(etl.iloc[0,0]).strftime("%Y.%m.%d %H:%M:%S") if len(etl)>0 and pd.notna(etl.iloc[0,0]) else "?"
+    if du != "?":
+        try:
+            with open(_du_file, "w", encoding="utf-8") as f: f.write(du)
+        except OSError: pass
+    else:
+        du = _prev_du()  # 데이터는 있는데 날짜만 못 읽는 경우
+    # 정상 조회 결과를 캐시로 저장 (다음 0건 상황의 폴백용 — 사내 데이터, 커밋 금지)
+    try:
+        df.to_pickle(_cache_file)
+    except OSError: pass
     print(f"  → 원본 갱신: {du}")
     return df, du
 
@@ -734,8 +765,9 @@ try {
       updateNoticeBtn();
     }
 
-    // 로그아웃
-    document.getElementById('grv-logout-btn').addEventListener('click', window.grvLogout);
+    // 로그아웃 (redesign으로 버튼이 없어져도 위젯 전체가 죽지 않도록 null 가드)
+    var logoutBtn = document.getElementById('grv-logout-btn');
+    if (logoutBtn) logoutBtn.addEventListener('click', window.grvLogout);
 
     // 첫 날씨 조회
     fetchWeather(localStorage.getItem(WEATHER_KEY) || REGIONS[0].label);
@@ -901,11 +933,13 @@ try {
 
   function $(id){ return document.getElementById(id); }
 
-  $('grv-login-btn').addEventListener('click', doLogin);
-  $('grv-login-pw').addEventListener('keydown', function(e){ if(e.key==='Enter') doLogin(); });
-  $('grv-login-email').addEventListener('keydown', function(e){ if(e.key==='Enter') $('grv-login-pw').focus(); });
-  $('grv-pw-toggle').addEventListener('click', function(){
+  var _lgBtn = $('grv-login-btn'), _lgPw = $('grv-login-pw'), _lgEmail = $('grv-login-email'), _pwTgl = $('grv-pw-toggle');
+  if (_lgBtn) _lgBtn.addEventListener('click', doLogin);
+  if (_lgPw) _lgPw.addEventListener('keydown', function(e){ if(e.key==='Enter') doLogin(); });
+  if (_lgEmail) _lgEmail.addEventListener('keydown', function(e){ if(e.key==='Enter' && _lgPw) _lgPw.focus(); });
+  if (_pwTgl) _pwTgl.addEventListener('click', function(){
     var inp = $('grv-login-pw'); var btn = $('grv-pw-toggle');
+    if (!inp || !btn) return;
     if (inp.type === 'password') { inp.type='text'; btn.innerHTML='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>'; btn.classList.add('on'); }
     else { inp.type='password'; btn.innerHTML='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>'; btn.classList.remove('on'); }
   });
@@ -915,8 +949,8 @@ try {
     var pw    = ($('grv-login-pw').value||'').trim();
     var btn   = $('grv-login-btn');
     var err   = $('grv-login-err');
-    err.style.display='none';
-    btn.disabled=true; btn.textContent='확인 중...';
+    if (err) err.style.display='none';
+    if (btn) { btn.disabled=true; btn.textContent='확인 중...'; }
 
     var diag = [];
     diag.push('빌드: ' + BUILD_TIME);
@@ -969,13 +1003,15 @@ try {
         logLogin(info);
         showApp(info);
       } else {
-        err.innerHTML = '<div>이메일 또는 사번이 올바르지 않습니다. (' + (failReason||'사번이 일치하지 않습니다') + ')</div>'
-          + '<details style="margin-top:8px;font-size:11px;color:#A1A8B3;text-align:left">'
-          + '<summary style="cursor:pointer">진단 정보 보기</summary>'
-          + '<pre style="margin-top:6px;background:#F5F7F8;padding:8px;border-radius:4px;white-space:pre-wrap;word-break:break-all">'
-          + diag.join('\\n') + '</pre></details>';
-        err.style.display = 'block';
-        btn.disabled = false; btn.textContent = '로그인';
+        if (err) {
+          err.innerHTML = '<div>이메일 또는 사번이 올바르지 않습니다. (' + (failReason||'사번이 일치하지 않습니다') + ')</div>'
+            + '<details style="margin-top:8px;font-size:11px;color:#A1A8B3;text-align:left">'
+            + '<summary style="cursor:pointer">진단 정보 보기</summary>'
+            + '<pre style="margin-top:6px;background:#F5F7F8;padding:8px;border-radius:4px;white-space:pre-wrap;word-break:break-all">'
+            + diag.join('\\n') + '</pre></details>';
+          err.style.display = 'block';
+        }
+        if (btn) { btn.disabled = false; btn.textContent = '로그인'; }
         console.warn('[로그인 실패]', diag.join(' | '));
       }
     }
@@ -1204,84 +1240,79 @@ def build_html(df25, du="", dart=None, news=None, users=None):
 # ============================================================
 # GitHub
 # ============================================================
-def _gh_req(method, url, headers, timeout=60, retries=3, verify=False, **kwargs):
-    """502/503/504 transient 에러 자동 재시도 래퍼 (blob 제외 범용)"""
-    import time
-    for attempt in range(1, retries + 1):
-        r = getattr(req_lib, method)(url, headers=headers, timeout=timeout, verify=verify, **kwargs)
-        if r.status_code not in (502, 503, 504) or attempt == retries:
-            return r
-        wait = 10 * attempt
-        print(f"  [{method.upper()}] {r.status_code} — {wait}초 후 재시도 ({attempt}/{retries})...")
-        time.sleep(wait)
-    return r
-
 def push_gh(ip):
-    import time
+    """git CLI(얕은 clone → commit → push) 업로드.
+    Git Data API blob 생성은 40MB급 파일에서 422 'input too large' 거부 (2026-08-11 확인),
+    Contents API는 30MB에서 409/403 (기존 검증) — git push는 파일당 100MB까지 허용."""
+    import subprocess, tempfile, shutil, stat, time
     if not GITHUB_TOKEN:
         print(f"\n⚠ GitHub 토큰 미설정 (.env 확인) → {ip}"); return False
-    print("\nGitHub 업로드...")
-    base = f"https://api.github.com/repos/{GITHUB_REPO}"
-    h = {"Authorization": f"token {GITHUB_TOKEN}", "Accept": "application/vnd.github.v3+json"}
+    print("\nGitHub 업로드 (git push)...")
+    try:
+        subprocess.run(["git", "--version"], capture_output=True, timeout=30)
+    except (FileNotFoundError, subprocess.TimeoutExpired):
+        print("❌ git 실행 파일 없음 — Git 설치 필요"); return False
 
-    with open(ip, "rb") as f: b64 = base64.b64encode(f.read()).decode()
+    # 토큰은 URL이 아닌 HTTP 헤더로 전달 (에러 메시지에 토큰 노출 방지)
+    _auth = base64.b64encode(f"x-access-token:{GITHUB_TOKEN}".encode()).decode()
+    cfg = ["-c", f"http.https://github.com/.extraheader=AUTHORIZATION: basic {_auth}",
+           "-c", "http.sslVerify=false",        # PwC 사내망 SSL 인터셉트
+           "-c", "http.postBuffer=157286400",   # 150MB — 대용량 push 대비
+           "-c", "core.autocrlf=false",         # 디스크 바이트 그대로 커밋
+           "-c", "user.name=JSKIMKorea",
+           "-c", "user.email=JSKIMKorea@users.noreply.github.com"]
+    url = f"https://github.com/{GITHUB_REPO}.git"
+    tmp = tempfile.mkdtemp(prefix="retain_push_")
+    env = dict(os.environ); env["GIT_TERMINAL_PROMPT"] = "0"
 
-    # 1) blob 생성 — 대용량(~30MB) 업로드, 최대 5회 지수 백오프 재시도
-    blob_sha = None
-    for attempt in range(1, 6):
+    def _git(args, cwd=tmp, timeout=600):
+        return subprocess.run(["git"] + cfg + args, cwd=cwd, env=env,
+                              capture_output=True, text=True,
+                              encoding="utf-8", errors="replace", timeout=timeout)
+
+    def _cleanup():
+        # .git 내부 읽기전용 파일 삭제 (onerror는 3.14에서 제거 → 버전 분기)
+        def _rw(func, p, _e):
+            try: os.chmod(p, stat.S_IWRITE); func(p)
+            except OSError: pass
         try:
-            r = req_lib.post(f"{base}/git/blobs", headers=h,
-                             json={"content": b64, "encoding": "base64"},
-                             timeout=360, verify=False)
-        except Exception as e:
-            print(f"  blob 시도 {attempt}/5 예외: {e}")
-            if attempt == 5:
-                print("❌ blob 최종 실패"); return False
-            wait = min(15 * (2 ** (attempt - 1)), 120)
-            print(f"  {wait}초 후 재시도...")
-            time.sleep(wait)
-            continue
-        if r.status_code == 201:
-            blob_sha = r.json()["sha"]
-            break
-        print(f"  blob 시도 {attempt}/5 실패: {r.status_code} {r.text[:200]}")
-        if r.status_code not in (502, 503, 504) or attempt == 5:
-            print("❌ blob 최종 실패"); return False
-        wait = min(15 * (2 ** (attempt - 1)), 120)  # 15 → 30 → 60 → 120초
-        print(f"  {wait}초 후 재시도...")
-        time.sleep(wait)
-    print(f"  blob SHA: {blob_sha[:12]}...")
+            if sys.version_info >= (3, 12): shutil.rmtree(tmp, onexc=_rw)
+            else: shutil.rmtree(tmp, onerror=_rw)
+        except OSError: pass
 
-    # 2) 현재 브랜치 최신 커밋 조회
-    r = _gh_req('get', f"{base}/git/refs/heads/main", h, timeout=30)
-    if r.status_code != 200: print(f"❌ ref 조회 실패: {r.status_code}"); return False
-    latest_commit = r.json()["object"]["sha"]
+    try:
+        # 1) 얕은 clone — 최신 커밋 1개만 (40MB HTML도 압축 전송이라 수 MB 수준)
+        r = _git(["clone", "--depth", "1", "--branch", "main", url, tmp], cwd=None)
+        if r.returncode != 0:
+            print(f"❌ clone 실패: {(r.stderr or r.stdout).strip()[:300]}"); return False
 
-    # 3) 현재 tree SHA 조회
-    r = _gh_req('get', f"{base}/git/commits/{latest_commit}", h, timeout=30)
-    if r.status_code != 200: print(f"❌ commit 조회 실패: {r.status_code}"); return False
-    base_tree = r.json()["tree"]["sha"]
+        # 2) index.html 교체
+        shutil.copyfile(ip, os.path.join(tmp, GITHUB_FILE))
+        r = _git(["status", "--porcelain"])
+        if not r.stdout.strip():
+            print("  변경 없음 — 업로드 생략"); return True
+        r = _git(["add", GITHUB_FILE])
+        if r.returncode != 0:
+            print(f"❌ add 실패: {(r.stderr or r.stdout).strip()[:300]}"); return False
 
-    # 4) 새 tree 생성
-    r = _gh_req('post', f"{base}/git/trees", h, timeout=60, json={
-        "base_tree": base_tree,
-        "tree": [{"path": GITHUB_FILE, "mode": "100644", "type": "blob", "sha": blob_sha}]
-    })
-    if r.status_code != 201: print(f"❌ tree 실패: {r.status_code} {r.text[:200]}"); return False
-    new_tree = r.json()["sha"]
+        # 3) commit
+        msg = f"Update ({datetime.now(timezone(timedelta(hours=9))).strftime('%Y-%m-%d')})"
+        r = _git(["commit", "-m", msg])
+        if r.returncode != 0:
+            print(f"❌ commit 실패: {(r.stderr or r.stdout).strip()[:300]}"); return False
 
-    # 5) 새 커밋 생성
-    msg = f"Update ({datetime.now(timezone(timedelta(hours=9))).strftime('%Y-%m-%d')})"
-    r = _gh_req('post', f"{base}/git/commits", h, timeout=60,
-                json={"message": msg, "tree": new_tree, "parents": [latest_commit]})
-    if r.status_code != 201: print(f"❌ commit 실패: {r.status_code} {r.text[:200]}"); return False
-    new_commit = r.json()["sha"]
-
-    # 6) 브랜치 ref 업데이트
-    r = _gh_req('patch', f"{base}/git/refs/heads/main", h, timeout=30,
-                json={"sha": new_commit})
-    if r.status_code in (200, 201): print("✅ GitHub 완료"); return True
-    print(f"❌ ref 업데이트 실패: {r.status_code} {r.text[:200]}"); return False
+        # 4) push — 일시 오류 3회 재시도
+        for attempt in range(1, 4):
+            r = _git(["push", "origin", "main"], timeout=900)
+            if r.returncode == 0:
+                print("✅ GitHub 완료 (git push)"); return True
+            print(f"  push 시도 {attempt}/3 실패: {(r.stderr or r.stdout).strip()[:300]}")
+            if attempt < 3: time.sleep(15 * attempt)
+        print("❌ push 최종 실패"); return False
+    except subprocess.TimeoutExpired as e:
+        print(f"❌ git 명령 타임아웃: {e}"); return False
+    finally:
+        _cleanup()
 
 # ============================================================
 # 실행
