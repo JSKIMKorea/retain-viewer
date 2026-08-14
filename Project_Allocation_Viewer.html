@@ -272,6 +272,8 @@ body.mobile-view .pf-reset{font-size:12px;padding:8px 10px}
 .pd-mini{width:26px;height:26px;border-radius:7px;border:1px solid #e2e8f0;background:#fff;color:#64748b;font-size:15px;line-height:1;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;padding:0}
 .pd-mini:hover{border-color:#93c5fd;color:#3b82f6}
 .pd-mini.del:hover{border-color:#fca5a5;color:#dc2626}
+.pd-mini:disabled{opacity:.35;cursor:not-allowed}
+.pd-mini:disabled:hover{border-color:#e2e8f0;color:#64748b}
 .pd-summary{font-size:12px;color:#64748b;margin:2px 0 8px;line-height:1.6}
 .pd-scroll{overflow:auto;max-height:calc(100vh - 330px);min-height:240px;border:1px solid #e2e8f0;border-radius:10px;background:#fff}
 .pd-table{border-collapse:separate;border-spacing:0;width:max-content}
@@ -295,7 +297,6 @@ body.mobile-view .pf-reset{font-size:12px;padding:8px 10px}
 .pd-dept-cell{position:sticky;left:0;z-index:3;background:#eef2f7;border-right:2px solid #cbd5e1;border-bottom:1px solid #e2e8f0;padding:6px 12px;font-size:12px;font-weight:700;color:#334155;min-width:190px!important;max-width:190px!important;white-space:nowrap}
 .pd-dept-fill{background:#eef2f7;border-bottom:1px solid #e2e8f0}
 .pd-seg-start{border-left:3px solid #94a3b8!important}
-.pd-more{margin-top:10px;text-align:center}
 html[data-theme="dark"] .pd-bar{background:#1e293b;border-color:#334155}
 html[data-theme="dark"] .pd-bar-label{color:#e2e8f0}
 html[data-theme="dark"] .pd-mini{background:#1e293b;border-color:#334155;color:#cbd5e1}
@@ -358,7 +359,7 @@ body.mobile-view .pd-range-row .date-input{width:118px!important;font-size:12px!
         <div id="projSearchArea"></div>
       </div>
       <div id="tabPeriod" style="display:none">
-        <div id="periodGuide" style="padding:8px 0 4px;font-size:14px;color:#1e293b;padding-left:20px;text-indent:-20px;line-height:1.6"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;flex-shrink:0"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a7 7 0 0 1 7 7c0 2.79-1.63 5.24-4 6.46V17H9v-1.54C6.63 14.24 5 11.79 5 9a7 7 0 0 1 7-7z"/></svg> 조회할 기간을 설정하면 해당 기간의 인원별 어싸인 내역을 주 단위로 보여줍니다. 표시는 주 단위로 맞춰지며, 종료일을 비우면 시작일이 속한 한 주만 조회됩니다. + 버튼으로 기간을 여러 구간 추가하면 한 줄로 이어서 비교할 수 있습니다.</div>
+        <div id="periodGuide" style="padding:8px 0 4px;font-size:14px;color:#1e293b;padding-left:20px;text-indent:-20px;line-height:1.6"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;flex-shrink:0"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a7 7 0 0 1 7 7c0 2.79-1.63 5.24-4 6.46V17H9v-1.54C6.63 14.24 5 11.79 5 9a7 7 0 0 1 7-7z"/></svg> 조회할 기간을 설정하면 해당 기간의 인원별 어싸인 내역을 주 단위로 보여줍니다. 표시는 주 단위로 맞춰지며, 종료일을 비우면 시작일이 속한 한 주만 조회됩니다. + 버튼으로 기간을 여러 구간(최대 10개) 추가하면 한 줄로 이어서 비교할 수 있습니다.</div>
         <div class="pd-bar" style="align-items:flex-start">
           <span class="pd-bar-label" style="padding-top:4px">기간</span>
           <div class="pd-ranges" id="pdRanges"></div>
@@ -1448,8 +1449,10 @@ function renderProjItem(container,projName,pData,autoExpand){
 // 어싸인 현황의 주(월요일) 단위 셀 렌더링 + 프로젝트별 검색의 '인원=행' 레이아웃 결합.
 // 선택한 구간들의 주를 순서대로 이어붙여 하나의 연속된 간트로 표시한다.
 var PD_DEPT_ORDER=["Global IPO","Global CMAAS","IOA","Assurance NGH","Global"];
-var PD_ROW_STEP=150;
-var pdRankSel=new Set(),pdJobSel=new Set(),pdRowLimit=PD_ROW_STEP,pdLast=null;
+// 부하 가드는 '인원 × 주 수 = 셀 개수' 기준. 주 수만 보면 필터를 건 소수 인원 조회까지
+// 불필요하게 막히고, 전체 인원 장기 조회는 통과해 버린다. 인원은 절대 잘라내지 않는다.
+var PD_CELL_WARN=30000,PD_CELL_MAX=80000,PD_MAX_RANGES=10;
+var pdRankSel=new Set(),pdJobSel=new Set(),pdLast=null;
 
 function pdParseYmd(s){var m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(String(s||""));return m?new Date(+m[1],+m[2]-1,+m[3]):null;}
 
@@ -1472,9 +1475,13 @@ function pdReadRows(){
 }
 function pdRenderRows(rows){
   if(!rows||!rows.length)rows=[{from:fmtDate(getKoreaToday()),to:""}];
+  if(rows.length>PD_MAX_RANGES)rows=rows.slice(0,PD_MAX_RANGES);
   var c=document.getElementById("pdRanges");
   c.innerHTML=rows.map(function(r,i){return pdRangeRowHtml(i,r.from,r.to);}).join("");
   if(rows.length<=1)c.querySelectorAll(".pd-mini.del").forEach(function(b){b.style.visibility="hidden";});
+  if(rows.length>=PD_MAX_RANGES)c.querySelectorAll(".pd-mini.add").forEach(function(b){
+    b.disabled=true;b.title="구간은 최대 "+PD_MAX_RANGES+"개까지 추가할 수 있습니다";
+  });
 }
 function pdGetRanges(){
   var out=[],err=null;
@@ -1541,7 +1548,7 @@ function pdCandidates(q){
   });
 }
 function pdInit(){
-  pdRankSel=new Set();pdJobSel=new Set();pdRowLimit=PD_ROW_STEP;pdLast=null;
+  pdRankSel=new Set();pdJobSel=new Set();pdLast=null;
   pdRenderRows(null);
   pdBuildFilterPanels();pdUpdateFilterBtns();
   document.getElementById("pdSearchInput").value="";
@@ -1556,14 +1563,18 @@ function pdRun(){
   if(g.err){sum.style.display="none";area.innerHTML='<div class="empty-state">'+escapeHtml(g.err)+'</div>';return;}
   if(!g.ranges.length){sum.style.display="none";area.innerHTML='<div class="empty-state">조회할 기간을 입력해 주세요.</div>';return;}
   var segs=pdBuildSegments(g.ranges);
+  var q0=document.getElementById("pdSearchInput").value.trim();
   var totalWeeks=segs.reduce(function(a,s){return a+s.weeks.length;},0);
-  if(totalWeeks>260){
+  var cand=pdCandidates(q0).length;
+  var cells=totalWeeks*cand;
+  if(cells>PD_CELL_MAX){
     sum.style.display="none";
-    area.innerHTML='<div class="empty-state">조회 기간이 너무 깁니다 (총 '+totalWeeks+'주). 260주 이하로 나눠서 조회해 주세요.</div>';
+    area.innerHTML='<div class="empty-state">조회량이 너무 많습니다 — 인원 '+cand.toLocaleString()+'명 × '+totalWeeks
+      +'주 = '+cells.toLocaleString()+'칸 (한도 '+PD_CELL_MAX.toLocaleString()+'칸).<br><br>'
+      +'기간을 줄이거나 직급·사번 필터를 걸어 주세요. 조회되는 인원을 잘라내지는 않습니다.</div>';
     return;
   }
-  pdRowLimit=PD_ROW_STEP;
-  pdLast={segs:segs,q:document.getElementById("pdSearchInput").value.trim()};
+  pdLast={segs:segs,q:q0};
   showLoading("기간별 조회 중...");
   setTimeout(function(){try{pdRenderTable();}finally{hideLoading();}},30);
 }
@@ -1641,7 +1652,6 @@ function pdRenderTable(){
   });
   var deptCount={};rows.forEach(function(r){deptCount[r.dept]=(deptCount[r.dept]||0)+1;});
   var withWork=rows.filter(function(r){return r.d&&r.d.total>0;}).length;
-  var shown=rows.slice(0,pdRowLimit);
   // 구간이 겹치면 같은 주가 두 컬럼에 그려진다(합계는 1회만 계산) — 오해 방지용 안내
   var overlap=false;
   for(var oi=0;oi<segs.length&&!overlap;oi++){
@@ -1654,8 +1664,8 @@ function pdRenderTable(){
   sum.innerHTML='조회 구간 '+segs.length+'개 · '
     +segs.map(function(s){return escapeHtml(fmtDateKR(s.from)+"~"+fmtDateKR(s.to));}).join(" / ")
     +' &nbsp;|&nbsp; 표시 '+cols.length+'주 · 인원 '+rows.length+'명 (어싸인 있는 인원 '+withWork+'명) · 총 '+fmtHours(grandHours)+' / '+recCount.toLocaleString()+'건'
-    +(shown.length<rows.length?' &nbsp;|&nbsp; <span style="color:#dc2626">상위 '+shown.length+'명만 표시 중</span>':'')
-    +(overlap?'<br><span style="color:#dc2626">구간이 서로 겹칩니다 — 겹치는 주는 각 구간에 중복해서 그려집니다 (합계 시간은 1회만 계산)</span>':'');
+    +(overlap?'<br><span style="color:#dc2626">구간이 서로 겹칩니다 — 겹치는 주는 각 구간에 중복해서 그려집니다 (합계 시간은 1회만 계산)</span>':'')
+    +(cols.length*rows.length>PD_CELL_WARN?'<br><span style="color:#d97706">표시량이 많습니다 ('+(cols.length*rows.length).toLocaleString()+'칸) — 화면이 그려지는 데 몇 초 걸릴 수 있습니다.</span>':'');
   // 테이블
   var todayKey=getTodayWeekKey();
   var mg=[];
@@ -1679,7 +1689,7 @@ function pdRenderTable(){
   });
   h+='</tr>';
   var curDept=null,ri=0;
-  shown.forEach(function(row){
+  rows.forEach(function(row){
     if(!q&&row.dept!==curDept){
       curDept=row.dept;
       h+='<tr><td class="pd-dept-cell">'+escapeHtml(curDept)+' <span style="font-weight:500;color:#64748b">'+deptCount[curDept]+'명</span></td>'
@@ -1713,16 +1723,7 @@ function pdRenderTable(){
     h+='</tr>';
   });
   h+='</tbody></table></div>';
-  if(shown.length<rows.length){
-    h+='<div class="pd-more"><button type="button" class="pf-reset" id="pdMoreBtn">더 보기 ('+shown.length+' / '+rows.length+'명)</button></div>';
-  }
-  area.innerHTML=h;
-  var more=document.getElementById("pdMoreBtn");
-  if(more)more.addEventListener("click",function(){
-    pdRowLimit+=PD_ROW_STEP;
-    showLoading("추가 렌더링 중...");
-    setTimeout(function(){try{pdRenderTable();}finally{hideLoading();}},30);
-  });
+  area.innerHTML=h;   // 조건에 맞는 인원은 잘라내지 않고 전원 렌더 (상한 없음)
 }
 // --- 기간별 검색 이벤트 바인딩 ---
 document.getElementById("pdRanges").addEventListener("click",function(e){
@@ -1732,7 +1733,10 @@ document.getElementById("pdRanges").addEventListener("click",function(e){
   if(!rowEl)return;
   var idx=parseInt(rowEl.dataset.i,10);
   var rows=pdReadRows();
-  if(btn.classList.contains("add"))rows.splice(idx+1,0,{from:"",to:""});
+  if(btn.classList.contains("add")){
+    if(rows.length>=PD_MAX_RANGES)return;
+    rows.splice(idx+1,0,{from:"",to:""});
+  }
   else if(rows.length>1)rows.splice(idx,1);
   else return;
   pdRenderRows(rows);
