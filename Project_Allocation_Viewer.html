@@ -263,6 +263,56 @@ html[data-theme="dark"] .pf-item:hover{background:#273449}
 html[data-theme="dark"] .pf-empty{color:#64748b}
 body.mobile-view .pf-btn{max-width:126px;font-size:12px}
 body.mobile-view .pf-reset{font-size:12px;padding:8px 10px}
+/* ── 기간별 검색 탭 ── */
+.pd-bar{padding:8px 14px;margin-bottom:8px;background:#fff;border:1px solid #e2e8f0;border-radius:10px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.pd-bar-label{font-size:14px;color:#1e293b;font-weight:700;flex-shrink:0}
+.pd-ranges{display:flex;flex-direction:column;gap:6px}
+.pd-range-row{display:flex;align-items:center;gap:6px}
+.pd-range-no{font-size:13px;color:#64748b;font-family:inherit;width:42px;flex-shrink:0}
+.pd-mini{width:26px;height:26px;border-radius:7px;border:1px solid #e2e8f0;background:#fff;color:#64748b;font-size:15px;line-height:1;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;padding:0}
+.pd-mini:hover{border-color:#93c5fd;color:#3b82f6}
+.pd-mini.del:hover{border-color:#fca5a5;color:#dc2626}
+.pd-summary{font-size:12px;color:#64748b;margin:2px 0 8px;line-height:1.6}
+.pd-scroll{overflow:auto;max-height:calc(100vh - 330px);min-height:240px;border:1px solid #e2e8f0;border-radius:10px;background:#fff}
+.pd-table{border-collapse:separate;border-spacing:0;width:max-content}
+.pd-table td{min-width:130px;max-width:130px}
+.pd-head td{position:sticky;z-index:4;background:#f8fafc;text-align:center;border-bottom:1px solid #e2e8f0;border-right:1px solid #cbd5e1}
+.pd-head-range td{top:0;height:28px}
+.pd-head-month td{top:28px;height:28px}
+.pd-head-week td{top:56px;height:26px}
+.pd-rangehdr{font-size:11px;font-weight:700;color:#334155;padding:0 6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pd-monthhdr{font-size:10px;font-weight:600;color:#64748b}
+.pd-weekhdr{font-size:10px;color:#94a3b8;font-family:'JetBrains Mono',monospace}
+.pd-weekhdr.today{background:#e8f1fe;color:#3b82f6;font-weight:600}
+.pd-corner{min-width:190px!important;max-width:190px!important;left:0;z-index:6;border-right:2px solid #cbd5e1;padding:0 12px;font-size:11px;font-weight:600;color:#64748b;text-align:left!important}
+.pd-name-cell{min-width:190px!important;max-width:190px!important;position:sticky;left:0;z-index:3;padding:7px 12px;border-right:2px solid #cbd5e1;border-bottom:1px solid #f1f5f9;background:#fff;vertical-align:top}
+.gantt-row-odd .pd-name-cell{background:#f8fafc}
+.pd-name{font-weight:600;font-size:12px;color:#1e293b;cursor:pointer;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pd-name:hover{color:#3b82f6;text-decoration:underline}
+.pd-sub{font-size:10px;color:#94a3b8;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pd-hours{font-family:'JetBrains Mono',monospace;font-size:10px;color:#3b82f6;font-weight:600}
+.pd-hours.zero{color:#cbd5e1}
+.pd-dept-cell{position:sticky;left:0;z-index:3;background:#eef2f7;border-right:2px solid #cbd5e1;border-bottom:1px solid #e2e8f0;padding:6px 12px;font-size:12px;font-weight:700;color:#334155;min-width:190px!important;max-width:190px!important;white-space:nowrap}
+.pd-dept-fill{background:#eef2f7;border-bottom:1px solid #e2e8f0}
+.pd-seg-start{border-left:3px solid #94a3b8!important}
+.pd-more{margin-top:10px;text-align:center}
+html[data-theme="dark"] .pd-bar{background:#1e293b;border-color:#334155}
+html[data-theme="dark"] .pd-bar-label{color:#e2e8f0}
+html[data-theme="dark"] .pd-mini{background:#1e293b;border-color:#334155;color:#cbd5e1}
+html[data-theme="dark"] .pd-summary{color:#94a3b8}
+html[data-theme="dark"] .pd-scroll{background:#0f172a;border-color:#334155}
+html[data-theme="dark"] .pd-head td{background:#1e293b;border-color:#334155}
+html[data-theme="dark"] .pd-rangehdr{color:#cbd5e1}
+html[data-theme="dark"] .pd-monthhdr,html[data-theme="dark"] .pd-weekhdr,html[data-theme="dark"] .pd-corner{color:#94a3b8}
+html[data-theme="dark"] .pd-weekhdr.today{background:#1e3a8a;color:#dbeafe}
+html[data-theme="dark"] .pd-name-cell{background:#1e293b;border-right-color:#334155;border-bottom-color:#334155}
+html[data-theme="dark"] .gantt-row-odd .pd-name-cell{background:#273449}
+html[data-theme="dark"] .pd-name{color:#e2e8f0}
+html[data-theme="dark"] .pd-dept-cell,html[data-theme="dark"] .pd-dept-fill{background:#334155;color:#e2e8f0;border-color:#475569}
+body.mobile-view .pd-scroll{max-height:none}
+body.mobile-view .pd-corner,body.mobile-view .pd-name-cell,body.mobile-view .pd-dept-cell{min-width:132px!important;max-width:132px!important}
+body.mobile-view .pd-bar{padding:8px 10px;gap:6px}
+body.mobile-view .pd-range-row .date-input{width:118px!important;font-size:12px!important}
 </style>
 </head>
 <body>
@@ -271,7 +321,8 @@ body.mobile-view .pf-reset{font-size:12px;padding:8px 10px}
     <div class="header-left" id="headerReset"><div><div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap"><div class="header-title" style="cursor:pointer" id="headerTitleReset">Global Retain Viewer<div style="font-size:14px;color:#64748b;font-weight:500;margin-top:2px">(Global IPO, CMAAS, IOA + NGH 전체 인원)</div></div></div><div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap"><div class="header-sub" id="headerSub">Copyright © 2026 JS KIM. All rights reserved.</div></div><div id="fileRunDateInfo" style="display:none;margin-top:6px"></div><div id="contactBar" style="display:none;margin-top:8px;font-size:12px;color:#94a3b8;letter-spacing:-0.2px">(오류 신고 및 기능 개선 의견 접수: <a href="mailto:jeesoo.j.kim@pwc.com?subject=[Global Retain Viewer] 의견" target="_blank" style="color:#3b82f6;text-decoration:none;font-weight:500" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">jeesoo.j.kim@pwc.com</a>)</div></div></div>
     <div class="header-right">
       <div id="headerNotice" style="display:none;width:100%;max-width:560px;padding:12px 16px;border:1px solid #e2e8f0;border-radius:8px;background:#fafbfc;font-size:13px;color:#475569;line-height:1.6">
-        <div style="margin-bottom:4px">해당 어싸인 표는 <span style="color:#dc2626;font-weight:700">실시간으로 업데이트되지 않으며</span>, 매일 오전 9시 기준 데이터로 하루 1회만 업데이트됩니다.</div>
+        <div style="margin-bottom:4px;padding-left:11px;text-indent:-11px">- 해당 어싸인 표는 <span style="color:#dc2626;font-weight:700">실시간으로 업데이트되지 않으며</span>, 매일 오전 9시 기준 데이터로 하루 1회만 업데이트됩니다.</div>
+        <div style="margin-bottom:4px;padding-left:11px;text-indent:-11px">- <span style="font-weight:700">'기간별 검색'</span> 기능 추가(2026.08.14)</div>
         <div style="margin-top:8px;padding-top:8px;border-top:1px solid #e2e8f0;display:flex;align-items:center;gap:8px;flex-wrap:nowrap"><span style="font-size:12px;color:#64748b;font-weight:600;white-space:nowrap">참고사이트</span><a href="https://pageone.pwc.kr/covicore/control/goOrgChart.do?type=A0&amp;treeKind=Group&amp;css=samil&amp;CFN_OpenWindowName=조직구성" target="_blank" rel="noopener" title="직원 검색(Pageone) 사이트로 이동" style="display:inline-flex;align-items:center;gap:5px;padding:3px 8px;border:1px solid #e2e8f0;border-radius:6px;background:#fff;font-size:11px;color:#64748b;text-decoration:none;font-family:inherit;cursor:pointer;white-space:nowrap" onmouseover="this.style.borderColor='#93c5fd';this.style.color='#2563eb';this.style.background='#f0f7ff'" onmouseout="this.style.borderColor='#e2e8f0';this.style.color='#64748b';this.style.background='#fff'"><img src="data:image/png;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADb/2wBDAAUDBAQEAwUEBAQFBQUGBwwIBwcHBw8LCwkMEQ8SEhEPERETFhwXExQaFRERGCEYGh0dHx8fExciJCIeJBweHx7/2wBDAQUFBQcGBw4ICA4eFBEUHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh7/wAARCAAUABwDASIAAhEBAxEB/8QAFgABAQEAAAAAAAAAAAAAAAAAAAYI/8QAHxAAAQMFAQEBAAAAAAAAAAAAAQACAwQFBhExIRIV/8QAFgEBAQEAAAAAAAAAAAAAAAAAAwAB/8QAIhEAAQQBAwUBAAAAAAAAAAAAAQACAxFhIVFxEiORobHB/9oADAMBAAIRAxEAPwDZaIpensWUm7GauzN1RbnPcX0UVtji2w70wSAlw1se987v1FJI5ldLSb2rTmyPVp4YmSAlzw2t71wKB15oZVQinMewbFsfuH6FotTaep+CwSGaR+ge6DnEDnVRrYjIW9wAHBv8HxZO2FrqhcSMgA+AXfURESIUREUpf//Z" style="width:14px;height:14px;border-radius:2px"> 직원 검색(Pageone)</a><a href="https://smartoffice.samil.com/usc/swc/selectSmrtCnterResveListSearch.do" target="_blank" rel="noopener" title="Smart Office System 사이트로 이동" style="display:inline-flex;align-items:center;gap:5px;padding:3px 8px;border:1px solid #e2e8f0;border-radius:6px;background:#fff;font-size:11px;color:#64748b;text-decoration:none;font-family:inherit;cursor:pointer;white-space:nowrap" onmouseover="this.style.borderColor='#93c5fd';this.style.color='#2563eb';this.style.background='#f0f7ff'" onmouseout="this.style.borderColor='#e2e8f0';this.style.color='#64748b';this.style.background='#fff'"><img src="data:image/png;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADb/2wBDAAUDBAQEAwUEBAQFBQUGBwwIBwcHBw8LCwkMEQ8SEhEPERETFhwXExQaFRERGCEYGh0dHx8fExciJCIeJBweHx7/2wBDAQUFBQcGBw4ICA4eFBEUHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh7/wAARCAAUABwDASIAAhEBAxEB/8QAFgABAQEAAAAAAAAAAAAAAAAAAAYI/8QAHxAAAQMFAQEBAAAAAAAAAAAAAQACAwQFBhExIRIV/8QAFgEBAQEAAAAAAAAAAAAAAAAAAwAB/8QAIhEAAQQBAwUBAAAAAAAAAAAAAQACAxFhIVFxEiORobHB/9oADAMBAAIRAxEAPwDZaIpensWUm7GauzN1RbnPcX0UVtji2w70wSAlw1se987v1FJI5ldLSb2rTmyPVp4YmSAlzw2t71wKB15oZVQinMewbFsfuH6FotTaep+CwSGaR+ge6DnEDnVRrYjIW9wAHBv8HxZO2FrqhcSMgA+AXfURESIUREUpf//Z" style="width:14px;height:14px;border-radius:2px"> Smart Office System</a></div>
       </div>
       <button class="action-btn save" id="saveBtn" style="display:none"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px"><line x1="16.5" y1="9.4" x2="7.5" y2="4.21"/><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg> 공유용 파일 저장</button>
@@ -287,6 +338,7 @@ body.mobile-view .pf-reset{font-size:12px;padding:8px 10px}
           <button class="tab-btn active" data-tab="gantt"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg> 어싸인 현황</button>
           <button class="tab-btn" data-tab="detail"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg> 개인별 프로젝트 내역</button>
           <button class="tab-btn" data-tab="projSearch"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg> 프로젝트별 검색</button>
+          <button class="tab-btn" data-tab="period"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="8" y1="14" x2="16" y2="14"/></svg> 기간별 검색</button>
           <button class="tab-btn" data-tab="avail"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/><polyline points="16 11 18 13 22 9"/></svg> Available 조회</button>
           <button class="tab-btn" data-tab="news"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px"><path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2zm0 0a2 2 0 0 1-2-2V9c0-1.1.9-2 2-2h2"/><line x1="18" y1="14" x2="10" y2="14"/><line x1="15" y1="18" x2="10" y2="18"/><rect x="10" y="6" width="8" height="4" rx="1"/></svg> 업계 기사모음</button>
       </div>
@@ -304,6 +356,22 @@ body.mobile-view .pf-reset{font-size:12px;padding:8px 10px}
         <div id="projGuide" style="padding:8px 0 4px;font-size:14px;color:#1e293b;display:flex;align-items:center;gap:6px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a7 7 0 0 1 7 7c0 2.79-1.63 5.24-4 6.46V17H9v-1.54C6.63 14.24 5 11.79 5 9a7 7 0 0 1 7-7z"/></svg>프로젝트명을 직접 검색하거나 해당하는 EL명을 클릭하여 조회할 수 있습니다. 인원 이름을 클릭하면 해당 인원의 어싸인 현황으로 이동합니다.</div>
         <div class="toolbar"><div class="search-wrap"><span class="search-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span><input class="search-input" id="projSearchInput" placeholder="프로젝트명 검색..." autocomplete="off" style="width:400px"></div><div class="pf-wrap"><button type="button" class="pf-btn" id="pfElBtn" title="EL명으로 필터링 (다중 선택)">EL 전체</button><div class="pf-panel" id="pfElPanel"><input class="pf-search" id="pfElSearch" placeholder="EL명 검색..." autocomplete="off"><div class="pf-list" id="pfElList"></div></div></div><div class="pf-wrap"><button type="button" class="pf-btn" id="pfPmBtn" title="PM명으로 필터링 (다중 선택)">PM 전체</button><div class="pf-panel" id="pfPmPanel"><input class="pf-search" id="pfPmSearch" placeholder="PM명 검색..." autocomplete="off"><div class="pf-list" id="pfPmList"></div></div></div><button type="button" class="pf-reset" id="pfResetBtn" title="EL/PM 필터 선택 모두 해제">필터 초기화</button></div>
         <div id="projSearchArea"></div>
+      </div>
+      <div id="tabPeriod" style="display:none">
+        <div id="periodGuide" style="padding:8px 0 4px;font-size:14px;color:#1e293b;padding-left:20px;text-indent:-20px;line-height:1.6"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;flex-shrink:0"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a7 7 0 0 1 7 7c0 2.79-1.63 5.24-4 6.46V17H9v-1.54C6.63 14.24 5 11.79 5 9a7 7 0 0 1 7-7z"/></svg> 조회할 기간을 설정하면 해당 기간의 인원별 어싸인 내역을 주 단위로 보여줍니다. 표시는 주 단위로 맞춰지며, 종료일을 비우면 시작일이 속한 한 주만 조회됩니다. + 버튼으로 기간을 여러 구간 추가하면 한 줄로 이어서 비교할 수 있습니다.</div>
+        <div class="pd-bar" style="align-items:flex-start">
+          <span class="pd-bar-label" style="padding-top:4px">기간</span>
+          <div class="pd-ranges" id="pdRanges"></div>
+        </div>
+        <div class="pd-bar">
+          <div class="search-wrap"><span class="search-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span><input class="search-input" id="pdSearchInput" placeholder="이름 검색..." autocomplete="off" style="width:240px;padding:8px 12px 8px 34px;font-size:13px"><button class="clear-btn" id="pdClearBtn" style="display:none;top:6px">✕</button></div>
+          <div class="pf-wrap"><button type="button" class="pf-btn" id="pdRankBtn" title="직급으로 필터링 (다중 선택)">직급 전체</button><div class="pf-panel" id="pdRankPanel"><div class="pf-list" id="pdRankList"></div></div></div>
+          <div class="pf-wrap"><button type="button" class="pf-btn" id="pdJobBtn" title="사번으로 필터링 (다중 선택)">사번 전체</button><div class="pf-panel" id="pdJobPanel"><div class="pf-list" id="pdJobList"></div></div></div>
+          <button type="button" class="pf-reset" id="pdResetBtn" title="기간·이름·직급·사번 조건 모두 초기화">필터 초기화</button>
+          <button class="check-btn" id="pdSearchBtn" style="padding:8px 18px;font-size:14px">조회</button>
+        </div>
+        <div class="pd-summary" id="pdSummary" style="display:none"></div>
+        <div id="pdArea"></div>
       </div>
       <div id="tabAvail" style="display:none">
         <div style="display:flex;gap:0;min-height:calc(100vh - 200px)">
@@ -680,12 +748,14 @@ document.querySelectorAll(".tab-btn").forEach(function(btn){btn.addEventListener
   document.getElementById("tabGantt").style.display=t==="gantt"?"block":"none";
   document.getElementById("tabDetail").style.display=t==="detail"?"block":"none";
   document.getElementById("tabProjSearch").style.display=t==="projSearch"?"block":"none";
+  document.getElementById("tabPeriod").style.display=t==="period"?"block":"none";
   document.getElementById("tabAvail").style.display=t==="avail"?"block":"none";
   document.getElementById("tabNews").style.display=t==="news"?"block":"none";
   // Reset each tab
   if(t==="gantt"){searchQuery="";expandedSet=new Set();personCache={};document.getElementById("searchInput").value="";document.getElementById("clearBtn").style.display="none";yearFilter="all";buildYearFilter();renderAll();setTimeout(scrollGanttsToToday,150);}
   if(t==="detail"){document.getElementById("detailSearchInput").value="";renderDetail("");}
   if(t==="projSearch"){document.getElementById("projSearchInput").value="";renderProjSearch("");}
+  if(t==="period"){pdInit();}
   if(t==="avail"){document.getElementById("availDateFrom").value=fmtDate(getKoreaToday());document.getElementById("availDateTo").value="";document.getElementById("availDateTo").min=document.getElementById("availDateFrom").value;document.getElementById("availMinDays").value="1";document.getElementById("availRankFilter").value="";document.getElementById("availJobCodeFilter").value="";document.getElementById("availResult").innerHTML="";initCompareTab();setTimeout(syncAvailHeaders,50);}
   if(t==="news"){renderNews();}
 });});
@@ -1374,6 +1444,346 @@ function renderProjItem(container,projName,pData,autoExpand){
     container.appendChild(sec);
 }
 
+// ===== PERIOD TAB (기간별 검색) =====
+// 어싸인 현황의 주(월요일) 단위 셀 렌더링 + 프로젝트별 검색의 '인원=행' 레이아웃 결합.
+// 선택한 구간들의 주를 순서대로 이어붙여 하나의 연속된 간트로 표시한다.
+var PD_DEPT_ORDER=["Global IPO","Global CMAAS","IOA","Assurance NGH","Global"];
+var PD_ROW_STEP=150;
+var pdRankSel=new Set(),pdJobSel=new Set(),pdRowLimit=PD_ROW_STEP,pdLast=null;
+
+function pdParseYmd(s){var m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(String(s||""));return m?new Date(+m[1],+m[2]-1,+m[3]):null;}
+
+function pdRangeRowHtml(i,from,to){
+  return '<div class="pd-range-row" data-i="'+i+'">'
+    +'<span class="pd-range-no">구간'+(i+1)+'</span>'
+    +'<input type="date" class="date-input pd-from" value="'+escapeAttr(from||"")+'" style="padding:5px 4px;font-size:13px;width:140px">'
+    +'<span style="color:#94a3b8;font-size:13px">~</span>'
+    +'<input type="date" class="date-input pd-to" value="'+escapeAttr(to||"")+'" min="'+escapeAttr(from||"")+'" style="padding:5px 4px;font-size:13px;width:140px">'
+    +'<button type="button" class="pd-mini add" title="아래에 기간 구간 추가">+</button>'
+    +'<button type="button" class="pd-mini del" title="이 구간 삭제">−</button>'
+    +'</div>';
+}
+function pdReadRows(){
+  var rows=[];
+  document.querySelectorAll("#pdRanges .pd-range-row").forEach(function(el){
+    rows.push({from:el.querySelector(".pd-from").value,to:el.querySelector(".pd-to").value});
+  });
+  return rows;
+}
+function pdRenderRows(rows){
+  if(!rows||!rows.length)rows=[{from:fmtDate(getKoreaToday()),to:""}];
+  var c=document.getElementById("pdRanges");
+  c.innerHTML=rows.map(function(r,i){return pdRangeRowHtml(i,r.from,r.to);}).join("");
+  if(rows.length<=1)c.querySelectorAll(".pd-mini.del").forEach(function(b){b.style.visibility="hidden";});
+}
+function pdGetRanges(){
+  var out=[],err=null;
+  pdReadRows().forEach(function(r,i){
+    if(!r.from&&!r.to)return;                        // 빈 줄은 무시
+    if(!r.from){if(!err)err="구간"+(i+1)+"의 시작일을 입력해 주세요.";return;}
+    var f=pdParseYmd(r.from);
+    var t=r.to?pdParseYmd(r.to):new Date(f);
+    if(!f||!t){if(!err)err="구간"+(i+1)+"의 날짜 형식이 올바르지 않습니다.";return;}
+    if(t<f){if(!err)err="구간"+(i+1)+"의 종료일이 시작일보다 빠릅니다.";return;}
+    out.push({from:f,to:t});
+  });
+  return {ranges:out,err:err};
+}
+// 각 구간을 월요일 경계로 스냅해 주 목록을 만든다 (간트가 주 단위로 딱 떨어지도록)
+function pdBuildSegments(ranges){
+  return ranges.map(function(r,i){
+    var weeks=getWeeksBetween(r.from,r.to);
+    var lastW=weeks[weeks.length-1];
+    var wTo=new Date(lastW.getFullYear(),lastW.getMonth(),lastW.getDate()+6);
+    return {idx:i,weeks:weeks,from:r.from,to:r.to,weekFrom:weeks[0],weekTo:wTo,
+            label:"구간"+(i+1)+" "+fmtWeek(r.from)+"~"+fmtWeek(r.to)};
+  });
+}
+function pdBuildFilterPanels(){
+  var present={};
+  allData.forEach(function(r){if(r.rank)present[r.rank]=1;});
+  var ranks=RANK_ORDER.filter(function(r){return present[r];})
+    .concat(Object.keys(present).filter(function(r){return RANK_ORDER.indexOf(r)<0&&r!=="Partner"&&r!=="Managing Director";}).sort());
+  var rl=document.getElementById("pdRankList");
+  rl.innerHTML=ranks.length?ranks.map(function(r){
+    return '<label class="pf-item"><input type="checkbox" value="'+escapeAttr(r)+'"'+(pdRankSel.has(r)?" checked":"")+'>'+escapeHtml(r)+'</label>';
+  }).join(""):'<div class="pf-empty">직급 정보 없음</div>';
+  var pre={};
+  allData.forEach(function(r){
+    if(!r.jobCode||String(r.jobCode).length<2)return;
+    var p=String(r.jobCode).substring(0,2),n=parseInt(p);
+    if(n>=20&&n<=60)pre[p]=1;
+  });
+  var jobs=Object.keys(pre).sort(function(a,b){return parseInt(b)-parseInt(a);});
+  var jl=document.getElementById("pdJobList");
+  jl.innerHTML=jobs.length?jobs.map(function(p){
+    return '<label class="pf-item"><input type="checkbox" value="'+p+'"'+(pdJobSel.has(p)?" checked":"")+'>'+p+'사번</label>';
+  }).join(""):'<div class="pf-empty">사번 정보 없음</div>';
+}
+function pdUpdateFilterBtns(){
+  var rb=document.getElementById("pdRankBtn"),jb=document.getElementById("pdJobBtn");
+  rb.textContent=pdRankSel.size?("직급 "+pdRankSel.size+"개"):"직급 전체";
+  rb.classList.toggle("active",pdRankSel.size>0);
+  jb.textContent=pdJobSel.size?("사번 "+pdJobSel.size+"개"):"사번 전체";
+  jb.classList.toggle("active",pdJobSel.size>0);
+}
+function pdCandidates(q){
+  return allNames.filter(function(k){
+    var rk=nameRankMap[k]||"";
+    if(rk==="Partner"||rk==="Managing Director")return false;
+    if(pdRankSel.size&&!pdRankSel.has(rk))return false;
+    if(pdJobSel.size){
+      var jc=String((personInfoMap[k]||{}).jobCode||"");
+      if(!pdJobSel.has(jc.substring(0,2)))return false;
+    }
+    if(q&&personKeyName(k).indexOf(q)<0)return false;
+    return true;
+  });
+}
+function pdInit(){
+  pdRankSel=new Set();pdJobSel=new Set();pdRowLimit=PD_ROW_STEP;pdLast=null;
+  pdRenderRows(null);
+  pdBuildFilterPanels();pdUpdateFilterBtns();
+  document.getElementById("pdSearchInput").value="";
+  document.getElementById("pdClearBtn").style.display="none";
+  document.getElementById("pdSummary").style.display="none";
+  document.getElementById("pdArea").innerHTML='<div class="empty-state">기간을 설정하고 <b>조회</b>를 누르면 인원별 어싸인 내역이 표시됩니다.</div>';
+  document.querySelectorAll("#tabPeriod .pf-panel").forEach(function(p){p.classList.remove("open");});
+}
+function pdRun(){
+  var area=document.getElementById("pdArea"),sum=document.getElementById("pdSummary");
+  var g=pdGetRanges();
+  if(g.err){sum.style.display="none";area.innerHTML='<div class="empty-state">'+escapeHtml(g.err)+'</div>';return;}
+  if(!g.ranges.length){sum.style.display="none";area.innerHTML='<div class="empty-state">조회할 기간을 입력해 주세요.</div>';return;}
+  var segs=pdBuildSegments(g.ranges);
+  var totalWeeks=segs.reduce(function(a,s){return a+s.weeks.length;},0);
+  if(totalWeeks>260){
+    sum.style.display="none";
+    area.innerHTML='<div class="empty-state">조회 기간이 너무 깁니다 (총 '+totalWeeks+'주). 260주 이하로 나눠서 조회해 주세요.</div>';
+    return;
+  }
+  pdRowLimit=PD_ROW_STEP;
+  pdLast={segs:segs,q:document.getElementById("pdSearchInput").value.trim()};
+  showLoading("기간별 조회 중...");
+  setTimeout(function(){try{pdRenderTable();}finally{hideLoading();}},30);
+}
+function pdRenderTable(){
+  if(!pdLast)return;
+  var segs=pdLast.segs,q=pdLast.q;
+  var area=document.getElementById("pdArea"),sum=document.getElementById("pdSummary");
+  var names=pdCandidates(q);
+  if(!names.length){
+    sum.style.display="none";
+    area.innerHTML='<div class="empty-state">'+(q?'"'+escapeHtml(q)+'" ':'')+'조건에 맞는 인원이 없습니다.</div>';
+    return;
+  }
+  // 컬럼(주) 목록 — 구간 순서대로 이어붙임
+  var cols=[];
+  segs.forEach(function(s){s.weeks.forEach(function(w,wi){cols.push({w:w,seg:s.idx,first:wi===0});});});
+  var weekCols={};
+  cols.forEach(function(c,ci){var k=fmtWeekFull(c.w);(weekCols[k]=weekCols[k]||[]).push(ci);});
+  var nameSet={};names.forEach(function(k){nameSet[k]=1;});
+  // 레코드 수집 (한 레코드 = 하루)
+  var per={},projSet={},grandHours=0,recCount=0;
+  allData.forEach(function(r){
+    if(!r.startDate||!r.endDate)return;
+    var wk=fmtWeekFull(getMonday(r.startDate));
+    var ciList=weekCols[wk];
+    if(!ciList)return;
+    var pk=personKey(r.name,r.jobCode);
+    if(!nameSet[pk])return;
+    var p=per[pk]||(per[pk]={cells:{},total:0});
+    var ws=getMonday(r.startDate);
+    var daySegs=getWeekdaySegments(r.startDate,r.endDate,ws);
+    var ek=r.assignId?(r.project+"|"+r.assignId):(r.projCode?(r.project+"|"+r.projCode):r.project);
+    ciList.forEach(function(ci){
+      var cell=p.cells[ci]||(p.cells[ci]={});
+      var e=cell[ek]||(cell[ek]={hours:0,el:r.el,pm:r.pm,ranges:[],segments:[],projName:r.project});
+      e.hours+=r.hours;
+      if(r.el)e.el=r.el;
+      if(r.pm)e.pm=r.pm;
+      e.ranges.push({sd:r.startDate,ed:r.endDate});
+      e.segments=e.segments.concat(daySegs);
+    });
+    p.total+=r.hours;                 // 구간이 겹쳐도 실제 시간은 1회만 합산
+    projSet[r.project]=1;
+    grandHours+=r.hours;recCount++;
+  });
+  Object.keys(per).forEach(function(pk){
+    var cells=per[pk].cells;
+    Object.keys(cells).forEach(function(ci){
+      Object.keys(cells[ci]).forEach(function(ek){cells[ci][ek].segments=mergeSegments(cells[ci][ek].segments);});
+    });
+  });
+  // 프로젝트 색상은 결과 전체 공통 — 같은 프로젝트가 인원이 달라도 같은 색
+  var colorMap={},cidx=0;
+  Object.keys(projSet).sort().forEach(function(p){colorMap[p]=COLORS[cidx%COLORS.length];cidx++;});
+  // 정렬: (이름 미검색 시) 본부 그룹 → 사번 내림차순
+  var rows=names.map(function(pk){
+    var info=personInfoMap[pk]||{};
+    return {pk:pk,dept:info.dept||"기타",rank:info.rank||"",jobCode:String(info.jobCode||""),d:per[pk]||null};
+  });
+  rows.sort(function(a,b){
+    if(!q){
+      var da=PD_DEPT_ORDER.indexOf(a.dept),db=PD_DEPT_ORDER.indexOf(b.dept);
+      if(da<0)da=PD_DEPT_ORDER.length;
+      if(db<0)db=PD_DEPT_ORDER.length;
+      if(da!==db)return da-db;
+      if(a.dept!==b.dept)return a.dept.localeCompare(b.dept);
+    }
+    if(a.jobCode!==b.jobCode){
+      // 사번 내림차순. 자릿수가 다른 사번(5~8자리 허용)이 섞여도 맞도록 숫자 비교 우선
+      var na=parseInt(a.jobCode,10),nb=parseInt(b.jobCode,10);
+      if(!isNaN(na)&&!isNaN(nb)&&na!==nb)return nb-na;
+      return b.jobCode.localeCompare(a.jobCode);
+    }
+    return personKeyName(a.pk).localeCompare(personKeyName(b.pk));
+  });
+  var deptCount={};rows.forEach(function(r){deptCount[r.dept]=(deptCount[r.dept]||0)+1;});
+  var withWork=rows.filter(function(r){return r.d&&r.d.total>0;}).length;
+  var shown=rows.slice(0,pdRowLimit);
+  // 구간이 겹치면 같은 주가 두 컬럼에 그려진다(합계는 1회만 계산) — 오해 방지용 안내
+  var overlap=false;
+  for(var oi=0;oi<segs.length&&!overlap;oi++){
+    for(var oj=oi+1;oj<segs.length;oj++){
+      if(segs[oi].weekFrom<=segs[oj].weekTo&&segs[oj].weekFrom<=segs[oi].weekTo){overlap=true;break;}
+    }
+  }
+  // 요약
+  sum.style.display="block";
+  sum.innerHTML='조회 구간 '+segs.length+'개 · '
+    +segs.map(function(s){return escapeHtml(fmtDateKR(s.from)+"~"+fmtDateKR(s.to));}).join(" / ")
+    +' &nbsp;|&nbsp; 표시 '+cols.length+'주 · 인원 '+rows.length+'명 (어싸인 있는 인원 '+withWork+'명) · 총 '+fmtHours(grandHours)+' / '+recCount.toLocaleString()+'건'
+    +(shown.length<rows.length?' &nbsp;|&nbsp; <span style="color:#dc2626">상위 '+shown.length+'명만 표시 중</span>':'')
+    +(overlap?'<br><span style="color:#dc2626">구간이 서로 겹칩니다 — 겹치는 주는 각 구간에 중복해서 그려집니다 (합계 시간은 1회만 계산)</span>':'');
+  // 테이블
+  var todayKey=getTodayWeekKey();
+  var mg=[];
+  cols.forEach(function(c){
+    var lbl=c.w.getFullYear()+"."+String(c.w.getMonth()+1).padStart(2,"0");
+    var last=mg[mg.length-1];
+    if(!last||last.l!==lbl||c.first)mg.push({l:lbl,s:1,segStart:c.first&&c.seg>0});
+    else last.s++;
+  });
+  var h='<div class="pd-scroll"><table class="pd-table"><tbody>';
+  h+='<tr class="pd-head pd-head-range"><td class="pd-corner">인원 '+rows.length+'명</td>';
+  segs.forEach(function(s){
+    h+='<td class="pd-rangehdr'+(s.idx>0?' pd-seg-start':'')+'" colspan="'+s.weeks.length+'" title="'+escapeAttr("입력: "+fmtDateKR(s.from)+" ~ "+fmtDateKR(s.to)+"\n표시: "+fmtDateKR(s.weekFrom)+" ~ "+fmtDateKR(s.weekTo)+" (주 단위)")+'">'+escapeHtml(s.label)+'</td>';
+  });
+  h+='</tr><tr class="pd-head pd-head-month"><td class="pd-corner"></td>';
+  mg.forEach(function(m){h+='<td class="pd-monthhdr'+(m.segStart?' pd-seg-start':'')+'" colspan="'+m.s+'">'+m.l+'</td>';});
+  h+='</tr><tr class="pd-head pd-head-week"><td class="pd-corner"></td>';
+  cols.forEach(function(c){
+    var isToday=fmtWeekFull(c.w)===todayKey;
+    h+='<td class="pd-weekhdr'+(isToday?' today':'')+(c.first&&c.seg>0?' pd-seg-start':'')+'">'+fmtWeek(c.w)+'</td>';
+  });
+  h+='</tr>';
+  var curDept=null,ri=0;
+  shown.forEach(function(row){
+    if(!q&&row.dept!==curDept){
+      curDept=row.dept;
+      h+='<tr><td class="pd-dept-cell">'+escapeHtml(curDept)+' <span style="font-weight:500;color:#64748b">'+deptCount[curDept]+'명</span></td>'
+        +'<td class="pd-dept-fill" colspan="'+cols.length+'"></td></tr>';
+    }
+    var isEven=ri%2===0;ri++;
+    var total=row.d?row.d.total:0;
+    h+='<tr class="'+(isEven?"gantt-row-even":"gantt-row-odd")+'">';
+    h+='<td class="pd-name-cell"><div class="pd-name" data-person="'+escapeAttr(row.pk)+'" title="클릭 → 어싸인 현황으로 이동">'+escapeHtml(personDisplayName(row.pk))+'</div>'
+      +'<div class="pd-sub">'+escapeHtml(infoText(row.rank,row.dept,row.jobCode))+'</div>'
+      +'<div class="pd-hours'+(total>0?"":" zero")+'">'+fmtHours(total)+'</div></td>';
+    cols.forEach(function(c,ci){
+      var bg=weekCellBackground(isEven?'#fff':'#f8fafc');
+      h+='<td class="gantt-cell'+(c.first&&c.seg>0?' pd-seg-start':'')+'" style="vertical-align:top;background:'+bg+'">';
+      var cell=row.d?row.d.cells[ci]:null;
+      if(cell){
+        Object.entries(cell).sort(function(a,b){return b[1].hours-a[1].hours;}).forEach(function(it){
+          var pn=it[1].projName||it[0];
+          var col=colorMap[pn]||"#666";
+          var nm=pn.length>13?pn.slice(0,13)+"…":pn;
+          var tip=pn+"\n기간: "+formatRanges(it[1].ranges)+"\nEL: "+(it[1].el||"-")+"\nPM: "+(it[1].pm||"-")+"\n\n클릭 → 프로젝트별 검색으로 이동";
+          h+='<div class="project-block" style="cursor:pointer;height:auto;display:block;padding:3px 4px" title="'+escapeAttr(tip)+'" data-proj="'+escapeAttr(pn)+'">'
+            +'<div style="display:flex;align-items:center;justify-content:space-between;gap:4px;margin-bottom:2px">'
+            +'<span class="project-block-name">'+escapeHtml(nm)+'</span>'
+            +'<span class="project-block-hours" style="color:'+col+'">'+fmtHours(it[1].hours)+'</span></div>'
+            +buildSegmentBarsHtml(it[1].segments,col)+'</div>';
+        });
+      }
+      h+='</td>';
+    });
+    h+='</tr>';
+  });
+  h+='</tbody></table></div>';
+  if(shown.length<rows.length){
+    h+='<div class="pd-more"><button type="button" class="pf-reset" id="pdMoreBtn">더 보기 ('+shown.length+' / '+rows.length+'명)</button></div>';
+  }
+  area.innerHTML=h;
+  var more=document.getElementById("pdMoreBtn");
+  if(more)more.addEventListener("click",function(){
+    pdRowLimit+=PD_ROW_STEP;
+    showLoading("추가 렌더링 중...");
+    setTimeout(function(){try{pdRenderTable();}finally{hideLoading();}},30);
+  });
+}
+// --- 기간별 검색 이벤트 바인딩 ---
+document.getElementById("pdRanges").addEventListener("click",function(e){
+  var btn=e.target.closest(".pd-mini");
+  if(!btn)return;
+  var rowEl=btn.closest(".pd-range-row");
+  if(!rowEl)return;
+  var idx=parseInt(rowEl.dataset.i,10);
+  var rows=pdReadRows();
+  if(btn.classList.contains("add"))rows.splice(idx+1,0,{from:"",to:""});
+  else if(rows.length>1)rows.splice(idx,1);
+  else return;
+  pdRenderRows(rows);
+});
+document.getElementById("pdRanges").addEventListener("change",function(e){
+  // 시작일을 고르면 종료일의 최소값을 맞춰 준다 (Available 탭과 동일 동작)
+  if(!e.target.classList.contains("pd-from"))return;
+  var rowEl=e.target.closest(".pd-range-row");
+  if(!rowEl)return;
+  var to=rowEl.querySelector(".pd-to");
+  to.min=e.target.value||"";
+});
+function pdBindPanel(btnId,panelId){
+  var p=document.getElementById(panelId);
+  document.getElementById(btnId).addEventListener("click",function(e){
+    e.stopPropagation();
+    var wasOpen=p.classList.contains("open");
+    Array.prototype.forEach.call(document.querySelectorAll(".pf-panel.open"),function(x){x.classList.remove("open");});
+    if(!wasOpen)p.classList.add("open");
+  });
+  // 전역 document 클릭 핸들러가 열린 패널을 모두 닫으므로, 패널 내부 클릭은 여기서 차단해야
+  // 체크박스를 누를 때마다 패널이 닫히지 않는다 (EL/PM 필터와 동일 패턴)
+  p.addEventListener("click",function(e){e.stopPropagation();});
+}
+pdBindPanel("pdRankBtn","pdRankPanel");
+pdBindPanel("pdJobBtn","pdJobPanel");
+document.getElementById("pdRankList").addEventListener("change",function(e){
+  if(!e.target||e.target.type!=="checkbox")return;
+  if(e.target.checked)pdRankSel.add(e.target.value);else pdRankSel.delete(e.target.value);
+  pdUpdateFilterBtns();
+});
+document.getElementById("pdJobList").addEventListener("change",function(e){
+  if(!e.target||e.target.type!=="checkbox")return;
+  if(e.target.checked)pdJobSel.add(e.target.value);else pdJobSel.delete(e.target.value);
+  pdUpdateFilterBtns();
+});
+document.getElementById("pdResetBtn").addEventListener("click",function(){pdInit();});
+document.getElementById("pdSearchBtn").addEventListener("click",function(){pdRun();});
+(function(){
+  var inp=document.getElementById("pdSearchInput"),clr=document.getElementById("pdClearBtn");
+  inp.addEventListener("input",function(){clr.style.display=inp.value.trim()?"flex":"none";});
+  inp.addEventListener("keydown",function(e){if(e.key==="Enter")pdRun();});
+  clr.addEventListener("click",function(){inp.value="";clr.style.display="none";inp.focus();});
+})();
+document.getElementById("pdArea").addEventListener("click",function(e){
+  var pb=e.target.closest("[data-proj]");
+  if(pb){goToProjSearch(pb.dataset.proj);return;}
+  var pn=e.target.closest("[data-person]");
+  if(pn)goToGanttPerson(pn.dataset.person);
+});
+
 // ===== AVAILABILITY (Range Search) =====
 document.getElementById("availBtn").addEventListener("click",checkAvailability);
 document.getElementById("availDateFrom").addEventListener("keydown",function(e){if(e.key==="Enter")checkAvailability();});
@@ -1595,6 +2005,7 @@ function goToGanttPerson(personNameOrKey){
   document.getElementById("tabGantt").style.display="block";
   document.getElementById("tabDetail").style.display="none";
   document.getElementById("tabProjSearch").style.display="none";
+  document.getElementById("tabPeriod").style.display="none";
   document.getElementById("tabAvail").style.display="none";document.getElementById("tabNews").style.display="none";
   var realName=personNameOrKey.indexOf("|")>=0?personKeyName(personNameOrKey):personNameOrKey;
   searchQuery=realName;
@@ -1618,6 +2029,7 @@ function goToProjSearch(projName){
   document.getElementById("tabGantt").style.display="none";
   document.getElementById("tabDetail").style.display="none";
   document.getElementById("tabProjSearch").style.display="block";
+  document.getElementById("tabPeriod").style.display="none";
   document.getElementById("tabAvail").style.display="none";document.getElementById("tabNews").style.display="none";
   document.getElementById("projSearchInput").value=projName;
   // Clear old heavy content first, then render in next frame
@@ -1635,6 +2047,7 @@ function goToDetailSearch(nameQuery){
   document.getElementById("tabGantt").style.display="none";
   document.getElementById("tabDetail").style.display="block";
   document.getElementById("tabProjSearch").style.display="none";
+  document.getElementById("tabPeriod").style.display="none";
   document.getElementById("tabAvail").style.display="none";document.getElementById("tabNews").style.display="none";
   document.getElementById("detailSearchInput").value=nameQuery;
   renderDetail(nameQuery);
@@ -1680,6 +2093,7 @@ function resetToHome(){
   document.getElementById("tabGantt").style.display="block";
   document.getElementById("tabDetail").style.display="none";
   document.getElementById("tabProjSearch").style.display="none";
+  document.getElementById("tabPeriod").style.display="none";
   document.getElementById("tabAvail").style.display="none";document.getElementById("tabNews").style.display="none";
   buildYearFilter();renderAll();setTimeout(scrollGanttsToToday,150);
 }
