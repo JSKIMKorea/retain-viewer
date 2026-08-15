@@ -346,6 +346,7 @@ html[data-theme="dark"] .pd-weekhdr.today{background:#1e3a8a;color:#dbeafe}
 html[data-theme="dark"] .pd-name-cell{background:#1e293b;border-right-color:#334155;border-bottom-color:#334155}
 html[data-theme="dark"] .gantt-row-odd .pd-name-cell{background:#273449}
 html[data-theme="dark"] .pd-name{color:#e2e8f0}
+html[data-theme="dark"] .pd-sub{color:#94a3b8}
 html[data-theme="dark"] .pd-dept-cell,html[data-theme="dark"] .pd-dept-fill{background:#334155;color:#e2e8f0;border-color:#475569}
 html[data-theme="dark"] .pd-viewseg{background:#1e293b;border-color:#334155}
 html[data-theme="dark"] .pd-viewbtn{color:#94a3b8;border-right-color:#334155}
@@ -375,7 +376,7 @@ body.mobile-view .pd-range-row .date-input{width:118px!important;font-size:12px!
 <body>
 <div id="appWrap">
   <div class="header">
-    <div class="header-left" id="headerReset"><div><div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap"><div class="header-title" style="cursor:pointer" id="headerTitleReset">Global Retain Viewer<div style="font-size:14px;color:#64748b;font-weight:500;margin-top:2px">(Global IPO, CMAAS, IOA + NGH 전체 인원)</div></div></div><div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap"><div class="header-sub" id="headerSub">Copyright © 2026 JS KIM. All rights reserved.</div></div><div id="fileRunDateInfo" style="display:none;margin-top:6px"></div><div id="contactBar" style="display:none;margin-top:8px;font-size:12px;color:#94a3b8;letter-spacing:-0.2px">(오류 신고 및 기능 개선 의견 접수: <a href="mailto:jeesoo.j.kim@pwc.com?subject=[Global Retain Viewer] 의견" target="_blank" style="color:#3b82f6;text-decoration:none;font-weight:500" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">jeesoo.j.kim@pwc.com</a>)</div></div></div>
+    <div class="header-left" id="headerReset"><div><div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap"><div class="header-title" style="cursor:pointer" id="headerTitleReset">Global Retain Viewer<div style="font-size:14px;color:#64748b;font-weight:500;margin-top:2px">(Global IPO, CMAAS, IOA + NGH 전체 인원)</div></div></div><div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap"><div class="header-sub" id="headerSub">Copyright © JS KIM. All rights reserved.</div></div><div id="fileRunDateInfo" style="display:none;margin-top:6px"></div><div id="contactBar" style="display:none;margin-top:8px;font-size:12px;color:#94a3b8;letter-spacing:-0.2px">(오류 신고 및 기능 개선 의견 접수: <a href="mailto:jeesoo.j.kim@pwc.com?subject=[Global Retain Viewer] 의견" target="_blank" style="color:#3b82f6;text-decoration:none;font-weight:500" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">jeesoo.j.kim@pwc.com</a>)</div></div></div>
     <div class="header-right">
       <div id="headerNotice" style="display:none;width:100%;max-width:560px;padding:12px 16px;border:1px solid #e2e8f0;border-radius:8px;background:#fafbfc;font-size:13px;color:#475569;line-height:1.6">
         <div style="margin-bottom:4px;padding-left:11px;text-indent:-11px">- 해당 어싸인 표는 <span style="color:#dc2626;font-weight:700">실시간으로 업데이트되지 않으며</span>, 매일 오전 9시 기준 데이터로 하루 1회만 업데이트됩니다.</div>
@@ -415,7 +416,7 @@ body.mobile-view .pd-range-row .date-input{width:118px!important;font-size:12px!
         <div id="projSearchArea"></div>
       </div>
       <div id="tabPeriod" style="display:none">
-        <div id="periodGuide" style="padding:8px 0 4px;font-size:14px;color:#1e293b;padding-left:20px;text-indent:-20px;line-height:1.6"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;flex-shrink:0"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a7 7 0 0 1 7 7c0 2.79-1.63 5.24-4 6.46V17H9v-1.54C6.63 14.24 5 11.79 5 9a7 7 0 0 1 7-7z"/></svg> 조회할 기간을 설정하면 해당 기간의 인원별 어싸인 내역을 주 단위로 보여줍니다. 표시는 주 단위로 맞춰지며, 종료일을 비우면 시작일이 속한 한 주만 조회됩니다. + 버튼으로 기간을 여러 구간(최대 10개) 추가하면 한 줄로 이어서 비교할 수 있습니다. <b>보기</b>는 <b>전체</b>(전원) · <b>어싸인</b>(어싸인 있는 인원만) · <b>빈 인원</b>(주별로 어싸인 없는 인원 명단) 중에 고르며, 다시 조회를 누르지 않아도 바로 전환됩니다.</div>
+        <div id="periodGuide" style="padding:8px 0 4px;font-size:14px;color:#1e293b;padding-left:20px;text-indent:-20px;line-height:1.6"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;flex-shrink:0"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a7 7 0 0 1 7 7c0 2.79-1.63 5.24-4 6.46V17H9v-1.54C6.63 14.24 5 11.79 5 9a7 7 0 0 1 7-7z"/></svg> 조회할 기간을 설정하면 해당 기간의 인원별 어싸인 내역을 주 단위로 보여줍니다. 표시는 주 단위로 맞춰지며, 종료일을 비우면 시작일이 속한 한 주만 조회됩니다.</div>
         <div class="pd-bar" style="align-items:flex-start">
           <span class="pd-bar-label" style="padding-top:4px">기간</span>
           <div class="pd-ranges" id="pdRanges"></div>
@@ -1516,7 +1517,7 @@ function renderProjItem(container,projName,pData,autoExpand){
 // ===== PERIOD TAB (기간별 검색) =====
 // 어싸인 현황의 주(월요일) 단위 셀 렌더링 + 프로젝트별 검색의 '인원=행' 레이아웃 결합.
 // 선택한 구간들의 주를 순서대로 이어붙여 하나의 연속된 간트로 표시한다.
-var PD_DEPT_ORDER=["Global IPO","Global CMAAS","IOA","Assurance NGH","Global"];
+var PD_DEPT_ORDER=["Global","Global IPO","Global CMAAS","IOA","Assurance NGH"];
 // 부하 가드는 '인원 × 주 수 = 셀 개수' 기준. 주 수만 보면 필터를 건 소수 인원 조회까지
 // 불필요하게 막히고, 전체 인원 장기 조회는 통과해 버린다. 인원은 절대 잘라내지 않는다.
 var PD_CELL_WARN=30000,PD_CELL_MAX=80000,PD_MAX_RANGES=10;
@@ -2199,7 +2200,7 @@ function checkAvailability(){
       });
     });
   });
-  var DEPT_ORDER=["Global IPO","Global CMAAS","IOA","Global","Assurance NGH"];
+  var DEPT_ORDER=["Global","Global IPO","Global CMAAS","IOA","Assurance NGH"];   // 기간별 검색 탭 PD_DEPT_ORDER와 동일하게 유지
   var AVAIL_RANK_ORDER=["Senior-Manager","Manager","Senior-Associate","Associate","Assistant-Associate","Intern"];
   var sortedRanks=AVAIL_RANK_ORDER.filter(function(r){return byRank[r];}).concat(Object.keys(byRank).filter(function(r){return AVAIL_RANK_ORDER.indexOf(r)<0;}));
   
