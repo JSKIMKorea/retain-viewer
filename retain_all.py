@@ -696,6 +696,8 @@ try {
     // 로그인 사용자 기준 어싸인 현황 기본 검색 — 사번 정확 일치 (메인 스크립트 로드 전이면 GRV_USER로 전달만)
     window.GRV_USER = user;
     if (window.grvApplyDefaultUser && user && user.sabun) { try { window.grvApplyDefaultUser(user.name, user.sabun); } catch(e){} }
+    // 딥링크(#tab=...) 상태가 있으면 기본 검색 대신 그 화면으로 (메인 스크립트가 데이터 로드 후 적용)
+    if (window.grvApplyHash) { try { window.grvApplyHash(); } catch(e){} }
     // 헤더 위젯 바 마운트 (날씨·사용자·로그아웃·테마 토글)
     // headerNotice가 initApp에서 display:block 되기 전에 미리 mount해두면
     // 로그인 직후 바로 표시되고, 안 되어 있어도 polling으로 따라잡음
