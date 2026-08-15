@@ -277,8 +277,8 @@ body.mobile-view .pf-reset{font-size:12px;padding:8px 10px}
 .pd-summary{font-size:12px;color:#64748b;margin:2px 0 8px;line-height:1.6}
 .pd-scroll{overflow:auto;max-height:calc(100vh - 330px);min-height:240px;border:1px solid #e2e8f0;border-radius:10px;background:#fff}
 .pd-table{border-collapse:separate;border-spacing:0;width:max-content}
-.pd-table td{min-width:130px;max-width:130px}
-.pd-head td{position:sticky;z-index:4;background:#f8fafc;text-align:center;border-bottom:1px solid #e2e8f0;border-right:1px solid #cbd5e1}
+.pd-table td{min-width:var(--pdwk,110px);max-width:var(--pdwk,110px)}   /* 주칸 — 기본값은 PD_WEEK_W와 같아야 하고, 남는 폭이 있으면 JS가 --pdwk를 키운다 */
+.pd-head td{position:sticky;z-index:5;background:#f8fafc;text-align:center;border-bottom:1px solid #e2e8f0;border-right:1px solid #cbd5e1}
 .pd-head-range td{top:0;height:28px}
 .pd-head-month td{top:28px;height:28px}
 .pd-head-week td{top:56px;height:26px}
@@ -286,17 +286,54 @@ body.mobile-view .pf-reset{font-size:12px;padding:8px 10px}
 .pd-monthhdr{font-size:10px;font-weight:600;color:#64748b}
 .pd-weekhdr{font-size:10px;color:#94a3b8;font-family:'JetBrains Mono',monospace}
 .pd-weekhdr.today{background:#e8f1fe;color:#3b82f6;font-weight:600}
-.pd-corner{min-width:190px!important;max-width:190px!important;left:0;z-index:6;border-right:2px solid #cbd5e1;padding:0 12px;font-size:11px;font-weight:600;color:#64748b;text-align:left!important}
-.pd-name-cell{min-width:190px!important;max-width:190px!important;position:sticky;left:0;z-index:3;padding:7px 12px;border-right:2px solid #cbd5e1;border-bottom:1px solid #f1f5f9;background:#fff;vertical-align:top}
+.pd-corner{min-width:150px!important;max-width:none!important;left:0;z-index:6;border-right:2px solid #cbd5e1;padding:0 12px;font-size:11px;font-weight:600;color:#64748b;text-align:left!important}
+.pd-name-cell{min-width:150px!important;max-width:none!important;position:sticky;left:0;z-index:3;padding:7px 12px;border-right:2px solid #cbd5e1;border-bottom:1px solid #f1f5f9;background:#fff;vertical-align:top}
 .gantt-row-odd .pd-name-cell{background:#f8fafc}
 .pd-name{font-weight:600;font-size:12px;color:#1e293b;cursor:pointer;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .pd-name:hover{color:#3b82f6;text-decoration:underline}
 .pd-sub{font-size:10px;color:#94a3b8;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .pd-hours{font-family:'JetBrains Mono',monospace;font-size:10px;color:#3b82f6;font-weight:600}
 .pd-hours.zero{color:#cbd5e1}
-.pd-dept-cell{position:sticky;left:0;z-index:3;background:#eef2f7;border-right:2px solid #cbd5e1;border-bottom:1px solid #e2e8f0;padding:6px 12px;font-size:12px;font-weight:700;color:#334155;min-width:190px!important;max-width:190px!important;white-space:nowrap}
+.pd-dept-cell{position:sticky;left:0;z-index:3;background:#eef2f7;border-right:2px solid #cbd5e1;border-bottom:1px solid #e2e8f0;padding:6px 12px;font-size:12px;font-weight:700;color:#334155;min-width:150px!important;max-width:none!important;white-space:nowrap}
 .pd-dept-fill{background:#eef2f7;border-bottom:1px solid #e2e8f0}
+/* 본부 행은 헤더 3줄(82px) 아래에 상단 고정 — 스크롤 중에도 현재 본부명이 각 레인 왼쪽에 보이고, 다음 본부 행이 오면 교체된다 */
+.pd-dept-cell,.pd-dept-fill{position:sticky;top:82px;z-index:4}
 .pd-seg-start{border-left:3px solid #94a3b8!important}
+/* --- 뷰 전환 (전체 / 어싸인 / 빈 인원) --- */
+.pd-viewseg{display:inline-flex;border:1px solid #e2e8f0;border-radius:9px;overflow:hidden;background:#fff;flex-shrink:0}
+.pd-viewbtn{border:0;background:transparent;padding:8px 14px;font-size:13px;font-family:inherit;color:#64748b;cursor:pointer;border-right:1px solid #e2e8f0}
+.pd-viewbtn:last-child{border-right:0}
+.pd-viewbtn:hover{background:#f1f5f9;color:#3b82f6}
+.pd-viewbtn.active{background:#3b82f6;color:#fff;font-weight:700}
+/* --- 본부 레인 다단 (어싸인/전체 뷰) --- */
+.pd-lanes{display:flex;align-items:flex-start;gap:12px}   /* gap = PD_LANE_GAP */
+.pd-lane{flex:0 0 auto}
+/* 다단일 때는 가로 스크롤이 없도록 폭을 맞춰 놓았다. sticky left를 켜 두면 레인들의
+   이름칸이 전부 왼쪽 끝에 겹쳐 붙으므로 반드시 해제하고, 폭도 고정해 계산과 어긋나지 않게 한다. */
+.pd-lanes.multi .pd-name-cell{position:static;max-width:150px!important}
+.pd-lanes.multi .pd-corner{position:sticky;left:auto;max-width:150px!important}   /* 다단: 코너("인원 N명")도 상단 고정만 유지 */
+.pd-lanes.multi .pd-dept-cell{position:sticky;left:auto;top:82px;max-width:150px!important}   /* 다단에서도 본부 행은 상단 고정 유지 (가로 고정만 해제) */
+/* --- 빈 인원 뷰 (행=본부 / 열=주 / 셀=그 주 0h 인원) --- */
+.pd-free{border-collapse:separate;border-spacing:0;width:100%}
+.pd-free td{border-bottom:1px solid #e2e8f0;border-right:1px solid #f1f5f9;vertical-align:top}
+.pd-free .pd-head td{position:sticky;z-index:5;background:#f8fafc;text-align:center;border-bottom:1px solid #e2e8f0}
+.pd-free .pd-fhead-range td{top:0;height:26px}
+.pd-free .pd-fhead-week td{top:26px;height:32px}
+.pd-freehdr{font-size:11px;font-weight:700;color:#334155;padding:4px}
+.pd-freehdr .wk{display:block;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:500;color:#94a3b8;margin-top:2px}
+.pd-freehdr.today{background:#e8f1fe}
+.pd-free-dept{position:sticky;left:0;z-index:3;width:150px;min-width:150px;background:#eef2f7;border-right:2px solid #cbd5e1;padding:8px 12px;font-size:12px;font-weight:700;color:#334155}
+.pd-free-dept .sub{display:block;font-size:10px;font-weight:500;color:#64748b;margin-top:2px}
+.pd-free-cell{padding:7px 8px;min-width:220px}
+.pd-free-cnt{font-size:11px;font-weight:700;color:#3b82f6;font-family:'JetBrains Mono',monospace;margin-bottom:5px}
+.pd-free-cnt.zero{color:#cbd5e1}
+.pd-free-chips{display:flex;flex-wrap:wrap;gap:4px}
+.pd-free-chip{display:inline-flex;align-items:baseline;gap:4px;padding:3px 8px;border:1px solid #e2e8f0;border-radius:11px;background:#fff;font-size:11px;color:#1e293b;cursor:pointer;white-space:nowrap}
+.pd-free-chip:hover{border-color:#93c5fd;background:#eff6ff;color:#3b82f6}
+.pd-free-chip em{font-style:normal;font-size:9px;color:#94a3b8}
+.pd-free-none{font-size:11px;color:#cbd5e1}
+.pd-free-grp{margin-bottom:6px}.pd-free-grp:last-child{margin-bottom:0}
+.pd-free-grp-hd{font-size:10px;font-weight:600;color:#64748b;margin:0 0 3px 1px;letter-spacing:-.2px}.pd-free-grp-hd b{font-weight:700;color:#3b82f6;font-family:'JetBrains Mono',monospace;font-size:10px}
 html[data-theme="dark"] .pd-bar{background:#1e293b;border-color:#334155}
 html[data-theme="dark"] .pd-bar-label{color:#e2e8f0}
 html[data-theme="dark"] .pd-mini{background:#1e293b;border-color:#334155;color:#cbd5e1}
@@ -310,8 +347,27 @@ html[data-theme="dark"] .pd-name-cell{background:#1e293b;border-right-color:#334
 html[data-theme="dark"] .gantt-row-odd .pd-name-cell{background:#273449}
 html[data-theme="dark"] .pd-name{color:#e2e8f0}
 html[data-theme="dark"] .pd-dept-cell,html[data-theme="dark"] .pd-dept-fill{background:#334155;color:#e2e8f0;border-color:#475569}
+html[data-theme="dark"] .pd-viewseg{background:#1e293b;border-color:#334155}
+html[data-theme="dark"] .pd-viewbtn{color:#94a3b8;border-right-color:#334155}
+html[data-theme="dark"] .pd-viewbtn:hover{background:#334155;color:#dbeafe}
+html[data-theme="dark"] .pd-viewbtn.active{background:#3b82f6;color:#fff}
+html[data-theme="dark"] .pd-free td{border-bottom-color:#334155;border-right-color:#1e293b}
+html[data-theme="dark"] .pd-free .pd-head td{background:#1e293b;border-color:#334155}
+html[data-theme="dark"] .pd-freehdr{color:#cbd5e1}
+html[data-theme="dark"] .pd-freehdr.today{background:#1e3a8a}
+html[data-theme="dark"] .pd-free-dept{background:#334155;color:#e2e8f0;border-right-color:#475569}
+html[data-theme="dark"] .pd-free-dept .sub{color:#94a3b8}
+html[data-theme="dark"] .pd-free-chip{background:#1e293b;border-color:#334155;color:#e2e8f0}
+html[data-theme="dark"] .pd-free-chip:hover{background:#1e3a8a;border-color:#3b82f6;color:#dbeafe}
+html[data-theme="dark"] .pd-free-none{color:#475569}
+html[data-theme="dark"] .pd-free-grp-hd{color:#94a3b8}html[data-theme="dark"] .pd-free-grp-hd b{color:#60a5fa}
 body.mobile-view .pd-scroll{max-height:none}
+body.mobile-view .pd-lanes{flex-direction:column;gap:14px}   /* 모바일은 JS에서도 레인 1개로 강제 — 이건 안전망 */
+body.mobile-view .pd-viewbtn{padding:7px 10px;font-size:12px}
+body.mobile-view .pd-free-dept{width:96px;min-width:96px;padding:6px 8px;font-size:11px}
+body.mobile-view .pd-free-cell{min-width:190px}
 body.mobile-view .pd-corner,body.mobile-view .pd-name-cell,body.mobile-view .pd-dept-cell{min-width:132px!important;max-width:132px!important}
+body.mobile-view .pd-sub{white-space:normal;overflow-wrap:anywhere;overflow:visible;text-overflow:clip} /* 모바일: 폭 고정 대신 줄바꿈으로 사번 표시 */
 body.mobile-view .pd-bar{padding:8px 10px;gap:6px}
 body.mobile-view .pd-range-row .date-input{width:118px!important;font-size:12px!important}
 </style>
@@ -359,12 +415,18 @@ body.mobile-view .pd-range-row .date-input{width:118px!important;font-size:12px!
         <div id="projSearchArea"></div>
       </div>
       <div id="tabPeriod" style="display:none">
-        <div id="periodGuide" style="padding:8px 0 4px;font-size:14px;color:#1e293b;padding-left:20px;text-indent:-20px;line-height:1.6"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;flex-shrink:0"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a7 7 0 0 1 7 7c0 2.79-1.63 5.24-4 6.46V17H9v-1.54C6.63 14.24 5 11.79 5 9a7 7 0 0 1 7-7z"/></svg> 조회할 기간을 설정하면 해당 기간의 인원별 어싸인 내역을 주 단위로 보여줍니다. 표시는 주 단위로 맞춰지며, 종료일을 비우면 시작일이 속한 한 주만 조회됩니다. + 버튼으로 기간을 여러 구간(최대 10개) 추가하면 한 줄로 이어서 비교할 수 있습니다.</div>
+        <div id="periodGuide" style="padding:8px 0 4px;font-size:14px;color:#1e293b;padding-left:20px;text-indent:-20px;line-height:1.6"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;flex-shrink:0"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a7 7 0 0 1 7 7c0 2.79-1.63 5.24-4 6.46V17H9v-1.54C6.63 14.24 5 11.79 5 9a7 7 0 0 1 7-7z"/></svg> 조회할 기간을 설정하면 해당 기간의 인원별 어싸인 내역을 주 단위로 보여줍니다. 표시는 주 단위로 맞춰지며, 종료일을 비우면 시작일이 속한 한 주만 조회됩니다. + 버튼으로 기간을 여러 구간(최대 10개) 추가하면 한 줄로 이어서 비교할 수 있습니다. <b>보기</b>는 <b>전체</b>(전원) · <b>어싸인</b>(어싸인 있는 인원만) · <b>빈 인원</b>(주별로 어싸인 없는 인원 명단) 중에 고르며, 다시 조회를 누르지 않아도 바로 전환됩니다.</div>
         <div class="pd-bar" style="align-items:flex-start">
           <span class="pd-bar-label" style="padding-top:4px">기간</span>
           <div class="pd-ranges" id="pdRanges"></div>
         </div>
         <div class="pd-bar">
+          <span class="pd-bar-label">보기</span>
+          <div class="pd-viewseg" id="pdViewSeg">
+            <button type="button" class="pd-viewbtn active" data-view="all" title="조건에 맞는 인원 전원을 간트로 표시">전체</button>
+            <button type="button" class="pd-viewbtn" data-view="assigned" title="조회 기간에 어싸인이 있는 인원만 간트로 표시">어싸인</button>
+            <button type="button" class="pd-viewbtn" data-view="free" title="주별로 어싸인이 없는(0h) 인원 명단 — 휴가자는 어싸인 있음으로 보아 제외">빈 인원</button>
+          </div>
           <div class="search-wrap"><span class="search-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span><input class="search-input" id="pdSearchInput" placeholder="이름 검색..." autocomplete="off" style="width:240px;padding:8px 12px 8px 34px;font-size:13px"><button class="clear-btn" id="pdClearBtn" style="display:none;top:6px">✕</button></div>
           <div class="pf-wrap"><button type="button" class="pf-btn" id="pdRankBtn" title="직급으로 필터링 (다중 선택)">직급 전체</button><div class="pf-panel" id="pdRankPanel"><div class="pf-list" id="pdRankList"></div></div></div>
           <div class="pf-wrap"><button type="button" class="pf-btn" id="pdJobBtn" title="사번으로 필터링 (다중 선택)">사번 전체</button><div class="pf-panel" id="pdJobPanel"><div class="pf-list" id="pdJobList"></div></div></div>
@@ -686,7 +748,7 @@ function loadEmbeddedData(){
 
     document.getElementById("availDateFrom").value=fmtDate(getKoreaToday());
     document.getElementById("availDateTo").value="";document.getElementById("availDateTo").min=document.getElementById("availDateFrom").value;
-    buildYearFilter();hideLoading();showLoading("차트 렌더링 중...");setTimeout(function(){renderAll();setTimeout(scrollGanttsToToday,150);hideLoading();},50);
+    buildYearFilter();hideLoading();showLoading("차트 렌더링 중...");setTimeout(function(){renderAll();setTimeout(scrollGanttsToToday,150);hideLoading();onDataReady();},50);
   },50);
 }
 
@@ -705,7 +767,7 @@ function processFile(file){
     document.getElementById("searchInput").value="";document.getElementById("clearBtn").style.display="none";
     document.getElementById("availDateFrom").value=fmtDate(getKoreaToday());
     document.getElementById("availDateTo").value="";document.getElementById("availDateTo").min=document.getElementById("availDateFrom").value;
-    buildYearFilter();hideLoading();showLoading("차트 렌더링 중...");setTimeout(function(){renderAll();setTimeout(scrollGanttsToToday,150);hideLoading();},50);
+    buildYearFilter();hideLoading();showLoading("차트 렌더링 중...");setTimeout(function(){renderAll();setTimeout(scrollGanttsToToday,150);hideLoading();onDataReady();},50);
   },50);};reader.readAsArrayBuffer(file);
 }
 document.getElementById("fileInput").addEventListener("change",function(e){processFile(e.target.files[0]);});
@@ -745,6 +807,7 @@ document.getElementById("saveBtn").addEventListener("click",function(){
 document.querySelectorAll(".tab-btn").forEach(function(btn){btn.addEventListener("click",function(){
   document.querySelectorAll(".tab-btn").forEach(function(b){b.classList.remove("active");});
   btn.classList.add("active");
+  hashPushPending=true;   // 딥링크: 이 탭 전환에서 처음 쓰는 해시는 pushState (아래 렌더가 먼저 syncHash를 불러도 히스토리에 남도록)
   var t=btn.dataset.tab;
   document.getElementById("tabGantt").style.display=t==="gantt"?"block":"none";
   document.getElementById("tabDetail").style.display=t==="detail"?"block":"none";
@@ -759,6 +822,8 @@ document.querySelectorAll(".tab-btn").forEach(function(btn){btn.addEventListener
   if(t==="period"){pdInit();}
   if(t==="avail"){document.getElementById("availDateFrom").value=fmtDate(getKoreaToday());document.getElementById("availDateTo").value="";document.getElementById("availDateTo").min=document.getElementById("availDateFrom").value;document.getElementById("availMinDays").value="1";document.getElementById("availRankFilter").value="";document.getElementById("availJobCodeFilter").value="";document.getElementById("availResult").innerHTML="";initCompareTab();setTimeout(syncAvailHeaders,50);}
   if(t==="news"){renderNews();}
+  syncHash(true);   // 딥링크: 탭 전환은 히스토리에 남겨 뒤로가기로 복귀 가능
+  hashPushPending=false;
 });});
 function syncAvailHeaders(){
   var l=document.getElementById("availLeftGuide"),r=document.getElementById("availRightGuide");
@@ -892,6 +957,7 @@ function scrollGanttsToToday(){
 }
 
 function renderAll(){
+  syncHash();
   var ganttGuide=document.getElementById("ganttGuide");
   if(ganttGuide)ganttGuide.style.display=searchQuery?"none":"flex";
   var names=getFilteredNames();
@@ -984,6 +1050,7 @@ detailSearch.addEventListener("input",function(){clearTimeout(detailTimer);detai
 detailSearch.addEventListener("keydown",function(e){if(e.key==="Enter"){clearTimeout(detailTimer);renderDetail(detailSearch.value.trim());}});
 
 function renderDetail(q){
+  syncHash();
   var area=document.getElementById("detailArea");
   var guide=document.getElementById("detailGuide");
   if(guide)guide.style.display=q?"none":"flex";
@@ -1203,6 +1270,7 @@ document.getElementById("pfResetBtn").addEventListener("click",function(){
 });
 
 function renderProjSearch(q,autoExpand){
+  syncHash();
   var area=document.getElementById("projSearchArea");
   var projGuide=document.getElementById("projGuide");
   var filterActive=!!(Object.keys(pfSelEls).length||Object.keys(pfSelPms).length);
@@ -1452,7 +1520,15 @@ var PD_DEPT_ORDER=["Global IPO","Global CMAAS","IOA","Assurance NGH","Global"];
 // 부하 가드는 '인원 × 주 수 = 셀 개수' 기준. 주 수만 보면 필터를 건 소수 인원 조회까지
 // 불필요하게 막히고, 전체 인원 장기 조회는 통과해 버린다. 인원은 절대 잘라내지 않는다.
 var PD_CELL_WARN=30000,PD_CELL_MAX=80000,PD_MAX_RANGES=10;
-var pdRankSel=new Set(),pdJobSel=new Set(),pdLast=null;
+// 본부 레인 다단 — 레인 수는 고정 임계값이 아니라 실제 컨테이너 폭에서 계산한다.
+// (사내 여러 해상도에서 보는 포털이라 1920 기준 고정값은 노트북에서 깨진다)
+// PD_WEEK_W / PD_NAME_W 는 CSS의 .pd-table td / .pd-name-cell 폭과 반드시 같아야 한다.
+var PD_NAME_W=150,PD_WEEK_W=110,PD_LANE_GAP=12,PD_MAX_LANES=5;
+var PD_VIEWS=["all","assigned","free"];
+// 빈 인원 칩은 좁아서 직급을 약어로 — 전체 직급명은 칩 title에 그대로 들어간다
+var PD_RANK_ABBR={"Director":"D","Senior-Manager":"SM","Manager":"M","Senior-Associate":"SA","Associate":"A","Assistant-Associate":"AA","Intern":"I"};
+function pdRankAbbr(r){return PD_RANK_ABBR[r]||(r||"-");}
+var pdRankSel=new Set(),pdJobSel=new Set(),pdLast=null,pdView="all",pdLaneN=1,pdGroupN=1,pdWkW=PD_WEEK_W;
 
 function pdParseYmd(s){var m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(String(s||""));return m?new Date(+m[1],+m[2]-1,+m[3]):null;}
 
@@ -1547,8 +1623,64 @@ function pdCandidates(q){
     return true;
   });
 }
+function pdSetView(v){
+  pdView=PD_VIEWS.indexOf(v)>=0?v:"all";
+  document.querySelectorAll("#pdViewSeg .pd-viewbtn").forEach(function(b){
+    b.classList.toggle("active",b.dataset.view===pdView);
+  });
+}
+// 화면 폭이 허용하는 만큼만 레인을 쓴다. 1920px 기준으로 3주→4레인 / 5~7주→2레인 / 8주+→1레인.
+function pdLaneCount(weekN,groupN){
+  if(document.body.classList.contains("mobile-view"))return 1;
+  var el=document.getElementById("pdArea");
+  var w=el.clientWidth||el.offsetWidth||1200;
+  var per=PD_NAME_W+weekN*PD_WEEK_W+PD_LANE_GAP;
+  return Math.max(1,Math.min(Math.floor((w+PD_LANE_GAP)/per),groupN,PD_MAX_LANES));
+}
+// 레인을 최대로 깐 뒤에도 폭이 남으면(예: 1~2주 조회) 남는 만큼 주칸을 넓혀 여백을 없앤다.
+// 넓힐수록 프로젝트명이 덜 잘리므로 정보량도 같이 는다. 과도하게 늘어지지 않게 상한을 둔다.
+function pdWeekWidth(laneN,weekN){
+  var el=document.getElementById("pdArea");
+  var w=el.clientWidth||el.offsetWidth||0;
+  if(!w||!weekN)return PD_WEEK_W;
+  var per=Math.floor((w-laneN*(PD_NAME_W+PD_LANE_GAP))/(laneN*weekN));
+  return Math.max(PD_WEEK_W,Math.min(per,240));
+}
+// 본부는 쪼개지 않고 PD_DEPT_ORDER 순서를 유지한 채 '연속 구간'으로 L등분한다.
+// 연속으로 자르면 좌→우 읽는 순서가 보존되고, 각 레인 인원 수의 최댓값이 최소가 되도록 고른다.
+// (본부 수가 5개 이하라 완전탐색으로 충분)
+function pdSplitLanes(groups,L){
+  var n=groups.length;
+  if(L>=n)return groups.map(function(g){return [g];});
+  var cnt=function(part){return part.reduce(function(a,g){return a+g.rows.length;},0);};
+  var best=null,bestMax=Infinity;
+  (function rec(start,left,acc){
+    if(left===1){
+      var parts=acc.concat([groups.slice(start)]);
+      var mx=Math.max.apply(null,parts.map(cnt));
+      if(mx<bestMax){bestMax=mx;best=parts;}
+      return;
+    }
+    for(var i=start+1;i<=n-left+1;i++)rec(i,left-1,acc.concat([groups.slice(start,i)]));
+  })(0,L,[]);
+  return best||[groups];
+}
+// 정렬된 rows를 본부별 그룹으로 묶는다 (이름 검색 중이면 본부 구분 없이 한 덩어리)
+function pdGroupByDept(rows,q){
+  if(q)return [{dept:null,rows:rows}];
+  var map={},order=[];
+  rows.forEach(function(r){if(!map[r.dept]){map[r.dept]=[];order.push(r.dept);}map[r.dept].push(r);});
+  return order.map(function(d){return {dept:d,rows:map[d]};});   // rows가 이미 본부 순으로 정렬돼 있음
+}
+function pdGroupByRank(rows){   // 빈 인원 뷰: 셀 내부 직급 묶음 (RANK_ORDER 순 → 그 외 직급 이름순)
+  var map={},extra=[];
+  rows.forEach(function(r){var k=r.rank||"";if(!map[k]){map[k]=[];if(RANK_ORDER.indexOf(k)<0)extra.push(k);}map[k].push(r);});
+  extra.sort();
+  return RANK_ORDER.concat(extra).filter(function(k){return map[k];}).map(function(k){return {rank:k,rows:map[k]};});
+}
 function pdInit(){
   pdRankSel=new Set();pdJobSel=new Set();pdLast=null;
+  pdSetView("all");
   pdRenderRows(null);
   pdBuildFilterPanels();pdUpdateFilterBtns();
   document.getElementById("pdSearchInput").value="";
@@ -1556,6 +1688,7 @@ function pdInit(){
   document.getElementById("pdSummary").style.display="none";
   document.getElementById("pdArea").innerHTML='<div class="empty-state">기간을 설정하고 <b>조회</b>를 누르면 인원별 어싸인 내역이 표시됩니다.</div>';
   document.querySelectorAll("#tabPeriod .pf-panel").forEach(function(p){p.classList.remove("open");});
+  syncHash();
 }
 function pdRun(){
   var area=document.getElementById("pdArea"),sum=document.getElementById("pdSummary");
@@ -1567,7 +1700,8 @@ function pdRun(){
   var totalWeeks=segs.reduce(function(a,s){return a+s.weeks.length;},0);
   var cand=pdCandidates(q0).length;
   var cells=totalWeeks*cand;
-  if(cells>PD_CELL_MAX){
+  // 빈 인원 뷰는 셀이 아니라 이름 칩 목록이라 훨씬 가볍다 — 간트 기준 가드를 적용하지 않는다
+  if(pdView!=="free"&&cells>PD_CELL_MAX){
     sum.style.display="none";
     area.innerHTML='<div class="empty-state">조회량이 너무 많습니다 — 인원 '+cand.toLocaleString()+'명 × '+totalWeeks
       +'주 = '+cells.toLocaleString()+'칸 (한도 '+PD_CELL_MAX.toLocaleString()+'칸).<br><br>'
@@ -1575,7 +1709,8 @@ function pdRun(){
     return;
   }
   pdLast={segs:segs,q:q0};
-  showLoading("기간별 조회 중...");
+  syncHash();
+  showLoading(pdView==="free"?"빈 인원 조회 중...":"기간별 조회 중...");
   setTimeout(function(){try{pdRenderTable();}finally{hideLoading();}},30);
 }
 function pdRenderTable(){
@@ -1603,7 +1738,7 @@ function pdRenderTable(){
     if(!ciList)return;
     var pk=personKey(r.name,r.jobCode);
     if(!nameSet[pk])return;
-    var p=per[pk]||(per[pk]={cells:{},total:0});
+    var p=per[pk]||(per[pk]={cells:{},total:0,ch:{}});   // ch = 컬럼(주)별 시간 합 — 빈 인원 판정용
     var ws=getMonday(r.startDate);
     var daySegs=getWeekdaySegments(r.startDate,r.endDate,ws);
     var ek=r.assignId?(r.project+"|"+r.assignId):(r.projCode?(r.project+"|"+r.projCode):r.project);
@@ -1615,6 +1750,7 @@ function pdRenderTable(){
       if(r.pm)e.pm=r.pm;
       e.ranges.push({sd:r.startDate,ed:r.endDate});
       e.segments=e.segments.concat(daySegs);
+      p.ch[ci]=(p.ch[ci]||0)+r.hours;
     });
     p.total+=r.hours;                 // 구간이 겹쳐도 실제 시간은 1회만 합산
     projSet[r.project]=1;
@@ -1650,7 +1786,7 @@ function pdRenderTable(){
     }
     return personKeyName(a.pk).localeCompare(personKeyName(b.pk));
   });
-  var deptCount={};rows.forEach(function(r){deptCount[r.dept]=(deptCount[r.dept]||0)+1;});
+  var allCount=rows.length;
   var withWork=rows.filter(function(r){return r.d&&r.d.total>0;}).length;
   // 구간이 겹치면 같은 주가 두 컬럼에 그려진다(합계는 1회만 계산) — 오해 방지용 안내
   var overlap=false;
@@ -1659,15 +1795,36 @@ function pdRenderTable(){
       if(segs[oi].weekFrom<=segs[oj].weekTo&&segs[oj].weekFrom<=segs[oi].weekTo){overlap=true;break;}
     }
   }
+  var overlapMsg=overlap?'<br><span style="color:#dc2626">구간이 서로 겹칩니다 — 겹치는 주는 각 구간에 중복해서 그려집니다 (합계 시간은 1회만 계산)</span>':'';
+  var segTxt='조회 구간 '+segs.length+'개 · '
+    +segs.map(function(s){return escapeHtml(fmtDateKR(s.from)+"~"+fmtDateKR(s.to));}).join(" / ");
+  var todayKey=getTodayWeekKey();
+  // 빈 인원 뷰는 격자 자체가 달라진다 (열마다 남는 사람이 다르므로 행=인원 구조를 쓸 수 없음)
+  if(pdView==="free"){pdRenderFree(segs,cols,rows,q,todayKey,segTxt,overlapMsg);return;}
+  if(pdView==="assigned")rows=rows.filter(function(r){return r.d&&r.d.total>0;});
+  if(!rows.length){
+    sum.style.display="none";
+    area.innerHTML='<div class="empty-state">조회 기간에 어싸인이 있는 인원이 없습니다.</div>';
+    return;
+  }
+  // 본부 밴드의 'N명'이 실제 표시 행 수와 맞도록 표시 대상 기준으로 다시 센다
+  var deptCount={};rows.forEach(function(r){deptCount[r.dept]=(deptCount[r.dept]||0)+1;});
+  var groups=pdGroupByDept(rows,q);
+  var laneN=pdLaneCount(cols.length,groups.length);
+  pdLaneN=laneN;pdGroupN=groups.length;
+  var lanes=pdSplitLanes(groups,laneN);
   // 요약
   sum.style.display="block";
-  sum.innerHTML='조회 구간 '+segs.length+'개 · '
-    +segs.map(function(s){return escapeHtml(fmtDateKR(s.from)+"~"+fmtDateKR(s.to));}).join(" / ")
-    +' &nbsp;|&nbsp; 표시 '+cols.length+'주 · 인원 '+rows.length+'명 (어싸인 있는 인원 '+withWork+'명) · 총 '+fmtHours(grandHours)+' / '+recCount.toLocaleString()+'건'
-    +(overlap?'<br><span style="color:#dc2626">구간이 서로 겹칩니다 — 겹치는 주는 각 구간에 중복해서 그려집니다 (합계 시간은 1회만 계산)</span>':'')
+  sum.innerHTML=segTxt
+    +' &nbsp;|&nbsp; 표시 '+cols.length+'주 · '
+    +(pdView==="assigned"
+      ? '어싸인 있는 인원 '+rows.length+'명만 표시 (조건 인원 '+allCount+'명)'
+      : '인원 '+rows.length+'명 (어싸인 있는 인원 '+withWork+'명)')
+    +' · 총 '+fmtHours(grandHours)+' / '+recCount.toLocaleString()+'건'
+    +(laneN>1?' · 본부 '+laneN+'단 배치':'')
+    +overlapMsg
     +(cols.length*rows.length>PD_CELL_WARN?'<br><span style="color:#d97706">표시량이 많습니다 ('+(cols.length*rows.length).toLocaleString()+'칸) — 화면이 그려지는 데 몇 초 걸릴 수 있습니다.</span>':'');
   // 테이블
-  var todayKey=getTodayWeekKey();
   var mg=[];
   cols.forEach(function(c){
     var lbl=c.w.getFullYear()+"."+String(c.w.getMonth()+1).padStart(2,"0");
@@ -1675,7 +1832,20 @@ function pdRenderTable(){
     if(!last||last.l!==lbl||c.first)mg.push({l:lbl,s:1,segStart:c.first&&c.seg>0});
     else last.s++;
   });
-  var h='<div class="pd-scroll"><table class="pd-table"><tbody>';
+  pdWkW=pdWeekWidth(laneN,cols.length);
+  var h='<div class="pd-scroll"><div class="pd-lanes'+(laneN>1?' multi':'')
+    +'" style="--pdwk:'+pdWkW+'px">';
+  lanes.forEach(function(lane){
+    var laneRows=[];
+    lane.forEach(function(g){laneRows=laneRows.concat(g.rows);});
+    h+='<div class="pd-lane">'+pdLaneTableHtml(laneRows,cols,mg,segs,colorMap,q,deptCount,todayKey)+'</div>';
+  });
+  h+='</div></div>';
+  area.innerHTML=h;   // 조건에 맞는 인원은 잘라내지 않고 전원 렌더 (상한 없음)
+}
+// 레인 1개분 간트 테이블. 레인이 1개면 이전과 완전히 같은 화면이 나온다.
+function pdLaneTableHtml(rows,cols,mg,segs,colorMap,q,deptCount,todayKey){
+  var h='<table class="pd-table"><tbody>';
   h+='<tr class="pd-head pd-head-range"><td class="pd-corner">인원 '+rows.length+'명</td>';
   segs.forEach(function(s){
     h+='<td class="pd-rangehdr'+(s.idx>0?' pd-seg-start':'')+'" colspan="'+s.weeks.length+'" title="'+escapeAttr("입력: "+fmtDateKR(s.from)+" ~ "+fmtDateKR(s.to)+"\n표시: "+fmtDateKR(s.weekFrom)+" ~ "+fmtDateKR(s.weekTo)+" (주 단위)")+'">'+escapeHtml(s.label)+'</td>';
@@ -1699,7 +1869,7 @@ function pdRenderTable(){
     var total=row.d?row.d.total:0;
     h+='<tr class="'+(isEven?"gantt-row-even":"gantt-row-odd")+'">';
     h+='<td class="pd-name-cell"><div class="pd-name" data-person="'+escapeAttr(row.pk)+'" title="클릭 → 어싸인 현황으로 이동">'+escapeHtml(personDisplayName(row.pk))+'</div>'
-      +'<div class="pd-sub">'+escapeHtml(infoText(row.rank,row.dept,row.jobCode))+'</div>'
+      +'<div class="pd-sub" title="'+escapeAttr(personDisplayName(row.pk)+"\n"+infoText(row.rank,row.dept,row.jobCode))+'">'+escapeHtml(infoText(row.rank,row.dept,row.jobCode))+'</div>'
       +'<div class="pd-hours'+(total>0?"":" zero")+'">'+fmtHours(total)+'</div></td>';
     cols.forEach(function(c,ci){
       var bg=weekCellBackground(isEven?'#fff':'#f8fafc');
@@ -1722,8 +1892,62 @@ function pdRenderTable(){
     });
     h+='</tr>';
   });
+  return h+'</tbody></table>';
+}
+// 빈 인원 뷰 — 행=본부 / 열=주 / 셀=그 주에 어싸인 0h인 인원 칩.
+// 열마다 명단이 독립이라 "이번 주는 비지만 다음 주는 어싸인 있는" 인원도 비는 주 칸에는 그대로 나온다.
+// 휴가(연월차·유급 등)도 어싸인 레코드라 휴가 중인 인원은 빈 인원에 잡히지 않는다.
+function pdRenderFree(segs,cols,rows,q,todayKey,segTxt,overlapMsg){
+  var area=document.getElementById("pdArea"),sum=document.getElementById("pdSummary");
+  var groups=pdGroupByDept(rows,q);
+  var isFree=function(row,ci){return !(row.d&&row.d.ch[ci]>0);};
+  var colFree=cols.map(function(c,ci){
+    return rows.filter(function(r){return isFree(r,ci);}).length;
+  });
+  sum.style.display="block";
+  sum.innerHTML=segTxt
+    +' &nbsp;|&nbsp; 대상 인원 '+rows.length+'명 · 주별 빈 인원 '
+    +cols.map(function(c,ci){return escapeHtml(fmtWeek(c.w))+'주 '+colFree[ci]+'명';}).join(' · ')
+    +overlapMsg
+    +'<br><span style="color:#94a3b8">휴가(연월차·유급 등)도 어싸인으로 잡히므로 휴가 중인 인원은 빈 인원에서 제외됩니다.</span>';
+  var h='<div class="pd-scroll"><table class="pd-free"><tbody>';
+  h+='<tr class="pd-head pd-fhead-range"><td class="pd-corner">본부</td>';
+  segs.forEach(function(s){
+    h+='<td class="pd-rangehdr'+(s.idx>0?' pd-seg-start':'')+'" colspan="'+s.weeks.length+'" title="'+escapeAttr("입력: "+fmtDateKR(s.from)+" ~ "+fmtDateKR(s.to)+"\n표시: "+fmtDateKR(s.weekFrom)+" ~ "+fmtDateKR(s.weekTo)+" (주 단위)")+'">'+escapeHtml(s.label)+'</td>';
+  });
+  h+='</tr><tr class="pd-head pd-fhead-week"><td class="pd-corner"></td>';
+  cols.forEach(function(c,ci){
+    var isToday=fmtWeekFull(c.w)===todayKey;
+    h+='<td class="pd-freehdr'+(isToday?' today':'')+(c.first&&c.seg>0?' pd-seg-start':'')+'">'
+      +escapeHtml(fmtWeek(c.w))+'주<span class="wk">빈 인원 '+colFree[ci]+'명</span></td>';
+  });
+  h+='</tr>';
+  groups.forEach(function(g){
+    h+='<tr><td class="pd-free-dept">'+escapeHtml(g.dept||"검색 결과")
+      +'<span class="sub">대상 '+g.rows.length+'명</span></td>';
+    cols.forEach(function(c,ci){
+      var free=g.rows.filter(function(r){return isFree(r,ci);});
+      h+='<td class="pd-free-cell'+(c.first&&c.seg>0?' pd-seg-start':'')+'">'
+        +'<div class="pd-free-cnt'+(free.length?"":" zero")+'">'+free.length+'명</div>';
+      if(free.length){
+        // 본부 안에서 직급별로 묶어 표시 (RANK_ORDER 순, 그 외 직급은 뒤에 이름순)
+        pdGroupByRank(free).forEach(function(rg){
+          h+='<div class="pd-free-grp"><div class="pd-free-grp-hd">'+escapeHtml(rg.rank||"직급 미상")+' <b>'+rg.rows.length+'명</b></div>'
+            +'<div class="pd-free-chips">'+rg.rows.map(function(r){
+          return '<span class="pd-free-chip" data-person="'+escapeAttr(r.pk)+'" title="'
+            +escapeAttr(infoText(r.rank,r.dept,r.jobCode)+"\n클릭 → 어싸인 현황으로 이동")+'">'
+            +escapeHtml(personKeyName(r.pk))+'<em>'+escapeHtml(pdRankAbbr(r.rank))+'·'+escapeHtml(r.jobCode||"-")+'</em></span>';
+        }).join("")+'</div></div>';
+        });
+      }else{
+        h+='<div class="pd-free-none">없음</div>';
+      }
+      h+='</td>';
+    });
+    h+='</tr>';
+  });
   h+='</tbody></table></div>';
-  area.innerHTML=h;   // 조건에 맞는 인원은 잘라내지 않고 전원 렌더 (상한 없음)
+  area.innerHTML=h;   // 빈 인원도 잘라내지 않고 전원 렌더
 }
 // --- 기간별 검색 이벤트 바인딩 ---
 document.getElementById("pdRanges").addEventListener("click",function(e){
@@ -1775,6 +1999,30 @@ document.getElementById("pdJobList").addEventListener("change",function(e){
 });
 document.getElementById("pdResetBtn").addEventListener("click",function(){pdInit();});
 document.getElementById("pdSearchBtn").addEventListener("click",function(){pdRun();});
+// 뷰 전환 = 현재 설정된 조건 그대로 즉시 재조회 (조회 버튼을 다시 누를 필요 없음).
+// 아직 한 번도 조회하지 않았으면 버튼 상태만 바꾸고 화면은 그대로 둔다.
+document.getElementById("pdViewSeg").addEventListener("click",function(e){
+  var b=e.target.closest(".pd-viewbtn");
+  if(!b||b.dataset.view===pdView)return;
+  pdSetView(b.dataset.view);
+  if(pdLast)pdRun();else syncHash();
+});
+// 창 폭이 바뀌면 레인 수가 달라질 수 있다 — 실제로 달라질 때만 다시 그린다
+(function(){
+  var t=null;
+  window.addEventListener("resize",function(){
+    if(!pdLast||pdView==="free")return;
+    if(currentTabName()!=="period")return;
+    clearTimeout(t);
+    t=setTimeout(function(){
+      if(!pdLast)return;
+      var weekN=pdLast.segs.reduce(function(a,s){return a+s.weeks.length;},0);
+      var ln=pdLaneCount(weekN,pdGroupN);
+      if(ln===pdLaneN&&Math.abs(pdWeekWidth(ln,weekN)-pdWkW)<8)return;
+      pdRenderTable();
+    },250);
+  });
+})();
 (function(){
   var inp=document.getElementById("pdSearchInput"),clr=document.getElementById("pdClearBtn");
   inp.addEventListener("input",function(){clr.style.display=inp.value.trim()?"flex":"none";});
@@ -1991,6 +2239,7 @@ function checkAvailability(){
     html+='</div></div>';
   });
   resultDiv.innerHTML=html;
+  syncHash();
   resultDiv.querySelectorAll(".rank-group-header").forEach(function(hdr){
     hdr.addEventListener("click",function(){var gid=hdr.dataset.grp;var body=document.getElementById("body_"+gid);var arrow=document.getElementById("arrow_"+gid);
       if(body.style.display==="none"){closeSiblings(hdr);body.style.display="block";arrow.classList.add("open");hdr.classList.add("open");}
@@ -2140,6 +2389,7 @@ compareSearchInput.addEventListener("keydown",function(e){
 });
 
 function updateCompareInfo(){
+  syncHash();
   var info=document.getElementById("compareSelectedInfo");
   if(compareSelected.length===0){info.innerHTML='<span style="color:#94a3b8">비교할 인원을 선택하세요 (최대 5명)</span>';return;}
   var chips=compareSelected.map(function(k){var dn=personDisplayName(k);return '<span style="display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:5px;background:#e8f1fe;color:#1e40af;font-size:11px;font-weight:500">'+escapeHtml(dn)+' <span style="cursor:pointer;font-size:9px;opacity:0.6" data-compare-remove="'+escapeAttr(k)+'">✕</span></span>';}).join(" ");
@@ -2475,11 +2725,178 @@ function toggleMobileView(){
   updateStickyOffsets();
 })();
 // ===== 로그인 사용자 기본 화면: 어싸인 현황에서 본인 이름 자동 검색 =====
+// ===== 딥링크 (URL 해시 상태) =====
+// 화면 상태(탭·검색어·주요 필터)를 location.hash 에 반영하고, 해시가 있는 URL로 진입/뒤로가기 시 그 상태를 복원한다.
+//  - 쓰기: 검색/필터/조회 시 replaceState(히스토리 오염 없음), 탭 전환만 pushState(뒤로가기 = 탭 복귀)
+//  - 읽기: 로그인 통과 후(grvApplyHash) 또는 popstate 시 applyHashState
+//  - 데이터가 아직 로드되지 않았으면 onDataReady 에서 후속 적용
+//  - 잘못된 값은 무시(에러 없이 기본 화면). 접힘/펼침 같은 순간 상태는 담지 않는다.
+var HASH_TAB_TO_KEY={gantt:"gantt",detail:"detail",projSearch:"proj",period:"period",avail:"avail",news:"news"};
+var HASH_KEY_TO_TAB={gantt:"gantt",detail:"detail",proj:"projSearch",period:"period",avail:"avail",news:"news"};
+var hashReady=false;          // 로그인 통과 전에는 URL을 건드리지 않음 (공유받은 해시 보존)
+var hashApplying=false;       // applyHashState 실행 중 발생하는 렌더의 syncHash 무시
+var hashPending=false;        // 데이터 로드 전 grvApplyHash 호출 → 로드 후 적용
+var defaultUserPending=null;  // 데이터 로드 전 grvApplyDefaultUser 호출 → 로드 후 적용
+var lastWrittenHash=null;     // 우리가 쓴 해시 (popstate 자기반응 방지)
+var hashPushPending=false;    // 탭 전환 직후 첫 해시 쓰기를 pushState로 (탭 핸들러 내부 렌더의 replaceState가 push를 가로채지 않도록)
+var HASH_YMD=/^\d{4}-\d{2}-\d{2}$/;
+
+function hashEncode(v){return encodeURIComponent(v).replace(/%7C/gi,"|").replace(/%2C/gi,",").replace(/%7E/gi,"~");}
+function parseHash(){
+  var h=(location.hash||"").replace(/^#/,""),o={};
+  if(!h)return o;
+  h.split("&").forEach(function(kv){
+    var i=kv.indexOf("=");if(i<=0)return;
+    var k=kv.slice(0,i),v=kv.slice(i+1);
+    try{v=decodeURIComponent(v);}catch(e){return;}
+    o[k]=v;
+  });
+  return o;
+}
+function currentTabName(){var b=document.querySelector(".tab-btn.active");return b?b.dataset.tab:"gantt";}
+function buildHashState(){
+  var t=currentTabName(),p={tab:HASH_TAB_TO_KEY[t]||"gantt"},q;
+  if(t==="gantt"){
+    if(searchQuery)p.q=searchQuery;
+    if(yearFilter&&yearFilter!=="all")p.year=String(yearFilter);
+  }else if(t==="detail"){
+    q=(document.getElementById("detailSearchInput").value||"").trim();if(q)p.q=q;
+  }else if(t==="projSearch"){
+    q=(document.getElementById("projSearchInput").value||"").trim();if(q)p.q=q;
+  }else if(t==="period"){
+    if(pdLast){   // 조회가 실행된 상태만 담는다 (기본 오늘 날짜만 있는 초기 상태는 제외)
+      var rows=pdReadRows().filter(function(r){return r.from||r.to;});
+      if(rows.length)p.r=rows.map(function(r){return r.from+"~"+r.to;}).join(",");
+      q=(document.getElementById("pdSearchInput").value||"").trim();if(q)p.q=q;
+      if(pdRankSel.size)p.rank=Array.from(pdRankSel).join("|");
+      if(pdJobSel.size)p.job=Array.from(pdJobSel).join("|");
+      if(pdView!=="all")p.v=pdView;   // 기본값(전체)은 해시에 담지 않는다
+    }
+  }else if(t==="avail"){
+    if(document.getElementById("availResult").innerHTML){   // 조회가 실행된 상태만
+      var f=document.getElementById("availDateFrom").value,to=document.getElementById("availDateTo").value;
+      var mn=document.getElementById("availMinDays").value,rk=document.getElementById("availRankFilter").value,jb=document.getElementById("availJobCodeFilter").value;
+      if(f)p.from=f;if(to)p.to=to;if(mn&&mn!=="1")p.min=mn;if(rk)p.rank=rk;if(jb)p.job=jb;
+    }
+    if(compareSelected.length)p.cmp=compareSelected.map(function(k){return k.replace(/,/g,"%2C");}).join(",");   // 키 내부 쉼표는 이스케이프 (구분자와 충돌 방지)
+  }
+  return p;
+}
+function serializeHash(p){
+  var keys=Object.keys(p);
+  if(keys.length===1&&p.tab==="gantt")return "";   // 초기 화면 = 해시 없음
+  return "#"+keys.map(function(k){return k+"="+hashEncode(p[k]);}).join("&");
+}
+function syncHash(push){
+  if(!hashReady||hashApplying||hashPending)return;   // hashPending: 데이터 로드 후 적용 예정인 해시를 초기 렌더가 덮어쓰지 않도록
+  var h;
+  try{h=serializeHash(buildHashState());}catch(e){return;}
+  if(h===(location.hash||""))return;
+  var doPush=!!(push||hashPushPending);hashPushPending=false;
+  var url=location.href.split("#")[0]+h;
+  try{
+    if(doPush)history.pushState(null,"",url);else history.replaceState(null,"",url);
+  }catch(e){
+    // file:// 등에서 History API가 막히면 해시 직접 대입 (popstate는 lastWrittenHash로 무시)
+    try{location.hash=h;}catch(e2){}
+  }
+  lastWrittenHash=location.hash||"";
+}
+function clickTab(t){var b=document.querySelector('.tab-btn[data-tab="'+t+'"]');if(b)b.click();}
+function applyHashState(){
+  var p=parseHash();
+  var t=HASH_KEY_TO_TAB[p.tab||""];
+  if(!t)return false;
+  hashApplying=true;
+  try{
+    clickTab(t);   // 탭 핸들러가 초기화+기본 렌더까지 수행 (syncHash는 hashApplying로 억제)
+    var q=(p.q||"").trim();
+    if(t==="gantt"){
+      searchQuery=q;
+      document.getElementById("searchInput").value=q;
+      document.getElementById("clearBtn").style.display=q?"flex":"none";
+      yearFilter=(p.year&&/^\d{4}$/.test(p.year))?p.year:"all";
+      buildYearFilter();
+      if(yearFilter!=="all"&&!document.querySelector('#yearBtns .year-btn[data-y="'+yearFilter+'"]')){yearFilter="all";buildYearFilter();}
+      expandedSet=new Set();personCache={};
+      if(q){var m=getFilteredNames();if(m.length<=3)m.forEach(function(n){expandedSet.add(n);});}
+      renderAll();setTimeout(scrollGanttsToToday,150);
+    }else if(t==="detail"){
+      document.getElementById("detailSearchInput").value=q;
+      renderDetail(q);
+    }else if(t==="projSearch"){
+      document.getElementById("projSearchInput").value=q;
+      renderProjSearch(q);
+    }else if(t==="period"){
+      var rows=[];
+      String(p.r||"").split(",").forEach(function(seg){
+        if(!seg)return;var a=seg.split("~"),f=a[0]||"",to=a[1]||"";
+        if(f&&!HASH_YMD.test(f))return;if(to&&!HASH_YMD.test(to))return;
+        if(f||to)rows.push({from:f,to:to});
+      });
+      if(rows.length){
+        pdRenderRows(rows);
+        document.getElementById("pdSearchInput").value=q;
+        document.getElementById("pdClearBtn").style.display=q?"flex":"none";
+        pdSetView(p.v||"all");   // 알 수 없는 값은 pdSetView가 "all"로 되돌린다
+        pdRankSel=new Set();pdJobSel=new Set();
+        String(p.rank||"").split("|").forEach(function(v){if(v)pdRankSel.add(v);});
+        String(p.job||"").split("|").forEach(function(v){if(v)pdJobSel.add(v);});
+        // 체크박스가 존재하는 값만 유효 — 없는 값은 집합에서 제거 (패널은 pdInit이 이미 만들어 둠)
+        var valid=function(listId,set){var vs={};document.querySelectorAll("#"+listId+' input[type="checkbox"]').forEach(function(cb){vs[cb.value]=1;});Array.from(set).forEach(function(v){if(!vs[v])set.delete(v);});};
+        valid("pdRankList",pdRankSel);valid("pdJobList",pdJobSel);
+        pdBuildFilterPanels();pdUpdateFilterBtns();
+        pdRun();
+      }
+    }else if(t==="avail"){
+      if(p.from&&HASH_YMD.test(p.from)){
+        document.getElementById("availDateFrom").value=p.from;
+        var toEl=document.getElementById("availDateTo");toEl.min=p.from;
+        toEl.value=(p.to&&HASH_YMD.test(p.to)&&p.to>=p.from)?p.to:"";
+        var mn=parseInt(p.min,10);document.getElementById("availMinDays").value=(mn>=1&&mn<=999)?String(mn):"1";
+        var rs=document.getElementById("availRankFilter");rs.value=p.rank||"";if(rs.value!==(p.rank||""))rs.value="";
+        var js=document.getElementById("availJobCodeFilter");js.value=p.job||"";if(js.value!==(p.job||""))js.value="";
+        checkAvailability();
+      }
+      if(p.cmp){
+        var keys=String(p.cmp).split(",").map(function(k){return k.replace(/%2C/gi,",");}).filter(function(k){return k&&allNames.indexOf(k)>=0&&nameRankMap[k]!=="Partner"&&nameRankMap[k]!=="Managing Director";});
+        compareSelected=[];keys.forEach(function(k){if(compareSelected.length<5&&compareSelected.indexOf(k)<0)compareSelected.push(k);});
+        updateCompareInfo();renderCompareList("");
+        if(compareSelected.length>=2)renderCompareResult();else document.getElementById("compareResultArea").innerHTML="";
+      }
+      setTimeout(syncAvailHeaders,50);
+    }
+  }catch(e){ if(window.console)console.warn("딥링크 적용 실패",e); }
+  finally{hashApplying=false;}
+  lastWrittenHash=location.hash||"";
+  return true;
+}
+// 로그인 통과 후 호출 (retain_all.py showApp / 아래 자동로그인 분기). true = 해시 상태가 있어 적용(또는 로드 후 적용 예약)됨
+window.grvApplyHash=function(){
+  hashReady=true;
+  if(hashPending)return true;   // 이미 로드 후 적용 예약됨 (중복 호출 무시)
+  var p=parseHash();
+  if(!HASH_KEY_TO_TAB[p.tab||""]){syncHash();return false;}   // 해시 없음 → 현재 화면을 URL에 반영만
+  if(!allNames.length){hashPending=true;return true;}
+  return applyHashState();
+};
+// 데이터 로드 완료 후 (loadEmbeddedData / processFile) — 대기 중인 해시·기본 사용자 검색 적용 (해시 우선)
+function onDataReady(){
+  if(hashPending){hashPending=false;if(applyHashState()){defaultUserPending=null;return;}}
+  if(defaultUserPending){var d=defaultUserPending;defaultUserPending=null;try{window.grvApplyDefaultUser(d[0],d[1]);}catch(e){}}
+}
+window.addEventListener("popstate",function(){
+  if(!hashReady||!allNames.length)return;
+  if((location.hash||"")===lastWrittenHash)return;   // 우리가 쓴 해시(fallback 경로)에는 반응하지 않음
+  if(!applyHashState()){hashApplying=true;try{clickTab("gantt");}finally{hashApplying=false;}lastWrittenHash=location.hash||"";}
+});
+
 // 로그인 오버레이(retain_all.py 주입)가 showApp 시 window.GRV_USER 설정 + 이 함수 호출.
 // 자동로그인(쿠키)은 본 스크립트보다 먼저 실행되므로 GRV_USER를 여기서 후속 적용.
 window.grvApplyDefaultUser=function(userName,userSabun){
   var sab=(userSabun===undefined||userSabun===null)?"":String(userSabun).trim().replace(/\.0$/,"");
   if(!sab)return;
+  if(!allNames.length){defaultUserPending=[userName,userSabun];return;}   // 데이터 로드 전(자동로그인 경로) → onDataReady에서 적용
   // 로그인 사번과 정확 일치하는 인원 찾기 — 없으면(어싸인 데이터 없는 타본부 인원 등) 기본 첫 화면 유지
   var match=null;
   for(var i=0;i<allNames.length;i++){
@@ -2495,6 +2912,7 @@ window.grvApplyDefaultUser=function(userName,userSabun){
   renderAll();setTimeout(scrollGanttsToToday,150);
 };
 if(window.GRV_USER&&window.GRV_USER.sabun){try{window.grvApplyDefaultUser(window.GRV_USER.name,window.GRV_USER.sabun);}catch(e){}}
+if(window.GRV_USER||!document.getElementById("grv-login-wrap")){try{window.grvApplyHash();}catch(e){}}   // 딥링크: 이미 로그인됐거나 로그인 오버레이가 없는 환경
 </script>
 <div id="saveTimestamp" style="position:fixed;bottom:8px;left:12px;font-size:9px;color:#64748b;letter-spacing:-0.3px;z-index:1"></div>
 </body>
