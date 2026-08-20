@@ -76,6 +76,9 @@ else:
 # 사용자 관리 — 기업정보포털과 동일한 5컬럼(이메일/사번/이름/부서/활성) 구조
 USERS_FILE = os.path.join(_SCRIPT_DIR, "2.사용자관리", "users.xlsx")
 
+# 수기 제외목록 — 여기 적힌 행은 index.html(및 Viewer HTML)에서 제외. 엑셀 산출물에는 남음.
+EXCLUDE_FILE = os.path.join(_SCRIPT_DIR, "07.제외목록", "exclude_list.xlsx")
+
 GITHUB_REPO   = os.getenv("GITHUB_REPO", "")
 GITHUB_TOKEN  = os.getenv("GITHUB_TOKEN", "")
 GITHUB_FILE   = "index.html"
@@ -202,10 +205,6 @@ def process_data(df):
     agg=agg.sort_values("Start Date").reset_index(drop=True)
     print(f"  → Summarize: {len(agg):,}건")
     return agg
-    agg=df.groupby(grp,dropna=False).agg(**{"Time (Hours)":("Time (Hours)","sum")}).reset_index()
-    agg=agg.sort_values("Start Date").reset_index(drop=True)
-    print(f"  → Summarize: {len(agg):,}건")
-    return agg
 
 # ============================================================
 # DART 캐시 로드 (API 호출 없음)
@@ -262,6 +261,70 @@ def save_excels(df):
     p2=upath(os.path.join(OUTPUT_DIR,f"Data_Output(Excel)_after 2025{rd}.xlsx"))
     d25.to_excel(p2,sheet_name="Sheet1",index=False); print(f"✅ 2025+: {p2} ({len(d25):,}건)")
     return df, d25
+
+# ============================================================
+# 수기 제외목록 (07.제외목록/exclude_list.xlsx)
+#   아래 12개 컬럼이 전부 일치하는 행만 제외 (전체 컬럼 정확 일치).
+#   FileRunDate는 빌드일마다 바뀌므로 비교 대상에서 제외, 제외사유는 메모용.
+#   엑셀 왕복으로 형식만 달라진 값(날짜/사번/시간)은 정규화 후 비교.
+# ============================================================
+EXCLUDE_KEYS = ["이름","직급","사번","소속","Project Name","Start Date","End Date",
+                "Time (Hours)","PM","Job Code","EL","Assign ID"]
+
+def _excl_norm(col, v):
+    """대조용 값 정규화 — 엑셀 왕복으로 타입만 달라진 값을 같게 취급"""
+    try:
+        if pd.isna(v): return ""
+    except (TypeError, ValueError):
+        pass
+    if col in ("Start Date","End Date"):
+        d=pd.to_datetime(v,errors="coerce")
+        return "" if pd.isna(d) else d.strftime("%Y-%m-%d")
+    if col=="사번":
+        n=pd.to_numeric(v,errors="coerce")
+        return "" if pd.isna(n) else str(int(n))
+    if col=="Time (Hours)":
+        n=pd.to_numeric(v,errors="coerce")
+        return "" if pd.isna(n) else f"{float(n):.1f}"
+    return str(v).strip()
+
+def _excl_keyframe(df):
+    """DataFrame → 행별 대조키 Series"""
+    parts=[]
+    for c in EXCLUDE_KEYS:
+        s=df[c] if c in df.columns else pd.Series([""]*len(df),index=df.index)
+        parts.append(s.map(lambda v,c=c:_excl_norm(c,v)))
+    return parts[0].str.cat(parts[1:],sep="|")
+
+def apply_exclusions(df):
+    """제외목록에 기재된 행을 df에서 제거. 파일이 없거나 비었으면 원본 그대로 반환."""
+    if not os.path.exists(EXCLUDE_FILE):
+        print(f"\n제외목록 파일 없음 — 제외 없이 진행 ({EXCLUDE_FILE})")
+        return df
+    try:
+        ex=pd.read_excel(EXCLUDE_FILE,sheet_name=0)
+    except Exception as e:
+        print(f"\n⚠ 제외목록 읽기 실패 — 제외 없이 진행: {e}")
+        return df
+    missing=[c for c in EXCLUDE_KEYS if c not in ex.columns]
+    if missing:
+        print(f"\n⚠ 제외목록 컬럼 누락 {missing} — 제외 없이 진행")
+        return df
+    ex=ex.dropna(how="all",subset=EXCLUDE_KEYS)
+    if ex.empty:
+        print("\n제외목록 비어있음 — 제외 0건")
+        return df
+    dkeys=_excl_keyframe(df)
+    want=set(_excl_keyframe(ex))
+    mask=dkeys.isin(want)
+    n=int(mask.sum())
+    print(f"\n제외목록 적용: {len(ex):,}행 기재 → {n:,}건 제외 (잔여 {len(df)-n:,}건)")
+    unmatched=want-set(dkeys[mask])
+    if unmatched:
+        print(f"  ⚠ 원본에서 못 찾은 기재행 {len(unmatched)}건 (컬럼값 불일치 — 앞 5건):")
+        for k in sorted(unmatched)[:5]:
+            print(f"     {k}")
+    return df[~mask].copy()
 
 # ============================================================
 # 사용자 인증 — 기업정보포털과 동일한 방식
@@ -1360,6 +1423,7 @@ if __name__=="__main__":
             df_all,df25=save_excels(result)
         dart=load_dart_cache()
         news=load_news_cache()
+        df25=apply_exclusions(df25)   # 수기 제외목록 → index.html에서만 제외
         ip,vp=build_html(df25,du,dart,news,users)
         if ip and not IS_CI:
             push_gh(ip)
