@@ -1,8 +1,8 @@
 name: Daily Retain Update_v2
 on:
   schedule:
-    # 매일 한국시간 오전 8시 5분 (UTC 전날 23시 5분)
-    - cron: '5 23 * * *'
+    # 매일 한국시간 오전 8시 25분 (UTC 전날 23시 25분)
+    - cron: '25 23 * * *'
   workflow_dispatch:
 jobs:
   update:
