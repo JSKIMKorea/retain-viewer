@@ -1,6 +1,6 @@
 {
-  "date": "2026-08-21",
-  "updated": "2026.08.21 08:04",
+  "date": "2026-08-22",
+  "updated": "2026.08.22 08:02",
   "sections": [
     {
       "title": "한국공인회계사회 기사",
@@ -19,8 +19,8 @@
           "impact": ""
         },
         {
-          "title": "엘케이벤쳐스, 삼일회계법인과 투자유치 자문 계약…‘견생네컷’으로...",
-          "url": "https://n.news.naver.com/mnews/article/032/0003465290?sid=101",
+          "title": "엘케이벤쳐스, 삼일회계법인과 투자유치 자문 계약… ‘견생네컷’ 등...",
+          "url": "https://n.news.naver.com/mnews/article/018/0006355535?sid=101",
           "source": "n.news.naver.com",
           "summary": "",
           "impact": ""
@@ -74,15 +74,15 @@
           "impact": ""
         },
         {
-          "title": "금감원 은행 ETF 수수료 검사…보험사기 의심 병원도 조사",
-          "url": "https://n.news.naver.com/mnews/article/016/0002683672?sid=101",
+          "title": "금감원, 메가박스·콘텐트리중앙 회계심사 돌입…자금 조달·회계처리 ...",
+          "url": "https://n.news.naver.com/mnews/article/056/0012237974?sid=101",
           "source": "n.news.naver.com",
           "summary": "",
           "impact": ""
         },
         {
-          "title": "이찬진 금감원장 1년…AI로 주가조작 잡고 운용사 주주권 강화",
-          "url": "https://n.news.naver.com/mnews/article/031/0001049624?sid=101",
+          "title": "이찬진 금감원장 취임 1주년...불공정거래 엄단·주주권 강화에 방점",
+          "url": "https://n.news.naver.com/mnews/article/366/0001186177?sid=101",
           "source": "n.news.naver.com",
           "summary": "",
           "impact": ""
@@ -94,8 +94,8 @@
       "icon": "🏛️",
       "items": [
         {
-          "title": "KB국민은행, 탈세 의혹으로 국세청 특별 세무조사",
-          "url": "https://n.news.naver.com/mnews/article/003/0014125112?sid=101",
+          "title": "국세청, 무신사 특별세무조사",
+          "url": "https://n.news.naver.com/mnews/article/015/0005323352?sid=101",
           "source": "n.news.naver.com",
           "summary": "",
           "impact": ""
@@ -104,6 +104,13 @@
           "title": "[특별기고] 해외선교비 세법개정(1) 시행령 개정 3가지 제안",
           "url": "https://www.christiantoday.co.kr/news/376875",
           "source": "christiantoday.co.kr",
+          "summary": "",
+          "impact": ""
+        },
+        {
+          "title": "자사주 팔았다 1.7억 세금이 5억 됐다…상법 개정에 떠는 사장들",
+          "url": "https://n.news.naver.com/mnews/article/016/0002686852?sid=101",
+          "source": "n.news.naver.com",
           "summary": "",
           "impact": ""
         },
@@ -118,13 +125,6 @@
           "title": "청년들 “AI로 5년 내 직무 대체·축소될 것”",
           "url": "https://www.wikitree.co.kr/articles/1152989",
           "source": "wikitree.co.kr",
-          "summary": "",
-          "impact": ""
-        },
-        {
-          "title": "[속보] 국세청, KB국민은행 특별세무조사 착수",
-          "url": "https://n.news.naver.com/mnews/article/009/0005720458?sid=101",
-          "source": "n.news.naver.com",
           "summary": "",
           "impact": ""
         }
@@ -142,30 +142,23 @@
           "impact": ""
         },
         {
-          "title": "[현대해상 승계딜레마 ②] 상법 개정의 나비효과… 느슨해지는 지배력 ...",
-          "url": "https://it.chosun.com/news/articleView.html?idxno=2023092167923",
-          "source": "조선일보",
-          "summary": "",
-          "impact": ""
-        },
-        {
-          "title": "내달부터 독립 감사위원 ‘최소 2명’…상법 2차 개정안 시행에 힘 실리...",
-          "url": "https://n.news.naver.com/mnews/article/009/0005720370?sid=101",
+          "title": "상법개정 후유증…유상증자 철회 2배 늘었다 [시그널]",
+          "url": "https://n.news.naver.com/mnews/article/011/0004653962?sid=101",
           "source": "n.news.naver.com",
           "summary": "",
           "impact": ""
         },
         {
-          "title": "주주환원인가, 상법개정 대응인가 … 유한양행 이어 씨젠도 자사주 '전...",
-          "url": "https://biz.newdaily.co.kr/site/data/html/2026/08/13/2026081300098.html",
-          "source": "biz.newdaily.co.kr",
+          "title": "감평협, 변리사법 개정안 논란 \"지식재산처 말 바꾸기, 도 넘었다\"",
+          "url": "http://www.newsprime.co.kr/news/article.html?no=744160",
+          "source": "newsprime.co.kr",
           "summary": "",
           "impact": ""
         },
         {
-          "title": "“자사주 소각하느니 차라리…” 상법 개정 후 RSU 명목 처분 3배 급증 ...",
-          "url": "https://n.news.naver.com/mnews/article/016/0002683679?sid=101",
-          "source": "n.news.naver.com",
+          "title": "금융투자협회, ‘금융투자 법규’ 과정 개설…개정 상법·자본시장법 실...",
+          "url": "https://www.megaeconomy.co.kr/news/newsview.php?ncode=1065595858116459",
+          "source": "megaeconomy.co.kr",
           "summary": "",
           "impact": ""
         }
