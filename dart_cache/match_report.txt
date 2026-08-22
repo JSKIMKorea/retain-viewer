@@ -1,7 +1,7 @@
-DART 매칭 리포트 (2026-08-19 22:27)
+DART 매칭 리포트 (2026-08-22 22:50)
 ==================================================
 
-[퍼지 매칭 결과] (103건)
+[퍼지 매칭 결과] (104건)
 아래 매칭이 맞는지 확인하세요. 틀리면 dart_aliases.json에서 수정하세요.
 
   (주)더블유에스피아시아리미티드 → [prefix:더블유에스피아시아리미티드⊃더블유에스]
@@ -101,6 +101,7 @@ DART 매칭 리포트 (2026-08-19 22:27)
   포스코홀딩스(주) → [fuzzy:포스코홀딩스→포스코]
   폴스타매뉴팩처링홀딩코리아유한책임회사 → [prefix:폴스타매뉴팩처링홀딩코리아⊃폴스타]
   피더블유씨-상하이 → [prefix:피더블유씨-상하이⊃피더블유]
+  피더블유씨저팬 → [prefix:피더블유씨저팬⊃피더블유]
   피더블유씨프랑스 → [prefix:피더블유씨프랑스⊃피더블유]
   피더블유씨홍콩 → [prefix:피더블유씨홍콩⊃피더블유]
   하이브아메리카 → [prefix:하이브아메리카⊃하이브]
@@ -108,7 +109,7 @@ DART 매칭 리포트 (2026-08-19 22:27)
   한스바이오메드USA → [prefix:한스바이오메드USA⊃한스바이오메드]
   한화파워(주) → [fuzzy:한화파워→한화]
 
-[미매칭 고객사] (240건)
+[미매칭 고객사] (241건)
 수동 매핑이 필요하면 dart_aliases.json에 추가하세요.
 
 dart_aliases.json 예시:
@@ -166,6 +167,7 @@ dart_aliases.json 예시:
     "AmazeVR, Inc.": "DART에 등록된 정확한 회사명",
     "Assurance Leader": "DART에 등록된 정확한 회사명",
     "Coupang, Inc.": "DART에 등록된 정확한 회사명",
+    "FIREBAT SUPERHOLDCO PTE. LTD.": "DART에 등록된 정확한 회사명",
     "HR": "DART에 등록된 정확한 회사명",
     "Helinox Pte. Ltd.": "DART에 등록된 정확한 회사명",
     "L&E": "DART에 등록된 정확한 회사명",
@@ -408,6 +410,7 @@ dart_aliases.json 예시:
   - AmazeVR, Inc.
   - Assurance Leader
   - Coupang, Inc.
+  - FIREBAT SUPERHOLDCO PTE. LTD.
   - HR
   - Helinox Pte. Ltd.
   - L&E
