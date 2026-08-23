@@ -1,6 +1,6 @@
 {
-  "date": "2026-08-23",
-  "updated": "2026.08.23 08:00",
+  "date": "2026-08-24",
+  "updated": "2026.08.24 08:00",
   "sections": [
     {
       "title": "한국공인회계사회 기사",
@@ -94,8 +94,8 @@
       "icon": "🏛️",
       "items": [
         {
-          "title": "국세청, 무신사 특별세무조사",
-          "url": "https://n.news.naver.com/mnews/article/015/0005323352?sid=101",
+          "title": "국세청장 \"고가 법인주택 42%는 '황제사택'…엄정 세무조사\"",
+          "url": "https://n.news.naver.com/mnews/article/057/0001965085?sid=101",
           "source": "n.news.naver.com",
           "summary": "",
           "impact": ""
@@ -142,15 +142,15 @@
           "impact": ""
         },
         {
-          "title": "상법개정 후유증…유상증자 철회 2배 늘었다 [시그널]",
-          "url": "https://n.news.naver.com/mnews/article/011/0004653962?sid=101",
+          "title": "[사설]증시 '밸류 업' 위한 상법개정… 기업투자 위축엔 눈 감나",
+          "url": "https://n.news.naver.com/mnews/article/417/0001156116?sid=110",
           "source": "n.news.naver.com",
           "summary": "",
           "impact": ""
         },
         {
           "title": "감평협, 변리사법 개정안 논란 \"지식재산처 말 바꾸기, 도 넘었다\"",
-          "url": "http://www.newsprime.co.kr/news/article.html?no=744160",
+          "url": "http://www.enewstoday.co.kr/news/articleView.html?idxno=2460308",
           "source": "newsprime.co.kr",
           "summary": "",
           "impact": ""
@@ -159,6 +159,13 @@
           "title": "금융투자협회, ‘금융투자 법규’ 과정 개설…개정 상법·자본시장법 실...",
           "url": "https://www.megaeconomy.co.kr/news/newsview.php?ncode=1065595858116459",
           "source": "megaeconomy.co.kr",
+          "summary": "",
+          "impact": ""
+        },
+        {
+          "title": "상법개정 후유증…유상증자 철회 2배 늘었다 [시그널]",
+          "url": "https://n.news.naver.com/mnews/article/011/0004653962?sid=101",
+          "source": "n.news.naver.com",
           "summary": "",
           "impact": ""
         }
