@@ -1,6 +1,6 @@
 {
-  "date": "2026-08-26",
-  "updated": "2026.08.26 08:04",
+  "date": "2026-08-27",
+  "updated": "2026.08.27 13:03",
   "sections": [
     {
       "title": "한국공인회계사회 기사",
@@ -12,15 +12,29 @@
       "icon": "📊",
       "items": [
         {
-          "title": "청년 2명 중 1명 “5년 안에 내 일자리 AI가 대체”",
-          "url": "https://n.news.naver.com/mnews/article/449/0000357185?sid=101",
+          "title": "[풍문레이다] 성현회계법인② 인터지스 미수금 대손상각 후 외부감사 수...",
+          "url": "https://www.nbntv.kr/news/articleView.html?idxno=340700",
+          "source": "nbntv.kr",
+          "summary": "",
+          "impact": ""
+        },
+        {
+          "title": "사라진 청년 일자리, AI 탓 말라",
+          "url": "https://www.ekn.kr/web/view.php?key=20260825026085955",
+          "source": "ekn.kr",
+          "summary": "",
+          "impact": ""
+        },
+        {
+          "title": "[2026 회계현안 심포지엄] 이승환 삼일회계법인 리더 “사람 일·AI 일 나...",
+          "url": "https://n.news.naver.com/mnews/article/366/0001188670?sid=101",
           "source": "n.news.naver.com",
           "summary": "",
           "impact": ""
         },
         {
-          "title": "엘케이벤쳐스, 삼일회계법인과 투자유치 자문 계약…‘견생네컷’으로...",
-          "url": "https://n.news.naver.com/mnews/article/032/0003465290?sid=101",
+          "title": "[2026 회계현안 심포지엄] 허규만 딜로이트 안진회계법인 회계사 “AI 통...",
+          "url": "https://n.news.naver.com/mnews/article/366/0001188678?sid=101",
           "source": "n.news.naver.com",
           "summary": "",
           "impact": ""
@@ -33,16 +47,9 @@
           "impact": ""
         },
         {
-          "title": "LG, ESG 공시 의무화 4년 앞서 대비…KSSB 기준 선제 적용",
-          "url": "https://n.news.naver.com/mnews/article/031/0001050662?sid=101",
+          "title": "\"4대 병목 관리 못하면 K-ESG 공시 가치 하락\"",
+          "url": "https://n.news.naver.com/mnews/article/050/0000110152?sid=101",
           "source": "n.news.naver.com",
-          "summary": "",
-          "impact": ""
-        },
-        {
-          "title": "구직 청년 64% “희망 직무, 5년 내 AI로 대체”…사무·전문직 불안 더...",
-          "url": "https://www.etoday.co.kr/news/view/2615212",
-          "source": "이투데이",
           "summary": "",
           "impact": ""
         }
@@ -53,9 +60,9 @@
       "icon": "📋",
       "items": [
         {
-          "title": "[단독] 금감원 경력채용 4명 미달…“지방 이전땐 인재수급 더 어려워”",
-          "url": "https://n.news.naver.com/mnews/article/011/0004654663?sid=101",
-          "source": "n.news.naver.com",
+          "title": "감리주기만 20년인데…금감원 세종 이전시 회계감리 공백 우려",
+          "url": "https://www.ebn.co.kr/news/articleView.html?idxno=1721749",
+          "source": "ebn.co.kr",
           "summary": "",
           "impact": ""
         },
@@ -67,23 +74,23 @@
           "impact": ""
         },
         {
-          "title": "금감원, 내년 신입 5급 95명 채용…7개 분야 모집",
-          "url": "https://n.news.naver.com/mnews/article/018/0006353605?sid=101",
+          "title": "고려아연 임시주총 앞두고 배임 의혹 재점화…금감원·증선위 엇갈린 이...",
+          "url": "https://n.news.naver.com/mnews/article/015/0005325399?sid=101",
           "source": "n.news.naver.com",
           "summary": "",
           "impact": ""
         },
         {
-          "title": "금감원, 2027년도 종합직원 5급  95명 채용…19일 접수",
-          "url": "http://www.4th.kr/news/articleView.html?idxno=2116532",
-          "source": "4th.kr",
+          "title": "[단독] 금감원 경력채용 4명 미달…“지방 이전땐 인재수급 더 어려워”",
+          "url": "https://n.news.naver.com/mnews/article/011/0004654663?sid=101",
+          "source": "n.news.naver.com",
           "summary": "",
           "impact": ""
         },
         {
-          "title": "청년들 “AI로 5년 내 직무 대체·축소될 것”",
-          "url": "https://www.wikitree.co.kr/articles/1152989",
-          "source": "wikitree.co.kr",
+          "title": "“AI가 인간보다 빨리 일자리 대체”…빌 게이츠의 경고",
+          "url": "https://n.news.naver.com/mnews/article/018/0006358764?sid=104",
+          "source": "n.news.naver.com",
           "summary": "",
           "impact": ""
         }
@@ -94,8 +101,8 @@
       "icon": "🏛️",
       "items": [
         {
-          "title": "‘황제 사택’ 1조9000억원 탈루 혐의...국세청, 50개 업체 세무조사 착...",
-          "url": "https://n.news.naver.com/mnews/article/023/0003994786?sid=101",
+          "title": "[단독] KCC, 국세청 ‘특별 세무조사’ 받아",
+          "url": "https://n.news.naver.com/mnews/article/366/0001188380?sid=101",
           "source": "n.news.naver.com",
           "summary": "",
           "impact": ""
@@ -122,8 +129,8 @@
           "impact": ""
         },
         {
-          "title": "\"AI 시대 명문대는 무슨\"…英 사무직 견습 는다",
-          "url": "https://n.news.naver.com/mnews/article/018/0006356427?sid=104",
+          "title": "\"이거 진짜예요\"…돈도 인프라도 다 밀리는 한국, 대체 뭘 믿고 AI에 국...",
+          "url": "https://n.news.naver.com/mnews/article/055/0001383527?sid=101",
           "source": "n.news.naver.com",
           "summary": "",
           "impact": ""
@@ -135,9 +142,16 @@
       "icon": "⚖️",
       "items": [
         {
-          "title": "상법 개정 이후 임원배상책임보험, 피상적 논의를 넘어 전략적 설계로 [삼일 이슈 프리즘]",
-          "url": "https://www.hankyung.com/article/202603188867r",
-          "source": "한국경제",
+          "title": "상법 개정 후 섬유·의류 상장사 주주환원 확대…배당성향 상향·차등배...",
+          "url": "https://n.news.naver.com/mnews/article/243/0000102179?sid=101",
+          "source": "n.news.naver.com",
+          "summary": "",
+          "impact": ""
+        },
+        {
+          "title": "[민법개정위 개정안 개요] 담보 관련 민법 등 규정에 대한 개정안 개요...",
+          "url": "https://www.lawtimes.co.kr/news/articleView.html?idxno=225077",
+          "source": "lawtimes.co.kr",
           "summary": "",
           "impact": ""
         },
@@ -149,16 +163,9 @@
           "impact": ""
         },
         {
-          "title": "주총 통지 기간 2주→4주 확대 추진…박홍배 의원, 상법·자본시장법 개...",
-          "url": "https://www.cnbizm.com/news/articleView.html?idxno=311980",
-          "source": "cnbizm.com",
-          "summary": "",
-          "impact": ""
-        },
-        {
-          "title": "금융투자협회, ‘금융투자 법규’ 과정 개설…개정 상법·자본시장법 실...",
-          "url": "https://www.megaeconomy.co.kr/news/newsview.php?ncode=1065595858116459",
-          "source": "megaeconomy.co.kr",
+          "title": "상법개정 후유증…유상증자 철회 2배 늘었다 [시그널]",
+          "url": "https://n.news.naver.com/mnews/article/011/0004653962?sid=101",
+          "source": "n.news.naver.com",
           "summary": "",
           "impact": ""
         },
