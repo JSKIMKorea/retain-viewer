@@ -1,6 +1,6 @@
 {
-  "date": "2026-08-27",
-  "updated": "2026.08.27 13:03",
+  "date": "2026-08-28",
+  "updated": "2026.08.28 15:22",
   "sections": [
     {
       "title": "한국공인회계사회 기사",
@@ -19,9 +19,9 @@
           "impact": ""
         },
         {
-          "title": "사라진 청년 일자리, AI 탓 말라",
-          "url": "https://www.ekn.kr/web/view.php?key=20260825026085955",
-          "source": "ekn.kr",
+          "title": "빌 게이츠 \"AI 대혼란 대비해야\"…'인간 전용 일자리' 제안",
+          "url": "https://www.mstoday.co.kr/news/articleView.html?idxno=102439",
+          "source": "mstoday.co.kr",
           "summary": "",
           "impact": ""
         },
@@ -47,9 +47,9 @@
           "impact": ""
         },
         {
-          "title": "\"4대 병목 관리 못하면 K-ESG 공시 가치 하락\"",
-          "url": "https://n.news.naver.com/mnews/article/050/0000110152?sid=101",
-          "source": "n.news.naver.com",
+          "title": "ESG 공시 1년새 대상 10배로…기업 부담에 \"속도조절 필요\"",
+          "url": "https://www.newspim.com/news/view/20260827000797",
+          "source": "newspim.com",
           "summary": "",
           "impact": ""
         }
@@ -67,9 +67,9 @@
           "impact": ""
         },
         {
-          "title": "AI 실업 영향 15bp, 청년층서 대체 신호 커졌다",
-          "url": "https://www.tokenpost.kr/news/cryptocurrency/394413",
-          "source": "tokenpost.kr",
+          "title": "“AI가 인간보다 빨리 일자리 대체”…빌 게이츠의 경고",
+          "url": "https://n.news.naver.com/mnews/article/018/0006358764?sid=104",
+          "source": "n.news.naver.com",
           "summary": "",
           "impact": ""
         },
@@ -81,15 +81,15 @@
           "impact": ""
         },
         {
-          "title": "[단독] 금감원 경력채용 4명 미달…“지방 이전땐 인재수급 더 어려워”",
-          "url": "https://n.news.naver.com/mnews/article/011/0004654663?sid=101",
-          "source": "n.news.naver.com",
+          "title": "금감원 경력채용도 미달…해외 감독기관은 전문직에 최대 4억원 보수",
+          "url": "https://www.greened.kr/news/articleView.html?idxno=348581",
+          "source": "greened.kr",
           "summary": "",
           "impact": ""
         },
         {
-          "title": "“AI가 인간보다 빨리 일자리 대체”…빌 게이츠의 경고",
-          "url": "https://n.news.naver.com/mnews/article/018/0006358764?sid=104",
+          "title": "[단독] 금감원 경력채용 4명 미달…“지방 이전땐 인재수급 더 어려워”",
+          "url": "https://n.news.naver.com/mnews/article/011/0004654663?sid=101",
           "source": "n.news.naver.com",
           "summary": "",
           "impact": ""
@@ -101,8 +101,8 @@
       "icon": "🏛️",
       "items": [
         {
-          "title": "[단독] KCC, 국세청 ‘특별 세무조사’ 받아",
-          "url": "https://n.news.naver.com/mnews/article/366/0001188380?sid=101",
+          "title": "‘황제 사택’ 1조9000억원 탈루 혐의...국세청, 50개 업체 세무조사 착...",
+          "url": "https://n.news.naver.com/mnews/article/023/0003994786?sid=101",
           "source": "n.news.naver.com",
           "summary": "",
           "impact": ""
@@ -129,6 +129,13 @@
           "impact": ""
         },
         {
+          "title": "국세청, 외투기업 세무조사 늘자…'국제조세분야' 역량 강화 나선다",
+          "url": "https://www.sejungilbo.com/news/articleView.html?idxno=59835",
+          "source": "세정일보",
+          "summary": "",
+          "impact": ""
+        },
+        {
           "title": "\"이거 진짜예요\"…돈도 인프라도 다 밀리는 한국, 대체 뭘 믿고 AI에 국...",
           "url": "https://n.news.naver.com/mnews/article/055/0001383527?sid=101",
           "source": "n.news.naver.com",
@@ -142,8 +149,15 @@
       "icon": "⚖️",
       "items": [
         {
+          "title": "상법 개정 이후 임원배상책임보험, 피상적 논의를 넘어 전략적 설계로 [삼일 이슈 프리즘]",
+          "url": "https://www.hankyung.com/article/202603188867r",
+          "source": "한국경제",
+          "summary": "",
+          "impact": ""
+        },
+        {
           "title": "상법 개정 후 섬유·의류 상장사 주주환원 확대…배당성향 상향·차등배...",
-          "url": "https://n.news.naver.com/mnews/article/243/0000102179?sid=101",
+          "url": "https://n.news.naver.com/mnews/article/241/0003527544?sid=101",
           "source": "n.news.naver.com",
           "summary": "",
           "impact": ""
@@ -156,23 +170,16 @@
           "impact": ""
         },
         {
-          "title": "상법 개정에 주주행동주의까지…디엘지·삼성화재, 임원 책임 해법 찾는...",
-          "url": "https://www.venturesquare.net/1108124/",
-          "source": "venturesquare.net",
-          "summary": "",
-          "impact": ""
-        },
-        {
-          "title": "상법개정 후유증…유상증자 철회 2배 늘었다 [시그널]",
-          "url": "https://n.news.naver.com/mnews/article/011/0004653962?sid=101",
+          "title": "상법 개정에 커진 사외이사 역할…삼정KPMG, 회계전문가 역량 강화",
+          "url": "https://n.news.naver.com/mnews/article/014/0005567310?sid=101",
           "source": "n.news.naver.com",
           "summary": "",
           "impact": ""
         },
         {
-          "title": "상법 개정 이후 기업의 길을 묻다…한국기업법학회 공동학술대회",
-          "url": "https://www.ccreview.co.kr/news/articleView.html?idxno=355699",
-          "source": "ccreview.co.kr",
+          "title": "[분석] 주주 목소리는 커졌는데 노동자는?…상법 개정 이후 달라지는 기...",
+          "url": "https://www.polinews.co.kr/news/articleView.html?idxno=741495",
+          "source": "polinews.co.kr",
           "summary": "",
           "impact": ""
         }
