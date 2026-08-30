@@ -1,6 +1,6 @@
 {
-  "date": "2026-08-29",
-  "updated": "2026.08.29 12:54",
+  "date": "2026-08-30",
+  "updated": "2026.08.30 09:45",
   "sections": [
     {
       "title": "한국공인회계사회 기사",
@@ -101,8 +101,8 @@
       "icon": "🏛️",
       "items": [
         {
-          "title": "[단독] KCC, 국세청 ‘특별 세무조사’ 받아",
-          "url": "https://n.news.naver.com/mnews/article/366/0001188380?sid=101",
+          "title": "‘황제 사택’ 1조9000억원 탈루 혐의...국세청, 50개 업체 세무조사 착...",
+          "url": "https://n.news.naver.com/mnews/article/023/0003994786?sid=101",
           "source": "n.news.naver.com",
           "summary": "",
           "impact": ""
@@ -156,13 +156,6 @@
           "impact": ""
         },
         {
-          "title": "[민법개정위 개정안 개요] 담보 관련 민법 등 규정에 대한 개정안 개요...",
-          "url": "https://www.lawtimes.co.kr/news/articleView.html?idxno=225077",
-          "source": "lawtimes.co.kr",
-          "summary": "",
-          "impact": ""
-        },
-        {
           "title": "상법 개정에 커진 사외이사 역할…삼정KPMG, 회계전문가 역량 강화",
           "url": "https://n.news.naver.com/mnews/article/014/0005567310?sid=101",
           "source": "n.news.naver.com",
@@ -173,6 +166,13 @@
           "title": "[김세완의 주말경제산책] 입맛대로 법도 바꾼다 … 머스크의 상법개정",
           "url": "https://n.news.naver.com/mnews/article/009/0005727311?sid=110",
           "source": "n.news.naver.com",
+          "summary": "",
+          "impact": ""
+        },
+        {
+          "title": "[분석] 주주 목소리는 커졌는데 노동자는?…상법 개정 이후 달라지는 기...",
+          "url": "https://www.polinews.co.kr/news/articleView.html?idxno=741495",
+          "source": "polinews.co.kr",
           "summary": "",
           "impact": ""
         }
