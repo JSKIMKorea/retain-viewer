@@ -1,4 +1,4 @@
-DART 매칭 리포트 (2026-08-25 23:07)
+DART 매칭 리포트 (2026-09-01 04:45)
 ==================================================
 
 [퍼지 매칭 결과] (104건)
@@ -109,7 +109,7 @@ DART 매칭 리포트 (2026-08-25 23:07)
   한스바이오메드USA → [prefix:한스바이오메드USA⊃한스바이오메드]
   한화파워(주) → [fuzzy:한화파워→한화]
 
-[미매칭 고객사] (242건)
+[미매칭 고객사] (240건)
 수동 매핑이 필요하면 dart_aliases.json에 추가하세요.
 
 dart_aliases.json 예시:
@@ -165,7 +165,6 @@ dart_aliases.json 예시:
     "(주)휴먼아고스": "DART에 등록된 정확한 회사명",
     "Administration": "DART에 등록된 정확한 회사명",
     "AmazeVR, Inc.": "DART에 등록된 정확한 회사명",
-    "Assurance Leader": "DART에 등록된 정확한 회사명",
     "Coupang, Inc.": "DART에 등록된 정확한 회사명",
     "FIREBAT SUPERHOLDCO PTE. LTD.": "DART에 등록된 정확한 회사명",
     "HR": "DART에 등록된 정확한 회사명",
@@ -247,7 +246,6 @@ dart_aliases.json 예시:
     "브리스캔영어쏘시에이츠(주)": "DART에 등록된 정확한 회사명",
     "브리즈바이오": "DART에 등록된 정확한 회사명",
     "비티젠(주)": "DART에 등록된 정확한 회사명",
-    "빅톨릭코리아(유)": "DART에 등록된 정확한 회사명",
     "사브인터내셔날테크놀로지코리아(주)": "DART에 등록된 정확한 회사명",
     "사우샘프턴 대학교": "DART에 등록된 정확한 회사명",
     "사이노슈어루트로닉": "DART에 등록된 정확한 회사명",
@@ -409,7 +407,6 @@ dart_aliases.json 예시:
   - (주)휴먼아고스
   - Administration
   - AmazeVR, Inc.
-  - Assurance Leader
   - Coupang, Inc.
   - FIREBAT SUPERHOLDCO PTE. LTD.
   - HR
@@ -491,7 +488,6 @@ dart_aliases.json 예시:
   - 브리스캔영어쏘시에이츠(주)
   - 브리즈바이오
   - 비티젠(주)
-  - 빅톨릭코리아(유)
   - 사브인터내셔날테크놀로지코리아(주)
   - 사우샘프턴 대학교
   - 사이노슈어루트로닉
