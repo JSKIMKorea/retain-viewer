@@ -1,6 +1,6 @@
 {
-  "date": "2026-09-01",
-  "updated": "2026.09.01 10:24",
+  "date": "2026-09-02",
+  "updated": "2026.09.02 09:34",
   "sections": [
     {
       "title": "한국공인회계사회 기사",
@@ -12,15 +12,8 @@
       "icon": "📊",
       "items": [
         {
-          "title": "[풍문레이다] 성현회계법인② 인터지스 미수금 대손상각 후 외부감사 수...",
-          "url": "https://www.nbntv.kr/news/articleView.html?idxno=340700",
-          "source": "nbntv.kr",
-          "summary": "",
-          "impact": ""
-        },
-        {
-          "title": "‘AI 대체 직종’ 채용 공고 11% 감소… “검침원-주차관리원 특히 취약...",
-          "url": "https://n.news.naver.com/mnews/article/020/0003744803?sid=102",
+          "title": "AI는 청년 일자리 대체하는데…인력난은 돌봄·음식점에",
+          "url": "https://n.news.naver.com/mnews/article/018/0006362163?sid=101",
           "source": "n.news.naver.com",
           "summary": "",
           "impact": ""
@@ -47,9 +40,9 @@
           "impact": ""
         },
         {
-          "title": "SK증권, ESG 보고서 글로벌 톱100…공시 의무화 앞두고 역량 인정",
-          "url": "https://www.megaeconomy.co.kr/news/newsview.php?ncode=1065594859489644",
-          "source": "megaeconomy.co.kr",
+          "title": "[EBN 칼럼] ESG 공시 의무화 시대, 경영진의 법적 책임과 거버넌스 과제",
+          "url": "https://www.ebn.co.kr/news/articleView.html?idxno=1722302",
+          "source": "ebn.co.kr",
           "summary": "",
           "impact": ""
         }
@@ -60,9 +53,9 @@
       "icon": "📋",
       "items": [
         {
-          "title": "감리주기만 20년인데…금감원 세종 이전시 회계감리 공백 우려",
-          "url": "https://www.ebn.co.kr/news/articleView.html?idxno=1721749",
-          "source": "ebn.co.kr",
+          "title": "[단독] JTBC 등 5곳 회계감리 착수…금감원 칼댄다",
+          "url": "https://n.news.naver.com/mnews/article/374/0000530470?sid=101",
+          "source": "n.news.naver.com",
           "summary": "",
           "impact": ""
         },
@@ -70,6 +63,13 @@
           "title": "30대 고용보험 가입자 53% AI ‘영향권’…노출도 1위는 변호사",
           "url": "https://n.news.naver.com/mnews/article/016/0002690437?sid=101",
           "source": "n.news.naver.com",
+          "summary": "",
+          "impact": ""
+        },
+        {
+          "title": "감리주기만 20년인데…금감원 세종 이전시 회계감리 공백 우려",
+          "url": "https://www.ebn.co.kr/news/articleView.html?idxno=1721749",
+          "source": "ebn.co.kr",
           "summary": "",
           "impact": ""
         },
@@ -86,13 +86,6 @@
           "source": "greened.kr",
           "summary": "",
           "impact": ""
-        },
-        {
-          "title": "AI發 고용 재편 시작됐다…회계·사무직 줄고 '주니어' 위축",
-          "url": "https://www.asiatoday.co.kr/kn/view.php?key=20260831010010550",
-          "source": "asiatoday.co.kr",
-          "summary": "",
-          "impact": ""
         }
       ]
     },
@@ -101,16 +94,16 @@
       "icon": "🏛️",
       "items": [
         {
-          "title": "‘황제 사택’ 1조9000억원 탈루 혐의...국세청, 50개 업체 세무조사 착...",
-          "url": "https://n.news.naver.com/mnews/article/023/0003994786?sid=101",
-          "source": "n.news.naver.com",
+          "title": "국세청, 소노그룹 '황제사택' 의혹 특별세무조사…IPO 악영향?",
+          "url": "https://www.sejungilbo.com/news/articleView.html?idxno=59900",
+          "source": "세정일보",
           "summary": "",
           "impact": ""
         },
         {
-          "title": "'법인지방소득세 공동세원화 → 법인세 5% 광역 재원화'…추 지사, 대통...",
-          "url": "https://www.kpinews.kr/newsView/1065599355002070",
-          "source": "kpinews.kr",
+          "title": "법인세 수입 올해의 두 배…내년 국세 수입 584조 [2027년 예산안]",
+          "url": "https://n.news.naver.com/mnews/article/015/0005327129?sid=101",
+          "source": "n.news.naver.com",
           "summary": "",
           "impact": ""
         },
@@ -149,9 +142,9 @@
           "impact": ""
         },
         {
-          "title": "상법 개정 후 섬유·의류 상장사 주주환원 확대…배당성향 상향·차등배...",
-          "url": "https://n.news.naver.com/mnews/article/241/0003527544?sid=101",
-          "source": "n.news.naver.com",
+          "title": "상법 개정 전후 자사주 소각 나선 제약바이오사들…주주환원 확대",
+          "url": "https://www.g-enews.com/view.php?ud=202609011538377965b065b72042_1",
+          "source": "g-enews.com",
           "summary": "",
           "impact": ""
         },
@@ -163,15 +156,15 @@
           "impact": ""
         },
         {
-          "title": "상법 개정에 커진 사외이사 역할…삼정KPMG, 회계전문가 역량 강화",
-          "url": "https://n.news.naver.com/mnews/article/014/0005567310?sid=101",
+          "title": "상법 개정 후 섬유·의류 상장사 주주환원 확대…배당성향 상향·차등배...",
+          "url": "https://n.news.naver.com/mnews/article/241/0003527544?sid=101",
           "source": "n.news.naver.com",
           "summary": "",
           "impact": ""
         },
         {
-          "title": "상법 개정 후 섬유·의류 상장사 주주환원 확대…배당성향 상향·차등배...",
-          "url": "https://n.news.naver.com/mnews/article/243/0000102179?sid=101",
+          "title": "상법 개정에 커진 사외이사 역할…삼정KPMG, 회계전문가 역량 강화",
+          "url": "https://n.news.naver.com/mnews/article/014/0005567310?sid=101",
           "source": "n.news.naver.com",
           "summary": "",
           "impact": ""
