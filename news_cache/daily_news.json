@@ -1,6 +1,6 @@
 {
-  "date": "2026-09-02",
-  "updated": "2026.09.02 09:34",
+  "date": "2026-09-03",
+  "updated": "2026.09.03 09:43",
   "sections": [
     {
       "title": "한국공인회계사회 기사",
@@ -19,8 +19,8 @@
           "impact": ""
         },
         {
-          "title": "[2026 회계현안 심포지엄] 이승환 삼일회계법인 리더 “사람 일·AI 일 나...",
-          "url": "https://n.news.naver.com/mnews/article/366/0001188670?sid=101",
+          "title": "삼일회계법인 \"홈플러스 회생계획안 수행 가능…공익채권 동의 전제\"",
+          "url": "https://n.news.naver.com/mnews/article/421/0009147209?sid=101",
           "source": "n.news.naver.com",
           "summary": "",
           "impact": ""
@@ -33,16 +33,16 @@
           "impact": ""
         },
         {
-          "title": "[Invest]IFRS-18 도입까지 4개월…SK스퀘어부터 현대차까지 회계·공시 대...",
-          "url": "https://www.investchosun.com/site/data/html_dir/2026/08/25/2026082580193.html",
-          "source": "조선일보",
+          "title": "[EBN 칼럼] ESG 공시 의무화 시대, 경영진의 법적 책임과 거버넌스 과제",
+          "url": "https://www.ebn.co.kr/news/articleView.html?idxno=1722302",
+          "source": "ebn.co.kr",
           "summary": "",
           "impact": ""
         },
         {
-          "title": "[EBN 칼럼] ESG 공시 의무화 시대, 경영진의 법적 책임과 거버넌스 과제",
-          "url": "https://www.ebn.co.kr/news/articleView.html?idxno=1722302",
-          "source": "ebn.co.kr",
+          "title": "나를 대체할 AI를 가르쳐 돈 번다…커지는 ‘AI 전문지식 판매’ 시장, ...",
+          "url": "https://n.news.naver.com/mnews/article/032/0003468051?sid=101",
+          "source": "n.news.naver.com",
           "summary": "",
           "impact": ""
         }
@@ -52,6 +52,13 @@
       "title": "회계",
       "icon": "📋",
       "items": [
+        {
+          "title": "금융당국, 금양 '분식회계 혐의'로 검찰 고발조치",
+          "url": "https://n.news.naver.com/mnews/article/015/0005328121?sid=101",
+          "source": "n.news.naver.com",
+          "summary": "",
+          "impact": ""
+        },
         {
           "title": "[단독] JTBC 등 5곳 회계감리 착수…금감원 칼댄다",
           "url": "https://n.news.naver.com/mnews/article/374/0000530470?sid=101",
@@ -67,23 +74,16 @@
           "impact": ""
         },
         {
-          "title": "감리주기만 20년인데…금감원 세종 이전시 회계감리 공백 우려",
-          "url": "https://www.ebn.co.kr/news/articleView.html?idxno=1721749",
-          "source": "ebn.co.kr",
-          "summary": "",
-          "impact": ""
-        },
-        {
-          "title": "고려아연 임시주총 앞두고 배임 의혹 재점화…금감원·증선위 엇갈린 이...",
-          "url": "https://n.news.naver.com/mnews/article/015/0005325399?sid=101",
+          "title": "‘상폐 위기’ 금양, 결국 분식회계 혐의로 검찰 고발",
+          "url": "https://n.news.naver.com/mnews/article/011/0004657985?sid=101",
           "source": "n.news.naver.com",
           "summary": "",
           "impact": ""
         },
         {
-          "title": "금감원 경력채용도 미달…해외 감독기관은 전문직에 최대 4억원 보수",
-          "url": "https://www.greened.kr/news/articleView.html?idxno=348581",
-          "source": "greened.kr",
+          "title": "'정화비용 축소' 영풍에 204억원 과징금… 주민들 \"이젠 검찰이 밝혀야...",
+          "url": "http://www.biztribune.co.kr/news/articleView.html?idxno=358329",
+          "source": "biztribune.co.kr",
           "summary": "",
           "impact": ""
         }
@@ -109,21 +109,21 @@
         },
         {
           "title": "해외직구 관세·부가세 면세 기준 150달러…미국발 예외",
-          "url": "https://www.vegannews.co.kr/news/article.html?no=385172",
+          "url": "https://n.news.naver.com/mnews/article/009/0005534953?sid=101",
           "source": "vegannews.co.kr",
           "summary": "",
           "impact": ""
         },
         {
-          "title": "딜로이트 안진, ‘한·중·대만 이전가격 세무조사 및APA 세미나’ 개최",
-          "url": "https://n.news.naver.com/mnews/article/123/0002389351?sid=101",
-          "source": "n.news.naver.com",
+          "title": "딜로이트 안진, '한·중·대만 이전가격 세무조사 및APA 세미나' 개최",
+          "url": "https://www.etoday.co.kr/news/view/2620343",
+          "source": "이투데이",
           "summary": "",
           "impact": ""
         },
         {
-          "title": "\"이거 진짜예요\"…돈도 인프라도 다 밀리는 한국, 대체 뭘 믿고 AI에 국...",
-          "url": "https://n.news.naver.com/mnews/article/055/0001383527?sid=101",
+          "title": "직장인 5명 중 1명은 AI '고노출군'…1위는 변호사",
+          "url": "https://n.news.naver.com/mnews/article/003/0014157613?sid=102",
           "source": "n.news.naver.com",
           "summary": "",
           "impact": ""
@@ -149,13 +149,6 @@
           "impact": ""
         },
         {
-          "title": "[코스피 1만의 조건] 단종레로 증시에 재뿌린 정부…주주환원 및 상법 ...",
-          "url": "https://dealsite.co.kr/articles/167433",
-          "source": "dealsite.co.kr",
-          "summary": "",
-          "impact": ""
-        },
-        {
           "title": "상법 개정 후 섬유·의류 상장사 주주환원 확대…배당성향 상향·차등배...",
           "url": "https://n.news.naver.com/mnews/article/241/0003527544?sid=101",
           "source": "n.news.naver.com",
@@ -165,6 +158,13 @@
         {
           "title": "상법 개정에 커진 사외이사 역할…삼정KPMG, 회계전문가 역량 강화",
           "url": "https://n.news.naver.com/mnews/article/014/0005567310?sid=101",
+          "source": "n.news.naver.com",
+          "summary": "",
+          "impact": ""
+        },
+        {
+          "title": "[김세완의 주말경제산책] 입맛대로 법도 바꾼다 … 머스크의 상법개정",
+          "url": "https://n.news.naver.com/mnews/article/009/0005727311?sid=110",
           "source": "n.news.naver.com",
           "summary": "",
           "impact": ""
